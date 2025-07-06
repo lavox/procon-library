@@ -1,0 +1,16 @@
+{
+  "java.project.sourcePaths": [
+    "lib/template",
+    "lib/data-structure",
+    "lib/math",
+    "lib/template",
+    "test/oj-verify/data-structure",
+    "test/oj-verify/math",
+    "test/unittest/data-structure",
+    "test/unittest/math",
+  ],
+  "java.project.outputPath": "bin",
+  "java.project.referencedLibraries": [
+      "dependency/*.jar"
+  ],
+}
