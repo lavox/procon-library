@@ -14,11 +14,14 @@
   - ModInt.java 剰余演算(四則演算、逆元、累乗、階乗、階乗の逆元、二項係数、順列)
   - Matrix.java 行列演算(行列累乗含む)
   - Vec.java ベクトル演算
+- string
+  - ZAlgorithm.java Z-Algorithm
+  - SuffixArray.java Suffix Array
+  - LcpArray.java LCP Array
 - template
   - Main.java アルゴリズムコンテスト用の提出ファイルテンプレート(入出力ユーティリティ含む)
 
 ### 今後整備予定
-- Z Algorithm、Suffix Array
 - 最大流(Dinic)
 - 最小費用流
 - 最近共通祖先(LCA)
