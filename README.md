@@ -9,6 +9,7 @@
   - Compression.java 座標圧縮
   - SegmentTree.java, IntSegmentTree.java, LongSegmentTree.java セグメント木
   - LazySegmentTree.java, IntLazySegmentTree.java, LongLazySegmentTree.java 遅延評価セグメント木
+  - DynamicSegmentTree.java 動的セグメント木
 - math
   - ModInt.java 剰余演算(四則演算、逆元、累乗、階乗、階乗の逆元、二項係数、順列)
   - Matrix.java 行列演算(行列累乗含む)
