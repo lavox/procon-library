@@ -10,6 +10,7 @@
     "test/oj-verify/math",
     "test/oj-verify/string",
     "test/unittest/data-structure",
+    "test/unittest/graph",
     "test/unittest/math",
   ],
   "java.project.outputPath": "bin",

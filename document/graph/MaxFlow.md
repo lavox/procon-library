@@ -28,10 +28,10 @@ public int addEdge(int from, int to, long cap)
 public MaxFlow.Edge getEdge(int i)
 public ArrayList<Edge> edges()
 public class Edge {
-  int from = 0;
-  int to = 0;
-  long cap = 0;
-  long flow = 0;
+  int from;
+  int to;
+  long cap;
+  long flow;
 }
 ```
 全ての辺の状態、または指定した辺番号の辺の状態を取得する。`cap`は辺の容量、`flow`は流量。
