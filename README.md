@@ -4,25 +4,40 @@
 
 よく使用するデータ構造やアルゴリズム、コンテスト用のテンプレートなどがあります。本家[ac-library](https://github.com/atcoder/ac-library/tree/master)からの移植も含みます(全て移植しているわけではありません)。
 
-- data-structure
-  - UnionFind.java Union Find木
-  - Compression.java 座標圧縮
-  - SegmentTree.java, IntSegmentTree.java, LongSegmentTree.java セグメント木
-  - LazySegmentTree.java, IntLazySegmentTree.java, LongLazySegmentTree.java 遅延評価セグメント木
-  - DynamicSegmentTree.java 動的セグメント木
-- math
-  - ModInt.java 剰余演算(四則演算、逆元、累乗、階乗、階乗の逆元、二項係数、順列)
-  - Matrix.java 行列演算(行列累乗含む)
-  - Vec.java ベクトル演算
-- string
-  - ZAlgorithm.java Z-Algorithm
-  - SuffixArray.java Suffix Array
-  - LcpArray.java LCP Array
-- template
-  - Main.java アルゴリズムコンテスト用の提出ファイルテンプレート(入出力ユーティリティ含む)
+### data-structure
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| UnionFind.java           | Union Find木                         |
+| Compression.java         | 座標圧縮                             |
+| SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
+| LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
+| DynamicSegmentTree.java  | 動的セグメント木                     |
+
+### graph
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| MaxFlow.java             | 最大流・最小カット                   |
+
+### math
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| ModInt.java              | 剰余演算(四則演算、逆元、累乗、階乗、階乗の逆元、二項係数、順列) |
+| Matrix.java              | 行列演算(行列累乗含む)               |
+| Vec.java                 | ベクトル演算                         |
+
+### string
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| ZAlgorithm.java          | Z-Algorithm                          |
+| SuffixArray.java         | Suffix Array                         |
+| LcpArray.java            | LCP Array                            |
+
+### template
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| Main.java                | アルゴリズムコンテスト用の提出ファイルテンプレート(入出力ユーティリティ含む) |
 
 ### 今後整備予定
-- 最大流(Dinic)
 - 最小費用流
 - 最近共通祖先(LCA)
 - 強連結分解

@@ -2,6 +2,7 @@
   "java.project.sourcePaths": [
     "lib/template",
     "lib/data-structure",
+    "lib/graph",
     "lib/math",
     "lib/string",
     "lib/template",
