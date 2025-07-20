@@ -7,6 +7,7 @@
     "lib/string",
     "lib/template",
     "test/oj-verify/data-structure",
+    "test/oj-verify/graph",
     "test/oj-verify/math",
     "test/oj-verify/string",
     "test/unittest/data-structure",

@@ -19,6 +19,7 @@
 | MaxFlow.java             | 最大流・最小カット                   |
 | MinCostFlow.java         | 最小費用流                           |
 | SccGraph.java            | 強連結成分分解(SCC)                  |
+| WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
 
 ### math
 | ファイル名               | 内容                                 |
@@ -45,7 +46,6 @@
 - 最近共通祖先(LCA)
 - トポロジカルソート
 - 2-SAT
-- Warshall-Floyd
 - 全方位木DP
 - 巡回セールスマン問題
 - ランレングス圧縮
