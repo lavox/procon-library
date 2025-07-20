@@ -7,6 +7,12 @@
 - 素因数分解
 - 約数列挙
 
+参考サイト
+- [ミラー・ラビンの素数判定法 (Miller-Rabin 法)](https://drken1215.hatenablog.com/entry/2023/05/23/233000)
+- [128bit 整数型を使わない 64bit modint](https://yu212.hatenablog.com/entry/2023/12/14/203400)
+- [素因数分解を <O(n), O(log(n)/log(log(n)))> で行う](https://rsk0315.hatenablog.com/entry/2023/05/03/133029) (※ただしO(log(n))にとどめた)
+
+
 ### コンストラクタ
 ```java
 public Prime(int max)
