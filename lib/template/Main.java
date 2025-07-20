@@ -52,6 +52,36 @@ public class Main {
 		if (ans.length() > 0) ans.deleteCharAt(ans.length() - 1);
 		System.out.println(ans.toString());
 	}
+	public static <T> void print(T[] array, char sep) {
+		print(array, sep, n -> n, 0, array.length);
+	}
+	public static <T> void print(T[] array, char sep, LongUnaryOperator conv) {
+		print(array, sep, conv, 0, array.length);
+	}
+	public static <T> void print(T[] array, char sep, LongUnaryOperator conv, int start, int end) {
+		StringBuilder ans = new StringBuilder();
+		for (int i = start; i < end; i++) {
+			ans.append(array[i].toString());
+			ans.append(sep);
+		}
+		if (ans.length() > 0) ans.deleteCharAt(ans.length() - 1);
+		System.out.println(ans.toString());
+	}
+	public static void printYesNo(boolean[] array, char sep) {
+		printYesNo(array, sep, n -> n, 0, array.length);
+	}
+	public static void printYesNo(boolean[] array, char sep, LongUnaryOperator conv) {
+		printYesNo(array, sep, conv, 0, array.length);
+	}
+	public static void printYesNo(boolean[] array, char sep, LongUnaryOperator conv, int start, int end) {
+		StringBuilder ans = new StringBuilder();
+		for (int i = start; i < end; i++) {
+			ans.append(array[i] ? YES : NO);
+			ans.append(sep);
+		}
+		if (ans.length() > 0) ans.deleteCharAt(ans.length() - 1);
+		System.out.println(ans.toString());
+	}
 	public static <T> void print(ArrayList<T> array, char sep) {
 		print(array, sep, a -> a, 0, array.size());
 	}
@@ -69,13 +99,16 @@ public class Main {
 	}
 	public static void print(int a) { System.out.println(a); }
 	public static void print(long a) { System.out.println(a); }
-	public static void print(String s) { System.out.println(s); }
+	public static <T> void print(T s) { System.out.println(s.toString()); }
 	public static void printYesNo(boolean yesno) {
 		System.out.println(yesno ? YES : NO);
 	}
 	public static void printDouble(double val, int digit) {
 		System.out.println(String.format("%." + digit + "f", val));
 	}
+	public static void print(int... a) { print(a, SPACE); }
+	public static void print(long... a) { print(a, SPACE); }
+	public static <T> void print(T... s) { print(s, SPACE); }
 }
 class FastScanner {
 	private final InputStream in;

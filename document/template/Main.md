@@ -82,9 +82,11 @@ Mainクラスのstaticメソッドや定数を用意しています。出力用�
 ```java
 public static void print(int a)
 public static void print(long a)
-public static void print(String s)
+public static <T> void print(T s)
 ```
 指定された値を出力します。多数回繰り返して呼ぶことは推奨しません。配列用の出力メソッドを使用するか、`StringBuilder`を使って出力する文字列を組み立ててから出力してください。
+
+`T s`については、`toString()`の結果を出力します。
 
 ```java
 public static void printYesNo(boolean yesno)
@@ -104,13 +106,31 @@ public static void print(int[] array, char sep, IntUnaryOperator conv, int start
 public static void print(long[] array, char sep)
 public static void print(long[] array, char sep, LongUnaryOperator conv)
 public static void print(long[] array, char sep, LongUnaryOperator conv, int start, int end)
+public static <T> void print(T[] array, char sep)
+public static <T> void print(T[] array, char sep, LongUnaryOperator conv)
+public static <T> void print(T[] array, char sep, LongUnaryOperator conv, int start, int end)
 public static <T> void print(ArrayList<T> array, char sep)
 public static <T> void print(ArrayList<T> array, char sep, UnaryOperator<T> conv)
 public static <T> void print(ArrayList<T> array, char sep, UnaryOperator<T> conv, int start, int end)
+public static void printYesNo(boolean[] array, char sep)
+public static void printYesNo(boolean[] array, char sep, LongUnaryOperator conv)
+public static void printYesNo(boolean[] array, char sep, LongUnaryOperator conv, int start, int end)
 ```
 配列や`ArrayList`形式の値を出力します。区切り文字は`sep`で指定します(通常は`SPACE`または`LF`を指定します)。また`conv`を指定することで値を変換して出力することも可能です。
 
 `start`と`end`を指定することで、配列のどの範囲を出力するか指定することも可能です。$\mathsf{start} \le i \lt \mathsf{end}$の範囲が出力されます。
+
+`T[] array`や`ArrayList<T> array`については、`toString()`の結果を出力します。
+`boolean[] array`については、`true`は`Yes`を、`false`は`No`を出力します。
+
+### 複数値の出力
+```java
+public static void print(int... a)
+public static void print(long... a)
+public static <T> void print(T... s)
+```
+指定された値をスペース区切りで出力します。
+`T... s`については、`toString()`の結果を出力します。
 
 ### 定数
 ```java
