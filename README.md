@@ -21,6 +21,7 @@
 | MinCostFlow.java         | 最小費用流                           |
 | LcaTree.java             | 最近共通祖先(LCA)                    |
 | SccGraph.java            | 強連結成分分解(SCC)                  |
+| TopologicalSort.java     | トポロジカルソート                   |
 | WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
 
 ### math
@@ -45,7 +46,6 @@
 | Main.java                | アルゴリズムコンテスト用の提出ファイルテンプレート(入出力ユーティリティ含む) |
 
 ### 今後整備予定
-- トポロジカルソート
 - 2-SAT
 - 全方位木DP
 - 巡回セールスマン問題
