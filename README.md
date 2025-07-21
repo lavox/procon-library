@@ -12,6 +12,7 @@
 | SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
 | LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
 | DynamicSegmentTree.java  | 動的セグメント木                     |
+| Permutation.java         | 順列(順列全列挙含む)                 |
 
 ### graph
 | ファイル名               | 内容                                 |
@@ -29,7 +30,6 @@
 | Prime.java               | 素数関連(素数判定、素数列挙、素因数分解、約数列挙) |
 | Matrix.java              | 行列演算(行列累乗含む)               |
 | Vec.java                 | ベクトル演算                         |
-| NextPermutation.java     | 順列全列挙                           |
 | Convolution.java         | 畳み込み                             |
 
 ### string
