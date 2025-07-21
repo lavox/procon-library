@@ -30,6 +30,7 @@
 | Matrix.java              | 行列演算(行列累乗含む)               |
 | Vec.java                 | ベクトル演算                         |
 | NextPermutation.java     | 順列全列挙                           |
+| Convolution.java         | 畳み込み                             |
 
 ### string
 | ファイル名               | 内容                                 |
@@ -54,7 +55,6 @@
 - LowLink
 - 高速フーリエ変換
 - 高速剰余変換
-- 畳み込み
 
 ## ライセンス
 このプロジェクトは[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode)の下で公開しています。
