@@ -9,6 +9,7 @@
 |:-------------------------|:-------------------------------------|
 | UnionFind.java           | Union Find木                         |
 | Compression.java         | 座標圧縮                             |
+| FenwickTree.java         | Fenwick木                            |
 | SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
 | LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
 | DynamicSegmentTree.java  | 動的セグメント木                     |
@@ -53,8 +54,6 @@
 - 中国剰余定理
 - ビット演算関連
 - LowLink
-- 高速フーリエ変換
-- 高速剰余変換
 
 ## ライセンス
 このプロジェクトは[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode)の下で公開しています。
