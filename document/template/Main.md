@@ -118,7 +118,7 @@ public static void printYesNo(boolean[] array, char sep, LongUnaryOperator conv,
 ```
 配列や`ArrayList`形式の値を出力します。区切り文字は`sep`で指定します(通常は`SPACE`または`LF`を指定します)。また`conv`を指定することで値を変換して出力することも可能です。
 
-`start`と`end`を指定することで、配列のどの範囲を出力するか指定することも可能です。$\mathsf{start} \le i \lt \mathsf{end}$の範囲が出力されます。
+`start`と`end`を指定することで、配列のどの範囲を出力するか指定することも可能です。 $\mathsf{start} \le i \lt \mathsf{end}$ の範囲が出力されます。
 
 `T[] array`や`ArrayList<T> array`については、`toString()`の結果を出力します。
 `boolean[] array`については、`true`は`Yes`を、`false`は`No`を出力します。

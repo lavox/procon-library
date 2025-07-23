@@ -18,11 +18,11 @@ public int addEdge(int from, int to, long cap, long cost)
 ```
 頂点`from`から頂点`to`への容量`cap`、コスト`cost`の辺を追加する。返り値は辺番号。
 - 引数
-  - `from`, `to` : 頂点番号$(0 \le \mathrm{from}, \mathrm{to} \lt n)$
-  - `cap` : 容量$(0 \le \mathrm{cap})$
-  - `cost` : コスト$(0 \le \mathrm{cost})$
+  - `from`, `to` : 頂点番号 $(0 \le \mathrm{from}, \mathrm{to} \lt n)$
+  - `cap` : 容量 $(0 \le \mathrm{cap})$
+  - `cost` : コスト $(0 \le \mathrm{cost})$
 - 計算量
-  - ならし$O(1)$
+  - ならし $O(1)$
 
 ### 辺の状態を取得
 ```java
@@ -40,7 +40,7 @@ public class Edge {
 - 引数
   - `i` : 辺番号
 - 計算量
-  - 辺番号指定の場合$O(1)$、全ての辺の場合$O(m)$ ($m$は追加した辺の数)
+  - 辺番号指定の場合 $O(1)$ 、全ての辺の場合 $O(m)$ ($m$ は追加した辺の数)
 
 ### 最小費用流
 ```java
@@ -53,9 +53,9 @@ public class Flow {
 ```
 頂点`s`から頂点`t`へ流せるだけ流し、その流量とコストを返す。
 - 引数
-  - `s`, `t` : 頂点番号$(0 \le s, t \lt n, s \ne t)$
+  - `s`, `t` : 頂点番号 $(0 \le s, t \lt n, s \ne t)$
   - `flowLimit` : 流す最大量
-- 計算量 ($m$を追加した辺数、$F$を流量とする)
+- 計算量 ($m$を追加した辺数、 $F$ を流量とする)
   - $O(F(n + m)\log{(n + m)})$
 
 ### 最小費用流(折れ線)
@@ -63,16 +63,16 @@ public class Flow {
 public ArrayList<MinCostFlow.Flow> slope(int s, int t)
 public ArrayList<MinCostFlow.Flow> slope(int s, int t, long flowLimit)
 ```
-流量とコストの関係の折れ線を返す。全ての$x$について、流量$x$の時の最小コストを$g(x)$とすると、$(x,g(x))$は返り値を折れ線として見たものに含まれる。
-- 返り値の最初の要素は$(0,0)$
+流量とコストの関係の折れ線を返す。全ての $x$ について、流量 $x$ の時の最小コストを $g(x)$ とすると、 $(x,g(x))$ は返り値を折れ線として見たものに含まれる。
+- 返り値の最初の要素は $(0,0)$
 - 3点が同一線上にあることはない
 - 最後の要素は最大流量(`flowLimit`を指定した場合は`flowLimit`以下の値)
 - `slope()`や`flow()`を合わせて複数回呼んだときの挙動は未定義
 - $0\le nx \le 8\times 10^{18} + 1000$
 
 - 引数
-  - `s`, `t` : 頂点番号$(0 \le s, t \lt n, s \ne t)$
+  - `s`, `t` : 頂点番号 $(0 \le s, t \lt n, s \ne t)$
   - `flowLimit` : 流す最大量
-- 計算量 ($m$を追加した辺数、$F$を流量とする)
+- 計算量 ($m$ を追加した辺数、 $F$ を流量とする)
   - $O(F(n + m)\log{(n + m)})$
 

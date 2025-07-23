@@ -1,5 +1,5 @@
 # Suffix Array
-長さ$n$の文字列`s`のSuffix Arrayとして、長さ$n$の配列を返す。Suffix Array `sa`は$(0,1,\dots,n-1)$の順列であって、各$i=0,1,\dots,n-2$について
+長さ $n$ の文字列`s`のSuffix Arrayとして、長さ $n$ の配列を返す。Suffix Array `sa`は $(0,1,\dots,n-1)$ の順列であって、各 $i=0,1,\dots,n-2$ について
 - `s[sa[i]..n) < s[sa[i+1]..n)`
 を満たすもの。
 

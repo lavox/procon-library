@@ -19,9 +19,9 @@ public void addEdge(int u, int v)
 ```
 頂点`u`,`v`間に辺を追加する。
 - 引数
-  - `u`, `v` : 頂点番号$(0 \le u, v \lt n)$
+  - `u`, `v` : 頂点番号 $(0 \le u, v \lt n)$
 - 計算量
-  - ならし$O(1)$
+  - ならし $O(1)$
 
 ### 祖先情報の構築(LCAを求める準備)
 ```java
@@ -29,7 +29,7 @@ public void build(int root)
 ```
 `root`を根として、ダブリングにより各頂点の祖先情報を構築する。
 - 引数
-  - `root` : 木の根とする頂点番号$(0 \le \mathrm{root} \lt n)$
+  - `root` : 木の根とする頂点番号 $(0 \le \mathrm{root} \lt n)$
 - 計算量
   - $O(n \log n)$
 
@@ -42,7 +42,7 @@ public int lca(int u, int v)
 事前に`build()`を実行しておく必要がある。
 
 - 引数
-  - `u`, `v` : 頂点番号$(0 \le u, v \lt n)$
+  - `u`, `v` : 頂点番号 $(0 \le u, v \lt n)$
 - 計算量
   - $O(\log n)$
 
@@ -54,7 +54,7 @@ public int depth(int u)
 
 事前に`build()`を実行しておく必要がある。
 - 引数
-  - `u` : 頂点番号$(0 \le u \lt n)$
+  - `u` : 頂点番号 $(0 \le u \lt n)$
 - 計算量
   - $O(1)$
 
@@ -66,7 +66,7 @@ public int ancestor(int u, int d)
 
 事前に`build()`を実行しておく必要がある。
 - 引数
-  - `u` : 頂点番号$(0 \le u \lt n)$
+  - `u` : 頂点番号 $(0 \le u \lt n)$
   - `d` : さかのぼる世代数
 - 計算量
   - $O(\log d)$

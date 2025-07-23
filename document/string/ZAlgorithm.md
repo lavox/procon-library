@@ -1,5 +1,5 @@
 # Z Algorighm
-`s`の長さを$n$として、長さ$n$の配列を返す。$i$番目の要素は、`s[0..n)`と`s[i..n)`の共通接頭辞(LCP=Longest Common Prefix)の長さ
+`s`の長さを $n$ として、長さ $n$ の配列を返す。 $i$ 番目の要素は、`s[0..n)`と`s[i..n)`の共通接頭辞(LCP=Longest Common Prefix)の長さ
 
 ```java
 // 実行例

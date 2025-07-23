@@ -59,7 +59,7 @@ public void set(int p, int x)
 public void set(int p, long x)
 ```
 - 引数
-  - `p` : 代入する位置$(0 \le p \lt n)$
+  - `p` : 代入する位置 $(0 \le p \lt n)$
   - `x` : 代入する値
 - 計算量
   - $O(\log{n})$
@@ -74,7 +74,7 @@ public int get(int p)
 public long get(int p)
 ```
 - 引数
-  - `p` : 取得する位置$(0 \le p \lt n)$
+  - `p` : 取得する位置 $(0 \le p \lt n)$
 - 計算量
   - $O(1)$
 
@@ -87,9 +87,9 @@ public int query(int l, int r)
 // long用
 public long query(int l, int r)
 ```
-区間$[l,r)$に対する演算結果。(※本家とメソッド名が異なるので注意)
+区間 $[l,r)$ に対する演算結果。(※本家とメソッド名が異なるので注意)
 - 引数
-  - `l`, `r` : 区間$(0 \le l \le r \le N)$
+  - `l`, `r` : 区間 $(0 \le l \le r \le N)$
 - 計算量
   - $O(\log{n})$
 
@@ -102,7 +102,7 @@ public int allQuery()
 // long用
 public long allQuery()
 ```
-全区間$[0,n)$に対する演算結果。(※本家とメソッド名が異なるので注意)
+全区間 $[0,n)$ に対する演算結果。(※本家とメソッド名が異なるので注意)
 - 計算量
   - $O(1)$
 
@@ -120,8 +120,8 @@ public void apply(int l, int r, long f)
 ```
 1つの要素または区間の要素に対する作用。
 - 引数
-  - `p` : 区間$(0 \le p \lt N)$
-  - `l`, `r` : 区間$(0 \le l \le r \le N)$
+  - `p` : 区間 $(0 \le p \lt N)$
+  - `l`, `r` : 区間 $(0 \le l \le r \le N)$
   - `f` : 作用
 - 計算量
   - $O(\log{n})$
@@ -141,7 +141,7 @@ public int maxRight(int l, LongPredicate g)
 `g`が単調であれば、`g(op(a[l], a[l + 1], ..., a[r - 1])) = true`となる最大の`r`。
 
 - 引数
-  - `l` : 起点$(0 \le l \le N)$
+  - `l` : 起点 $(0 \le l \le N)$
   - `g` : `boolean`を返す関数。`g(e()) = true`を満たす必要がある
 - 計算量
   - $O(\log{n})$
@@ -161,7 +161,7 @@ public int minLeft(int r, LongPredicate g)
 `g`が単調であれば、`g(op(a[l], a[l + 1], ..., a[r - 1])) = true`となる最小の`l`。
 
 - 引数
-  - `r` : 起点$(0 \le r \le N)$
+  - `r` : 起点 $(0 \le r \le N)$
   - `g` : `boolean`を返す関数。`g(e()) = true`を満たす必要がある
 - 計算量
   - $O(\log{n})$

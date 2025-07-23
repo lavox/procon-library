@@ -7,7 +7,7 @@ public DynamicSegmentTree(long L, long R, BinaryOperator<S> op, Supplier<S> e)
 ```
 単位元が初期値となる。
 - 引数
-  - `L`, `R` : 添え字の範囲($[L,R)$が対象範囲となる)
+  - `L`, `R` : 添え字の範囲($[L,R)$ が対象範囲となる)
   - `op` : 二項演算
   - `e` : 単位元
 - 計算量
@@ -18,7 +18,7 @@ public DynamicSegmentTree(long L, long R, BinaryOperator<S> op, Supplier<S> e)
 public void set(long p, S x)
 ```
 - 引数
-  - `p` : 代入する位置$(L \le p \lt R)$
+  - `p` : 代入する位置 $(L \le p \lt R)$
   - `x` : 代入する値
 - 計算量
   - $O(\log{(R - L)})$
@@ -28,7 +28,7 @@ public void set(long p, S x)
 public S get(long p)
 ```
 - 引数
-  - `p` : 取得する位置$(L \le p \lt R)$
+  - `p` : 取得する位置 $(L \le p \lt R)$
 - 計算量
   - $O(\log{(R - L)})$
 
@@ -36,8 +36,8 @@ public S get(long p)
 ```java
 public S query(long l, long r)
 ```
-区間$[l,r)$に対する演算結果。
+区間 $[l,r)$ に対する演算結果。
 - 引数
-  - `l`, `r` : 区間$(L \le l \le r \le R)$
+  - `l`, `r` : 区間 $(L \le l \le r \le R)$
 - 計算量
   - $O(\log{(R - L)})$

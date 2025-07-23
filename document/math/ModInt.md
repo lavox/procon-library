@@ -73,7 +73,7 @@ public int div(int a, int b)
   - `a`, `b` : 演算対象 $(0 \le a, b \lt \mathrm{m})$
 - 計算量
   - `add`, `sub`, `mul`: $O(1)$
-  - `div`: $O(\log\mathrm{m})$ (`prepareFactorial(int)`により、$a \le \mathrm{max}$が事前計算されている場合は$O(1))
+  - `div`: $O(\log\mathrm{m})$ (`prepareFactorial(int)`により、 $a \le \mathrm{max}$ が事前計算されている場合は $O(1))
 
 ### 累乗
 ```java
@@ -93,7 +93,7 @@ public int inv(int a)
 - 引数
   - `a` : 演算対象 $(0 \lt a \lt \mathrm{m})$
 - 計算量
-  - $O(\log\mathrm{m})$ (`prepareFactorial(int)`により、$a \le \mathrm{max}$が事前計算されている場合は$O(1))
+  - $O(\log\mathrm{m})$ (`prepareFactorial(int)`により、 $a \le \mathrm{max}$ が事前計算されている場合は $O(1))
 
 ### 剰余
 ```java
@@ -109,9 +109,9 @@ public int mod(long a)
 ```java
 public long fact(int a)
 ```
-`a`の階乗を`m`で割った余りを求める。`prepareFactorial(int)`により、$a \le \mathrm{max}$が事前計算されている必要がある。
+`a`の階乗を`m`で割った余りを求める。`prepareFactorial(int)`により、 $a \le \mathrm{max}$ が事前計算されている必要がある。
 - 引数
-  - `a` : 階乗する値$(0 \le a \le \mathrm{max})$
+  - `a` : 階乗する値 $(0 \le a \le \mathrm{max})$
 - 計算量
   - $O(1)$
 
@@ -119,9 +119,9 @@ public long fact(int a)
 ```java
 public long factInv(int a)
 ```
-`a`の階乗の逆元を求める。`prepareFactorial(int)`により、$a \le \mathrm{max}$が事前計算されている必要がある。
+`a`の階乗の逆元を求める。`prepareFactorial(int)`により、 $a \le \mathrm{max}$ が事前計算されている必要がある。
 - 引数
-  - `a` : 階乗の逆元を求める値$(0 \le a \le \mathrm{max})$
+  - `a` : 階乗の逆元を求める値 $(0 \le a \le \mathrm{max})$
 - 計算量
   - $O(1)$
 
@@ -129,9 +129,9 @@ public long factInv(int a)
 ```java
 public long combi(int n, int r)
 ```
-二項係数${}_n C_r$を`m`で割った余りを求める。`prepareFactorial(int)`により、$n \le \mathrm{max}$が事前計算されている必要がある。
+二項係数 ${}_n C_r$ を`m`で割った余りを求める。`prepareFactorial(int)`により、 $n \le \mathrm{max}$ が事前計算されている必要がある。
 - 引数
-  - `n`, `r` : 二項係数${}_n C_r$を求める値$(0 \le r \le n \le \mathrm{max})$
+  - `n`, `r` : 二項係数 ${}_n C_r$ を求める値 $(0 \le r \le n \le \mathrm{max})$
 - 計算量
   - $O(1)$
 
@@ -139,9 +139,9 @@ public long combi(int n, int r)
 ```java
 public long perm(int n, int r)
 ```
-順列${}_n P_r$を`m`で割った余りを求める。`prepareFactorial(int)`により、$n \le \mathrm{max}$が事前計算されている必要がある。
+順列 ${}_n P_r$ を`m`で割った余りを求める。`prepareFactorial(int)`により、 $n \le \mathrm{max}$ が事前計算されている必要がある。
 - 引数
-  - `n`, `r` : 順列${}_n P_r$を求める値$(0 \le r \le n \le \mathrm{max})$
+  - `n`, `r` : 順列 ${}_n P_r$ を求める値 $(0 \le r \le n \le \mathrm{max})$
 - 計算量
   - $O(1)$
 

@@ -1,5 +1,5 @@
 # LCP(Longest Common Prefix) Array
-長さ$n$の文字列`s`のLCP Arrayとして、長さ$n-1$の配列を返す。$i$番目の要素は、`s[sa[i]..n)`と`s[sa[i+1]..n)`のLCP(Longest Common Prefix)の長さ。
+長さ $n$ の文字列`s`のLCP Arrayとして、長さ $n-1$ の配列を返す。 $i$ 番目の要素は、`s[sa[i]..n)`と`s[sa[i+1]..n)`のLCP(Longest Common Prefix)の長さ。
 
 ac-libraryの[string](https://github.com/atcoder/ac-library/blob/master/document_ja/string.md)の移植。
 

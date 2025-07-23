@@ -29,8 +29,8 @@ public void add(int p, long x)
 public long sum(int l, int r)
 public long sum(int r)
 ```
-前者は$l\le p\lt r$の範囲の、後者は$0\le p\lt r$の範囲の要素の総和を求める。
+前者は $l\le p\lt r$ の範囲の、後者は $0\le p\lt r$ の範囲の要素の総和を求める。
 - 引数
-  - `l`, `r` : 和を求める範囲$(0 \le l \le r \le n)$
+  - `l`, `r` : 和を求める範囲 $(0 \le l \le r \le n)$
 - 計算量
   - $O(\log{n})$

@@ -18,9 +18,9 @@ public void addEdge(int from, int to)
 ```
 頂点`from`から頂点`to`への辺を追加する。
 - 引数
-  - `from`, `to` : 頂点番号$(0 \le \mathrm{from}, \mathrm{to} \lt n)$
+  - `from`, `to` : 頂点番号 $(0 \le \mathrm{from}, \mathrm{to} \lt n)$
 - 計算量
-  - ならし$O(1)$
+  - ならし $O(1)$
 
 ### 強連結成分分解
 ```java
@@ -40,7 +40,7 @@ public int id(int i)
 事前に`decompose()`を実行しておく必要がある。
 
 - 引数
-  - `i` : 頂点番号$(0 \le i \lt n)$
+  - `i` : 頂点番号 $(0 \le i \lt n)$
 - 計算量
   - $O(1)$
 

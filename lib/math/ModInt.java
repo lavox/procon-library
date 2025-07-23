@@ -115,7 +115,18 @@ class ModInt {
 		v = mop.div(v, mop.mod(a));
 		return this;
 	}
-
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof ModInt) {
+			ModInt m = (ModInt)o;
+			return val() == m.val() && mod() == m.mod();
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		return 31 * (31 + mod()) + val();
+	}
 	@Override
 	public String toString() {
 		return Integer.toString(v);
@@ -212,7 +223,6 @@ class ModFraction extends ModInt {
 		vd /= a;
 		return this;
 	}
-
 	@Override
 	public String toString() {
 		return String.format("%.10f", vd);

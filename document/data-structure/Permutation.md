@@ -10,7 +10,7 @@ public Permutation(int n)
 public static Permutation createPermutationByValue(int[] val)
 public static Permutation createPermutationByIndex(int[] idx)
 ```
-`n`を指定した場合は、$\{0,1,\dots,n-1\}$で初期化される。また、`val`や`idx`を指定する場合は、必ず`0`から`n-1`までの値が1回ずつ現れる配列であること。
+`n`を指定した場合は、 $\{0,1,\dots,n-1\}$ で初期化される。また、`val`や`idx`を指定する場合は、必ず`0`から`n-1`までの値が1回ずつ現れる配列であること。
 - 引数
   - `n` : 配列の長さ
   - `val` : 値の配列(`i`番目に`i`番目の値が格納されている配列)

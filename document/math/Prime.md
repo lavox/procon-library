@@ -51,9 +51,9 @@ public class Factor {
   int pow;
 }
 ```
-`num`を素因数分解する。$(1 \le \mathrm{num} \le \mathrm{max}^2)$の範囲で実行可能。
+`num`を素因数分解する。 $(1 \le \mathrm{num} \le \mathrm{max}^2)$ の範囲で実行可能。
 
-$(1 \le \mathrm{num} \le \mathrm{max})$の場合は各値について事前に求めておいた最小素因数を使用して素因数分解を行うため、$O(\log{(\mathrm{num})})$で実行可能。それ以上の場合は、素数を1つずつ割れるか試すため$O(\pi(\mathrm{max}) + \log{(\mathrm{num})})$となる。
+$(1 \le \mathrm{num} \le \mathrm{max})$ の場合は各値について事前に求めておいた最小素因数を使用して素因数分解を行うため、 $O(\log{(\mathrm{num})})$ で実行可能。それ以上の場合は、素数を1つずつ割れるか試すため $O(\pi(\mathrm{max}) + \log{(\mathrm{num})})$ となる。
 - 引数
   - `num` : 素因数分解する値 $(1 \le \mathrm{num} \le \mathrm{max}^2)$
 - 計算量

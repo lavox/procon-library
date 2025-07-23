@@ -18,10 +18,10 @@ public int addEdge(int from, int to, long cap)
 ```
 頂点`from`から頂点`to`への容量`cap`の辺を追加する。返り値は辺番号。
 - 引数
-  - `from`, `to` : 頂点番号$(0 \le \mathrm{from}, \mathrm{to} \lt n)$
+  - `from`, `to` : 頂点番号 $(0 \le \mathrm{from}, \mathrm{to} \lt n)$
   - `cap` : 容量
 - 計算量
-  - ならし$O(1)$
+  - ならし $O(1)$
 
 ### 辺の状態を取得
 ```java
@@ -38,7 +38,7 @@ public class Edge {
 - 引数
   - `i` : 辺番号
 - 計算量
-  - 辺番号指定の場合$O(1)$、全ての辺の場合$O(m)$ ($m$は追加した辺の数)
+  - 辺番号指定の場合 $O(1)$ 、全ての辺の場合 $O(m)$  ( $m$ は追加した辺の数)
 
 ### 辺の容量・流量の変更
 ```java
@@ -59,22 +59,22 @@ public long flow(int s, int t, long flowLimit)
 ```
 頂点`s`から頂点`t`への最大流を求める。
 - 引数
-  - `s`, `t` : 頂点番号$(0 \le s, t \lt n)$
+  - `s`, `t` : 頂点番号 $(0 \le s, t \lt n)$
   - `flowLimit` : 流す最大量
-- 計算量 ($m$を追加した辺数とする)
+- 計算量 ( $m$ を追加した辺数とする)
   - $O((n + m)\sqrt{m})$ (辺の容量がすべて1の時)
   - $O(n^2m)$
-  - $O(F(n + m))$ (返り値を$F$とする)
+  - $O(F(n + m))$ (返り値を $F$ とする)
 
 ### 最小カット
 ```java
 public BitSet minCut(int s)
 ```
-長さ$n$の`BitSet`を返す。$i$番目のビットは頂点$s$から頂点$i$に残余グラフで到達可能かどうかを表す。`flow(s,t)`を`flowLimit`なしでちょうど一回呼んだ後に呼ぶと、返り値は$s,t$間の最小カットに対応する。
+長さ $n$ の`BitSet`を返す。 $i$ 番目のビットは頂点 $s$ から頂点 $i$ に残余グラフで到達可能かどうかを表す。`flow(s,t)`を`flowLimit`なしでちょうど一回呼んだ後に呼ぶと、返り値は $s,t$ 間の最小カットに対応する。
 
 残余グラフ：辺の順方向に`cap - flow`、逆方向に`flow`の容量があるとしたグラフ
 - 引数
-  - `s`, `t` : 頂点番号$(0 \le s, t \lt n)$
+  - `s`, `t` : 頂点番号 $(0 \le s, t \lt n)$
 - 計算量 ($m$を追加した辺数とする)
   - $O(n + m)$
 

@@ -1,5 +1,5 @@
 # 2-SAT
-2-SATを解く。変数$x_0,x_1,\dots,x_{N-1}$に関して、
+2-SATを解く。変数 $x_0,x_1,\dots,x_{N-1}$ に関して、
 - $(x_i=f)\lor(x_j=g)$
 
 という形の条件式を指定し、それらをすべて満たす変数の真偽値の割り当て方があるかを判定する。
@@ -21,12 +21,12 @@ public TwoSat(int n)
 ```java
 public void addClause(int i, boolean f, int j, boolean g)
 ```
-条件式$(x_i=f)\lor(x_j=g)$を追加
+条件式 $(x_i=f)\lor(x_j=g)$ を追加
 - 引数
-  - `i`, `j` : 変数の添え字$(0 \le i,j \lt n)$
+  - `i`, `j` : 変数の添え字 $(0 \le i,j \lt n)$
   - `f`, `g` : 真偽値
 - 計算量
-  - ならし$O(1)$
+  - ならし $O(1)$
 
 ### 解の存在判定
 ```java

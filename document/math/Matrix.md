@@ -7,8 +7,8 @@ public Matrix(int H, int W)
 public Matrix(long[][] a)
 ```
 - 引数
-  - `H`, `W` : $H$行$W$列のサイズを指定(各要素は0で初期化)
-  - `a` : $H$行$W$列の2次元配列で行列の初期値を指定
+  - `H`, `W` : $H$ 行 $W$ 列のサイズを指定(各要素は0で初期化)
+  - `a` : $H$ 行 $W$ 列の2次元配列で行列の初期値を指定
 - 計算量
   - $O(HW)$
 
@@ -55,7 +55,7 @@ public Matrix mulMod(Matrix o, long p)
   - `o` : 掛ける行列
   - `p` : 割る値
 - 計算量
-  - $O(H_1 W_1 W_2)$ (この行列のサイズ:$H_1\times W_1$、`o`のサイズ:$H_2\times W_2$)
+  - $O(H_1 W_1 W_2)$ (この行列のサイズ: $H_1\times W_1$ 、`o`のサイズ: $H_2\times W_2$)
 
 ### 行列とスカラーの積
 ```java
@@ -91,4 +91,4 @@ public Matrix powMod(long n, long p)
   - `n` : べき指数
   - `p` : 割る値
 - 計算量
-  - $O(H^3 \log n)$ (この行列のサイズ:$H\times H$)
+  - $O(H^3 \log n)$ (この行列のサイズ: $H\times H$)
