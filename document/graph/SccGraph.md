@@ -27,7 +27,7 @@ public void addEdge(int from, int to)
 public void decompose()
 ```
 強連結成分分解を実行する。
-- 計算量 ($m$を追加した辺数、$F$を流量とする)
+- 計算量 ($m$を追加した辺数)
   - $O(n + m)$
 
 ### 強連結成分分解後のグループ番号を取得
