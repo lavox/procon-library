@@ -22,6 +22,18 @@ class WarshallFloyd {
 		}
 		return d;
 	}
+	public static long[][] updateEdge(long[][] d, int from, int to, long dist) {
+		if (d[from][to] <= dist) return d;
+		d[from][to] = dist;
+		int n = d.length;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (d[i][from] == INF || d[to][j] == INF) continue;
+				d[i][j] = Math.min(d[i][j], d[i][from] + dist + d[to][j]);
+			}
+		}
+		return d;
+	}
 	public static boolean hasNegativeLoop(long[][] d) {
 		for (int i = 0; i < d.length; i++) {
 			if (d[i][i] < 0) return true;

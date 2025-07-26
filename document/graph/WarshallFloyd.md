@@ -25,6 +25,18 @@ public static long[][] warshallFloyd(long[][] d)
 - 計算量
   - $O(n^3)$
 
+### 辺追加による距離更新
+```java
+public static long[][] updateEdge(long[][] d, int from, int to, long dist)
+```
+頂点`from`から頂点`to`への距離`dist`の辺を追加して距離テーブルを再計算する。
+- 引数
+  - `d` : 距離テーブル
+  - `from`, `to` : 頂点番号 $(0\le \mathrm{from}, \mathrm{to}\lt n)$
+  - dist: 距離
+- 計算量
+  - $O(n^2)$
+
 ### 負の閉路検出
 ```java
 public static boolean hasNegativeLoop(long[][] d)
