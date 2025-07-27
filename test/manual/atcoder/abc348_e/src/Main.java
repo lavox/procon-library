@@ -269,16 +269,16 @@ abstract class Rerooting<E> {
 	private Node node(int i) {
 		return nodes.get(i);
 	}
-	public void addEdge(int from, int to) {
+	public void addEdge(int u, int v) {
 		int eid = edges.size();
-		Node nFrom = node(from);
-		Node nTo = node(to);
-		Edge e = new Edge(eid, nFrom, nTo);
-		Edge re = new Edge(eid, nTo, nFrom);
+		Node nu = node(u);
+		Node nv = node(v);
+		Edge e = new Edge(eid, nu, nv);
+		Edge re = new Edge(eid, nv, nu);
 		e.rev = re;
 		re.rev = e;
-		nFrom.edge.add(e);
-		nTo.edge.add(re);
+		nu.edge.add(e);
+		nv.edge.add(re);
 		edges.add(e);
 	}
 	public void build() {
