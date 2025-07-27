@@ -14,6 +14,7 @@
 | LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
 | DynamicSegmentTree.java  | 動的セグメント木                     |
 | Permutation.java         | 順列(順列全列挙含む)                 |
+| RunLengthCompression.java| ランレングス圧縮                   |
 
 ### graph
 | ファイル名               | 内容                                 |
@@ -52,7 +53,6 @@
 ### 今後整備予定
 - 全方位木DP
 - 巡回セールスマン問題
-- ランレングス圧縮
 - ビット演算関連
 
 ## ライセンス
