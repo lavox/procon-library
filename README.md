@@ -25,6 +25,7 @@
 | TopologicalSort.java     | トポロジカルソート                   |
 | TwoSat.java              | 2-SAT                                |
 | WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
+| LowLink.java             | Low Link(関節点・橋の検出)           |
 
 ### math
 | ファイル名               | 内容                                 |
@@ -53,7 +54,6 @@
 - 巡回セールスマン問題
 - ランレングス圧縮
 - ビット演算関連
-- LowLink
 
 ## ライセンス
 このプロジェクトは[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode)の下で公開しています。
