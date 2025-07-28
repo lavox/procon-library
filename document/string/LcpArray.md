@@ -26,9 +26,12 @@ int[] la = lcpArray(s, sa);
 ```java
 public static int[] lcpArray(String s, int[] sa)
 public static <T> int[] lcpArray(T[] s, int[] sa)
+public static int[] lcpArray(IntBinaryOperator op, int n, int[] sa)
 ```
 - 引数
   - `s` : 文字列 または Tの配列(Tは`equals()`を適切に実装されている必要がある)
+  - `op` : 2つの引数`i`,`j`に対し、対象の`i`番目と`j`番目が一致するなら0、一致しないならそれ以外を返す2変数の`int`値演算
+  - `n` : 対象の長さ
   - `sa` : `s`のSuffix Array
 - 計算量
   - $O(n)$
