@@ -45,6 +45,7 @@
 | ZAlgorithm.java          | Z-Algorithm                          |
 | SuffixArray.java         | Suffix Array                         |
 | LcpArray.java            | LCP Array                            |
+| RollingHash.java         | ローリングハッシュ                   |
 
 ### template
 | ファイル名               | 内容                                 |

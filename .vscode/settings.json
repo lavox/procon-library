@@ -13,6 +13,8 @@
     "test/unittest/data-structure",
     "test/unittest/graph",
     "test/unittest/math",
+    "test/unittest/string",
+    "sandbox/src",
   ],
   "java.project.outputPath": "bin",
   "java.project.referencedLibraries": [
