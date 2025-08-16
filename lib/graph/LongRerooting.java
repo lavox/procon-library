@@ -1,7 +1,8 @@
+package graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-abstract class LongRerooting {
+public abstract class LongRerooting {
 	public abstract long e();
 	public abstract long merge(long x, long y);
 	public abstract long mergeSubtree(long x, Edge e);

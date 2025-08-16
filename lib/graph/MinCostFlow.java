@@ -1,9 +1,10 @@
+package graph;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-class MinCostFlow {
+public class MinCostFlow {
 	private int _n = 0;
 	private ArrayList<Edge> _edges = null;
 

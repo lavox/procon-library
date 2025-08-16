@@ -1,6 +1,7 @@
+package math;
 import java.util.Arrays;
 
-class Matrix {
+public class Matrix {
 	long[][] a = null;
 	public Matrix(int H, int W) {
 		a = new long[H][W];

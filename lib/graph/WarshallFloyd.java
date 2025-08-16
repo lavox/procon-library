@@ -1,6 +1,7 @@
+package graph;
 import java.util.Arrays;
 
-class WarshallFloyd {
+public class WarshallFloyd {
 	public static long INF = Long.MAX_VALUE >> 1;
 	public static long[][] createInitTable(int n) {
 		long[][] d = new long[n][n];

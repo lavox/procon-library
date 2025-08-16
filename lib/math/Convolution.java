@@ -1,6 +1,7 @@
+package math;
 import java.util.Arrays;
 
-class Convolution {
+public class Convolution {
 	private static class FftInfo {
 		int g;
 		int rank2;

@@ -1,6 +1,7 @@
+package math;
 import java.util.Arrays;
 
-class Vec {
+public class Vec {
 	long[] a = null;
 	public Vec(int N) {
 		a = new long[N];

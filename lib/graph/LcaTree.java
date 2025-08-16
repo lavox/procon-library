@@ -1,8 +1,9 @@
+package graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class LcaTree {
+public class LcaTree {
 	private int _n = 0;
 	private ArrayList<Integer>[] edges = null;
 	private int[] depth = null;

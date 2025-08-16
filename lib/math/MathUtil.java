@@ -1,6 +1,7 @@
+package math;
 import java.util.ArrayList;
 
-class MathUtil {
+public class MathUtil {
 	private static long mod(long x, long m) {
 		x %= m;
 		if (x < 0) x += m;

@@ -1,7 +1,8 @@
+package graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-class LowLink {
+public class LowLink {
 	private Node[] nodes = null;
 	private ArrayList<Edge> edges = null;
 	private ArrayList<Edge> bridges = null;

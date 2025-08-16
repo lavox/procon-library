@@ -1,7 +1,8 @@
+package graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class TopologicalSort {
+public class TopologicalSort {
 	private int _n = 0;
 	private ArrayList<Integer>[] edge = null;
   private Permutation nodes = null;

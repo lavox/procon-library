@@ -1,7 +1,8 @@
+package graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class SccGraph {
+public class SccGraph {
 	private int _n = 0;
 	private ArrayList<Integer>[] edges = null;
 

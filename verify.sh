@@ -1,22 +1,26 @@
 #!/bin/bash
-TMP_DIR="tmp"
+set -e
+SRC_DIR="lib"
+JUNIT_DIR="test/unittest"
 
-mkdir -p ${TMP_DIR}
-rm -rf ${TMP_DIR}/*.class
-rm -rf ${TMP_DIR}/*.java
-rm -rf ${TMP_DIR}/*.jar
+# 一時ディレクトリ作成
+TMP_DIR=$(mktemp -d)
+echo "Using temporary directory: $TMP_DIR"
 
-echo "[INFO] Copy all .java flatly"
-find lib -name '*.java' -exec cp -p {} "$TMP_DIR/" \;
-find test/oj-verify -name '*.java' -exec cp -p {} "$TMP_DIR/" \;
-find test/unittest -name '*.java' -exec cp -p {} "$TMP_DIR/" \;
+# JUnit JAR のパス
+JUNIT_JAR="./dependency/junit-platform-console-standalone-1.13.2.jar"
 
-cp dependency/junit-platform-console-standalone-1.13.2.jar "$TMP_DIR/"
+CLASSPATH="$TMP_DIR:$JUNIT_JAR"
 
-cd "$TMP_DIR"
+# Java ファイルをコンパイル
+echo "Compiling Java files..."
+find $SRC_DIR $JUNIT_DIR -name "*.java" > /tmp/java_files.txt
+javac -d "$TMP_DIR" -cp "$CLASSPATH" @/tmp/java_files.txt
 
-oj-verify run
+# テスト実行
+echo "Running tests..."
+java -jar $JUNIT_JAR execute --class-path "$CLASSPATH" --scan-classpath
 
-javac -cp junit-platform-console-standalone-1.13.2.jar *.java
-java -jar junit-platform-console-standalone-1.13.2.jar execute --class-path . --scan-classpath
-cd ..
+# 一時ディレクトリ削除
+rm -rf "$TMP_DIR"
+echo "Done."

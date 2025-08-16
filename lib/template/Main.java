@@ -1,3 +1,4 @@
+package template;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -108,6 +109,7 @@ public class Main {
 	}
 	public static void print(int... a) { print(a, SPACE); }
 	public static void print(long... a) { print(a, SPACE); }
+	@SuppressWarnings("unchecked")
 	public static <T> void print(T... s) { print(s, SPACE); }
 }
 class FastScanner {

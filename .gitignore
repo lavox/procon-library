@@ -28,3 +28,5 @@ tmp/**
 test/manual/**/.vscode
 test/manual/**/*.json
 test/manual/**/test
+**/build
+**/*.egg-info

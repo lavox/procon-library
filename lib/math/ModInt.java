@@ -1,4 +1,6 @@
-class ModInt {
+package math;
+
+public class ModInt {
 	final ModOperation mop;
 	int v = 0;
 	ModInt(ModOperation mop, int v) {

@@ -1,7 +1,8 @@
+package graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-abstract class Rerooting<E> {
+public abstract class Rerooting<E> {
 	public abstract E e();
 	public abstract E merge(E x, E y);
 	public abstract E mergeSubtree(E x, Edge e);

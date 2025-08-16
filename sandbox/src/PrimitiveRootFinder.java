@@ -3,6 +3,9 @@
 
 import java.util.Random;
 
+import math.MathUtil;
+import math.Prime;
+
 class PrimitiveRootFinder {
 	static long mul(long a, long b, long p) { // a*b mod 2^61-1
 		assert p == (1L << 61) - 1;

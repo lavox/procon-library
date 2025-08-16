@@ -1,8 +1,9 @@
+package string;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
-class SuffixArray {
+public class SuffixArray {
 	private static int[] convertToPrimitiveArray(Integer[] arr) {
 		int[] ret = new int[arr.length];
 		for (int i = 0; i < arr.length; i++) ret[i] = arr[i];

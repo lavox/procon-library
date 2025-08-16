@@ -1,7 +1,8 @@
+package math;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class Prime {
+public class Prime {
 	private int max = 0;
 	int[] lpf = null;
 	int[] primes = null;

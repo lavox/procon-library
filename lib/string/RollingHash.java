@@ -1,4 +1,6 @@
-class RollingHash {
+package string;
+
+public class RollingHash {
 	public static final long MOD1L61 = (1L << 61) - 1;
 	public static final long MOD998244353 = 998244353;
 	public static final long MOD1000000007 = 1000000007;

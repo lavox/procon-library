@@ -1,8 +1,9 @@
+package graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 
-class MaxFlow {
+public class MaxFlow {
 	private int _n = 0;
 	private ArrayList<_Edge>[] g = null;
 	private ArrayList<_Edge> edge = null;

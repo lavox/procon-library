@@ -1,6 +1,7 @@
+package string;
 import java.util.function.IntBinaryOperator;
 
-class ZAlgorithm {
+public class ZAlgorithm {
 	// Reference:
 	// D. Gusfield,
 	// Algorithms on Strings, Trees, and Sequences: Computer Science and

@@ -1,6 +1,7 @@
+package string;
 import java.util.function.IntBinaryOperator;
 
-class LcpArray {
+public class LcpArray {
 	// Reference:
 	// T. Kasai, G. Lee, H. Arimura, S. Arikawa, and K. Park,
 	// Linear-Time Longest-Common-Prefix Computation in Suffix Arrays and Its

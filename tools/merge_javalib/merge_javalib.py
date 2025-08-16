@@ -347,13 +347,15 @@ def main():
     ap.add_argument("--include", nargs="+", help="class to add (FQN or class name). Multiple values allowed.", default=[])
     args = ap.parse_args()
     if not args.include:
-      chosen_file = choose_file_in_lib(args.lib)
+      chosen_file = choose_file_in_lib(os.path.expanduser(args.lib))
       if chosen_file is None:
         print("No file selected.")
         sys.exit(0)
       args.include = [chosen_file]
     try:
-      merge_into_main(args.main, args.lib, args.include)
+      main_path = Path(os.path.expanduser(args.main))
+      lib_path = Path(os.path.expanduser(args.lib))
+      merge_into_main(main_path, lib_path, args.include)
     except javalang.parser.JavaSyntaxError as e:
       print(f"ERROR: Java parse error: {e}", file=sys.stderr)
       sys.exit(3)

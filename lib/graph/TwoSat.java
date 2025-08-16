@@ -1,4 +1,6 @@
-class TwoSat {
+package graph;
+
+public class TwoSat {
 	private boolean[] _answer = null;
 	private int _n = 0;
 	private SccGraph scc = null;
