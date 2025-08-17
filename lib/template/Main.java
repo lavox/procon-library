@@ -7,7 +7,7 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
-// https://github.com/lavox/procon-library
+// template & library : https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
 		Main o = new Main();
