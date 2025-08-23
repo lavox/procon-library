@@ -1,6 +1,8 @@
 # ベクトル演算
 ベクトル関連の演算。
 
+Vecのインスタンスでベクトル情報を管理し演算を行う使用方法と、long[]で表現したベクトルの演算を行うstaticメソッドを提供する。
+
 ### コンストラクタ
 ```java
 public Vec(int N)
@@ -36,6 +38,7 @@ public void set(int i, long c)
 ### ベクトルの和
 ```java
 public Vec add(Vec o)
+public static long[] add(long[] a, long[] b)
 ```
 このクラスが表すベクトルと、引数に指定されたベクトルの和を求める。双方のベクトルサイズが一致していること。
 - 引数
@@ -46,6 +49,7 @@ public Vec add(Vec o)
 ### ベクトルの差
 ```java
 public Vec sub(Vec o)
+public static long[] sub(long[] a, long[] b)
 ```
 このクラスが表すベクトルと、引数に指定されたベクトルの差を求める。双方のベクトルサイズが一致していること。
 - 引数
@@ -56,6 +60,7 @@ public Vec sub(Vec o)
 ### ベクトルのスカラー倍
 ```java
 public Vec mul(long c)
+public static long[] mul(long[] a, long c)
 ```
 このクラスが表すベクトルと、引数に指定されたスカラーの積を求める。
 - 引数
@@ -66,6 +71,7 @@ public Vec mul(long c)
 ### 内積
 ```java
 public long dot(Vec o)
+public static long dot(long[] a, long[] b)
 ```
 このクラスが表すベクトルと、引数に指定されたベクトルの内積を求める。双方のベクトルサイズが一致していること。
 - 引数
@@ -76,6 +82,7 @@ public long dot(Vec o)
 ### L1ノルム
 ```java
 public long norm1()
+public static long norm1(long[] a)
 ```
 このクラスが表すベクトルのL1ノルムを求める。
 - 計算量
@@ -84,6 +91,7 @@ public long norm1()
 ### L2ノルム
 ```java
 public double norm2()
+public static double norm2(long[] a)
 ```
 このクラスが表すベクトルのL2ノルムを求める。
 - 計算量
@@ -92,6 +100,7 @@ public double norm2()
 ### L2ノルムの平方
 ```java
 public long norm2Sq()
+public static long norm2Sq(long[] a)
 ```
 このクラスが表すベクトルのL2ノルムの平方を求める。
 - 計算量
@@ -100,6 +109,7 @@ public long norm2Sq()
 ### L1距離(マンハッタン距離)
 ```java
 public long dist1(Vec o)
+public static long dist1(long[] a, long[] b)
 ```
 このクラスが表すベクトルと引数に指定したベクトルのL1距離(マンハッタン距離)を求める。双方のベクトルサイズが一致していること。
 - 引数
@@ -110,6 +120,7 @@ public long dist1(Vec o)
 ### L2距離(ユークリッド距離)
 ```java
 public double dist2(Vec o)
+public static double dist2(long[] a, long[] b)
 ```
 このクラスが表すベクトルと引数に指定したベクトルのL2距離(ユークリッド距離)を求める。双方のベクトルサイズが一致していること。
 - 引数
@@ -120,6 +131,7 @@ public double dist2(Vec o)
 ### L2距離(ユークリッド距離)の平方
 ```java
 public long dist2Sq(Vec o)
+public static long dist2Sq(long[] a, long[] b)
 ```
 このクラスが表すベクトルと引数に指定したベクトルのL2距離(ユークリッド距離)の平方を求める。双方のベクトルサイズが一致していること。
 - 引数

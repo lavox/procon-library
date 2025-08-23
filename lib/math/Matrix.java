@@ -7,9 +7,16 @@ public class Matrix {
 		a = new long[H][W];
 	}
 	public Matrix(long[][] a) {
-		this.a = new long[a.length][];
-		for (int i = 0; i < a.length; i++) {
-			this.a[i] = Arrays.copyOf(a[i], a[i].length);
+		this(a, true);
+	}
+	Matrix(long[][] a, boolean copy) {
+		if (copy) {
+			this.a = new long[a.length][];
+			for (int i = 0; i < a.length; i++) {
+				this.a[i] = Arrays.copyOf(a[i], a[i].length);
+			}
+		} else {
+			this.a = a;
 		}
 	}
 	public long get(int i, int j) {
@@ -19,111 +26,143 @@ public class Matrix {
 		a[i][j] = v;
 	}
 	public Matrix add(Matrix o) {
-		assert a.length == o.a.length;
-		if ( a.length == 0 ) return new Matrix(0, 0);
-		assert a[0].length == o.a[0].length;
-		Matrix ret = new Matrix(a.length, a[0].length);
+		return new Matrix(add(this.a, o.a), false);
+	}
+	public static long[][] add(long[][] a, long[][] b) {
+		assert a.length == a.length;
+		if ( a.length == 0 ) return new long[0][0];
+		assert a[0].length == b[0].length;
+		long[][] ret = new long[a.length][a[0].length];
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[i].length; j++) {
-				ret.a[i][j] = a[i][j] + o.a[i][j];
+				ret[i][j] = a[i][j] + b[i][j];
 			}
 		}
 		return ret;
 	}
 	public Matrix addMod(Matrix o, long p) {
-		assert a.length == o.a.length;
-		if ( a.length == 0 ) return new Matrix(0, 0);
-		assert a[0].length == o.a[0].length;
-		Matrix ret = new Matrix(a.length, a[0].length);
+		return new Matrix(addMod(this.a, o.a, p), false);
+	}
+	public static long[][] addMod(long[][] a, long[][] b, long p) {
+		assert a.length == b.length;
+		if ( a.length == 0 ) return new long[0][0];
+		assert a[0].length == b[0].length;
+		long[][] ret = new long[a.length][a[0].length];
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[i].length; j++) {
-				ret.a[i][j] = (a[i][j] + o.a[i][j]) % p;
+				ret[i][j] = (a[i][j] + b[i][j]) % p;
 			}
 		}
 		return ret;
 	}
 	public Matrix mul(Matrix o) {
-		if ( o.a.length == 0 ) return new Matrix(0, 0);
-		Matrix ret = new Matrix(a.length, o.a[0].length);
+		return new Matrix(mul(this.a, o.a), false);
+	}
+	public static long[][] mul(long[][] a, long[][] b) {
+		if ( b.length == 0 ) return new long[0][0];
+		long[][] ret = new long[a.length][b[0].length];
 		for ( int i = 0 ; i < a.length ; i++ ) {
-			for ( int j = 0 ; j < o.a[0].length ; j++ ) {
+			for ( int j = 0 ; j < b[0].length ; j++ ) {
 				for ( int k = 0 ; k < a[i].length ; k++ ) {
-					ret.a[i][j] += a[i][k] * o.a[k][j];
+					ret[i][j] += a[i][k] * b[k][j];
 				}
 			}
 		}
 		return ret;
 	}
 	public Matrix mulMod(Matrix o, long p) {
-		if ( o.a.length == 0 ) return new Matrix(0, 0);
-		Matrix ret = new Matrix(a.length, o.a[0].length);
+		return new Matrix(mulMod(this.a, o.a, p), false);
+  }
+	public static long[][] mulMod(long[][] a, long[][] b, long p) {
+		if ( b.length == 0 ) return new long[0][0];
+		long[][] ret = new long[a.length][b[0].length];
 		for ( int i = 0 ; i < a.length ; i++ ) {
-			for ( int j = 0 ; j < o.a[0].length ; j++ ) {
+			for ( int j = 0 ; j < b[0].length ; j++ ) {
 				for ( int k = 0 ; k < a[i].length ; k++ ) {
-					ret.a[i][j] = (ret.a[i][j] + a[i][k] * o.a[k][j]) % p;
+					ret[i][j] = (ret[i][j] + a[i][k] * b[k][j]) % p;
 				}
 			}
 		}
 		return ret;
-  }
+	}
 	public Matrix mul(long c) {
-		if ( a.length == 0 ) return new Matrix(0, 0);
-		Matrix ret = new Matrix(a.length, a[0].length);
+		return new Matrix(mul(this.a, c), false);
+  }
+	public static long[][] mul(long[][] a, long c) {
+		if ( a.length == 0 ) return new long[0][0];
+		long[][] ret = new long[a.length][a[0].length];
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[i].length; j++) {
-				ret.a[i][j] = c * a[i][j];
+				ret[i][j] = c * a[i][j];
 			}
 		}
 		return ret;
-  }
+	}
 	public Matrix mulMod(long c, long p) {
-		if ( a.length == 0 ) return new Matrix(0, 0);
-		Matrix ret = new Matrix(a.length, a[0].length);
+		return new Matrix(mulMod(this.a, c, p), false);
+	}
+	public static long[][] mulMod(long[][] a, long c, long p) {
+		if ( a.length == 0 ) return new long[0][0];
+		long[][] ret = new long[a.length][a[0].length];
 		for (int i = 0; i < a.length; i++) {
 			for (int j = 0; j < a[i].length; j++) {
-				ret.a[i][j] = (c * a[i][j]) % p;
+				ret[i][j] = (c * a[i][j]) % p;
 			}
 		}
 		return ret;
 	}
 	public Vec mul(Vec v) {
-		if ( a.length == 0 ) return new Vec(0);
-		Vec ret = new Vec(a.length);
+		return new Vec(mul(this.a, v.a), false);
+	}
+	public static long[] mul(long[][] a, long[] v) {
+		if ( a.length == 0 ) return new long[0];
+		long[] ret = new long[a.length];
 		for (int i = 0; i < a.length; i++) {
 			for ( int k = 0 ; k < a[i].length ; k++ ) {
-				ret.a[i] += a[i][k] * v.a[k];
+				ret[i] += a[i][k] * v[k];
 			}
 		}
 		return ret;
 	}
 	public Vec mulMod(Vec v, long p) {
-		if ( a.length == 0 ) return new Vec(0);
-		Vec ret = new Vec(a.length);
+		return new Vec(mulMod(this.a, v.a, p), false);
+	}
+	public static long[] mulMod(long[][] a, long[] v, long p) {
+		if ( a.length == 0 ) return new long[0];
+		long[] ret = new long[a.length];
 		for (int i = 0; i < a.length; i++) {
 			for ( int k = 0 ; k < a[i].length ; k++ ) {
-				ret.a[i] = (ret.a[i] + a[i][k] * v.a[k]) % p;
+				ret[i] = (ret[i] + a[i][k] * v[k]) % p;
 			}
 		}
 		return ret;
 	}
 	public Matrix pow(long n) {
-		Matrix ret = new Matrix(a.length, a.length);
-		Matrix A = new Matrix(this.a);
-		for ( int i = 0 ; i < a.length ; i++ ) ret.a[i][i] = 1; 
+		return new Matrix(pow(this.a, n), false);
+	}
+	public static long[][] pow(long[][] a, long n) {
+		long[][] ret = new long[a.length][a.length];
+		long[][] A = new long[a.length][];
+		for (int i = 0; i < a.length; i++) A[i] = Arrays.copyOf(a[i], a[i].length);
+		for ( int i = 0 ; i < a.length ; i++ ) ret[i][i] = 1; 
 		while ( n > 0 ) {
-			if ( (n & 1L) != 0 ) ret = ret.mul(A);
-			A = A.mul(A);
+			if ( (n & 1L) != 0 ) ret = mul(ret, A);
+			A = mul(A, A);
 			n >>>= 1;
 		}
 		return ret;
 	}
 	public Matrix powMod(long n, long p) {
-		Matrix ret = new Matrix(a.length, a.length);
-		Matrix A = new Matrix(this.a);
-		for ( int i = 0 ; i < a.length ; i++ ) ret.a[i][i] = 1; 
+		return new Matrix(powMod(this.a, n, p), false);
+	}
+	public static long[][] powMod(long[][] a, long n, long p) {
+		long[][] ret = new long[a.length][a.length];
+		long[][] A = new long[a.length][];
+		for (int i = 0; i < a.length; i++) A[i] = Arrays.copyOf(a[i], a[i].length);
+		for ( int i = 0 ; i < a.length ; i++ ) ret[i][i] = 1; 
 		while ( n > 0 ) {
-			if ( (n & 1L) != 0 ) ret = ret.mulMod(A, p);
-			A = A.mulMod(A, p);
+			if ( (n & 1L) != 0 ) ret = mulMod(ret, A, p);
+			A = mulMod(A, A, p);
 			n >>>= 1;
 		}
 		return ret;

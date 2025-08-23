@@ -7,7 +7,14 @@ public class Vec {
 		a = new long[N];
 	}
 	public Vec(long[] a) {
-		this.a = Arrays.copyOf(a, a.length);
+		this(a, true);
+	}
+	Vec(long[] a, boolean copy) {
+		if (copy) {
+			this.a = Arrays.copyOf(a, a.length);
+		} else {
+			this.a = a;
+		}
 	}
 	public long get(int i) {
 		return a[i];
@@ -16,37 +23,52 @@ public class Vec {
 		a[i] = c;
 	}
 	public Vec add(Vec o) {
-		assert a.length == o.a.length;
-		Vec ret = new Vec(a.length);
+		return new Vec(add(this.a, o.a), false);
+	}
+	public static long[] add(long[] a, long[] b) {
+		assert a.length == b.length;
+		long[] ret = new long[a.length];
 		for (int i = 0; i < a.length; i++) {
-			ret.a[i] = a[i] + o.a[i];
+			ret[i] = a[i] + b[i];
 		}
 		return ret;
 	}
 	public Vec sub(Vec o) {
-		assert a.length == o.a.length;
-		Vec ret = new Vec(a.length);
+		return new Vec(sub(this.a, o.a), false);
+	}
+	public static long[] sub(long[] a, long[] b) {
+		assert a.length == b.length;
+		long[] ret = new long[a.length];
 		for (int i = 0; i < a.length; i++) {
-			ret.a[i] = a[i] - o.a[i];
+			ret[i] = a[i] - b[i];
 		}
 		return ret;
 	}
 	public Vec mul(long c) {
-		Vec ret = new Vec(a.length);
+		return new Vec(mul(this.a, c), false);
+	}
+	public static long[] mul(long[] a, long c) {
+		long[] ret = new long[a.length];
 		for (int i = 0; i < a.length; i++) {
-			ret.a[i] = a[i] * c;
+			ret[i] = a[i] * c;
 		}
 		return ret;
 	}
 	public long dot(Vec o) {
-		assert a.length == o.a.length;
+		return dot(this.a, o.a);
+	}
+	public static long dot(long[] a, long[] b) {
+		assert a.length == b.length;
 		long ret = 0;
 		for (int i = 0; i < a.length; i++) {
-			ret += a[i] * o.a[i];
+			ret += a[i] * b[i];
 		}
 		return ret;
 	}
 	public long norm1() {
+		return norm1(this.a);
+	}
+	public static long norm1(long[] a) {
 		long ret = 0;
 		for (int i = 0; i < a.length; i++) {
 			ret += Math.abs(a[i]);
@@ -54,6 +76,9 @@ public class Vec {
 		return ret;
 	}
 	public long norm2Sq() {
+		return norm2Sq(this.a);
+	}
+	public static long norm2Sq(long[] a) {
 		long ret = 0;
 		for (int i = 0; i < a.length; i++) {
 			ret += Math.abs(a[i] * a[i]);
@@ -61,18 +86,29 @@ public class Vec {
 		return ret;
 	}
 	public double norm2() {
-		return Math.sqrt(norm2Sq());
+		return norm2(this.a);
+	}
+	public static double norm2(long[] a) {
+		return Math.sqrt(norm2Sq(a));
 	}
 	public long dist1(Vec o) {
-		return sub(o).norm1();
+		return dist1(this.a, o.a);
+	}
+	public static long dist1(long[] a, long[] b) {
+		return norm1(sub(a, b));
 	}
 	public long dist2Sq(Vec o) {
-		return sub(o).norm2Sq();
+		return dist2Sq(this.a, o.a);
+	}
+	public static long dist2Sq(long[] a, long[] b) {
+		return norm2Sq(sub(a, b));
 	}
 	public double dist2(Vec o) {
-		return Math.sqrt(dist2Sq(o));
+		return dist2(this.a, o.a);
 	}
-
+	public static double dist2(long[] a, long[] b) {
+		return Math.sqrt(dist2Sq(a, b));
+	}
 	public boolean equals(Vec o) {
 		if ( a.length != o.a.length ) return false;
 		for (int i = 0; i < a.length; i++) {
