@@ -109,3 +109,7 @@ public class Edge {
 - `id()`: 辺番号
 - `from()`: 親側の頂点
 - `from()`: 子側の頂点
+
+## 検証
+- [ABC348E Minimize Sum of Distances (AtCoder)](https://atcoder.jp/contests/abc348/submissions/67996655) (Rerooting)
+- [ABC222F Expensive Expense (AtCoder)](https://atcoder.jp/contests/abc222/submissions/67994485) (LongRerooting)

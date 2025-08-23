@@ -70,3 +70,6 @@ public long[] divisors(long num)
 - 計算量
   - 素因数分解の計算量： `factorize()`参照
   - 約数列挙の計算量: $O(d)$ ($d$は約数の個数)
+
+## 検証
+- [Primality Test (Library Checker)](https://judge.yosupo.jp/submission/307919)

@@ -63,3 +63,6 @@ public int[] indexArray()
 位置を表す配列を取得する。取得した配列は書き換えを行わないこと。
 - 計算量
   - $O(1)$
+
+## 検証
+- [Topological Sort (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10750908#2)

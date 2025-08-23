@@ -144,3 +144,11 @@ public int minLeft(int r, LongPredicate f)
 - 計算量
   - $O(\log{n})$
 
+## 検証
+- [Static Range Sum (Library Checker)](https://judge.yosupo.jp/submission/307929) (SegmentTree)
+- [Static Range Sum (Library Checker)](https://judge.yosupo.jp/submission/307930) (LongSegmentTree)
+- [Static RMQ (Library Checker)](https://judge.yosupo.jp/submission/307931) (SegmentTree)
+- [Static RMQ (Library Checker)](https://judge.yosupo.jp/submission/307932) (IntSegmentTree)
+- [AtCoder Library Practice Contest-J Segment Tree (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67373691) (SegmentTree)
+- [AtCoder Library Practice Contest-J Segment Tree (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67373724) (LongSegmentTree)
+- [AtCoder Library Practice Contest-J Segment Tree (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67373643) (IntSegmentTree)

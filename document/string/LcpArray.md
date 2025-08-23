@@ -35,3 +35,6 @@ public static int[] lcpArray(IntBinaryOperator op, int n, int[] sa)
   - `sa` : `s`のSuffix Array
 - 計算量
   - $O(n)$
+
+## 検証
+- [AtCoder Library Practice Contest-I Number of Substrings (AtCoder)](https://atcoder.jp/contests/practice2/submissions/68701505)

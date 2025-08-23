@@ -78,3 +78,6 @@ public BitSet minCut(int s)
 - 計算量 ($m$を追加した辺数とする)
   - $O(n + m)$
 
+## 検証
+- [Selfish Spies 1 (yukicoder)](https://yukicoder.me/submissions/1104609)
+- [AtCoder Library Practice Contest-D Maxflow (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67575767)

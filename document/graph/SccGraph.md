@@ -59,3 +59,5 @@ public int[][] groups()
 - 計算量
   - $O(1)$
 
+## 検証
+- [AtCoder Library Practice Contest-G SCC (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67624740)

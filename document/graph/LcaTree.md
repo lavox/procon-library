@@ -70,3 +70,6 @@ public int ancestor(int u, int d)
   - `d` : さかのぼる世代数
 - 計算量
   - $O(\log d)$
+
+## 検証
+- [Lowest Common Ancestor (Library Checker)](https://judge.yosupo.jp/submission/307928)

@@ -46,3 +46,7 @@ public static boolean hasNegativeLoop(long[][] d)
   - `d` : 全頂点間最短経路を求めた距離テーブル。
 - 計算量
   - $O(n)$
+
+## 検証
+- [All Pairs Shortest Path (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806482#2)
+- [ABC416E Development (AtCoder)](https://atcoder.jp/contests/abc416/submissions/67981814)

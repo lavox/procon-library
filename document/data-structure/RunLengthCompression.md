@@ -92,3 +92,5 @@ public static String decodeAsString(ArrayList<RunLength> array)
 - 計算量
   - $O(\mathrm{totalLen})$
 
+## 検証
+- [ABC019B 高橋くんと文字列圧縮 (AtCoder)](https://atcoder.jp/contests/abc019/submissions/67988166)

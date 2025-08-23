@@ -62,3 +62,7 @@ public long hash(int i0, int len)
   - `len` : 区間の長さ
 - 計算量
   - $O(1)$
+
+## 検証
+- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/68052704) (MOD998244353)
+- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/68052651) (MOD1L61)

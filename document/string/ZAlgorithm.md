@@ -20,3 +20,6 @@ public static int[] zAlgorithm(IntBinaryOperator op, int n)
   - `n` : 対象の長さ
 - 計算量
   - $O(n)$
+
+## 検証
+- [Z Algorithm (Library Checker)](https://judge.yosupo.jp/submission/307927)

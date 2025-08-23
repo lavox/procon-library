@@ -250,3 +250,6 @@ public ModInt divAsn(long a)
 `ModOperation`クラスを`fraction = true`で生成し、その`create(long)`メソッドで生成する。
 
 本クラスのメソッドは`ModInt`と同等であるが、本クラスを使用する場合は引数の`ModInt`クラスは`ModFraction`である必要があり、戻り値も`ModFraction`クラスとなる。各メソッドの説明は省略。
+
+## 検証
+- [AtCoder Library Practice Contest-K Range Affine Range Sum (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67375003)

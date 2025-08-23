@@ -31,3 +31,7 @@ public static long[] convolution_ll(long[] a, long[] b)
   - `a`, `b` : 畳み込みを行う配列
 - 計算量
   - $O(n \log n)$
+
+## 検証
+- [ABC392G Fine Triplets (AtCoder)](https://atcoder.jp/contests/abc392/submissions/67809079)
+- [AtCoder Library Practice Contest-F Convolution (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67808244)

@@ -45,3 +45,6 @@ public boolean[] answer()
 事前に`isSatisfiable()`を実行しておく必要がある。
 - 計算量
   - $O(1)$
+
+## 検証
+- [AtCoder Library Practice Contest-H Two SAT (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67853949)

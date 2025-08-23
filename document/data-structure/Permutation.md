@@ -77,3 +77,6 @@ public static boolean nextPermutation(long[] array)
   - `array` : 配列
 - 計算量
   - $O(\mathrm{len(array)})$
+
+## 検証
+- [ABC250C Adjacent Swaps (AtCoder)](https://atcoder.jp/contests/abc250/submissions/67812459)

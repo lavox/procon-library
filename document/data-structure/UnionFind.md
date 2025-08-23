@@ -50,3 +50,6 @@ public int root(int i)
 - 計算量
   - ならし $O(\alpha(N))$
 
+## 検証
+- [Unionfind (Library Checker)](https://judge.yosupo.jp/submission/307933)
+- [AtCoder Library Practice Contest-A Disjoint Set Union (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67373477)

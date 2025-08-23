@@ -102,3 +102,8 @@ public Node node(int i)
 頂点の情報を取得する。事前に`build()`を実行しておく必要がある。
 - 計算量
   - $O(1)$
+
+## 検証
+- [Articulation Points (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806487#2)
+- [Bridges (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806484)
+- [ABC334G Christmas Color Grid 2 (AtCoder)](https://atcoder.jp/contests/abc334/submissions/67984944)

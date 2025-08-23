@@ -41,3 +41,6 @@ public S query(long l, long r)
   - `l`, `r` : 区間 $(L \le l \le r \le R)$
 - 計算量
   - $O(\log{(R - L)})$
+
+## 検証
+- [範囲の合計 (yukicoder)](https://yukicoder.me/submissions/1104417)

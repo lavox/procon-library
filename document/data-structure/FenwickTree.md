@@ -34,3 +34,6 @@ public long sum(int r)
   - `l`, `r` : 和を求める範囲 $(0 \le l \le r \le n)$
 - 計算量
   - $O(\log{n})$
+
+## 検証
+- [AtCoder Library Practice Contest-B Fenwick Tree (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67835365)

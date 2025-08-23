@@ -76,3 +76,5 @@ public ArrayList<MinCostFlow.Flow> slope(int s, int t, long flowLimit)
 - 計算量 ($m$ を追加した辺数、 $F$ を流量とする)
   - $O(F(n + m)\log{(n + m)})$
 
+## 検証
+- [AtCoder Library Practice Contest-E MinCostFlow (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67582035)

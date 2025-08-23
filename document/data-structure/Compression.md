@@ -58,3 +58,5 @@ public int size()
 - 計算量
   - $O(1)$
 
+## 検証
+- [ABC036C 座圧 (AtCoder)](https://atcoder.jp/contests/abc036/submissions/68701571)

@@ -36,3 +36,6 @@ public static int[] suffixArray(int[] s, int upper) // (3)
   - (1) $O(n)$
   - (2) $O(n \log n)$
   - (3) $O(n + \mathrm{upper})$
+
+## 検証
+- [AtCoder Library Practice Contest-I Number of Substrings (AtCoder)](https://atcoder.jp/contests/practice2/submissions/68701505)

@@ -43,3 +43,8 @@ public static long gcd(long a, long b)
   - `a,b` : $(0\le a,b)$
 - 計算量
   - $O(\log \min{(a,b)})$
+
+## 検証
+- [Chopsticks (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806467#2)
+- [Greatest Common Divisor (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806471#2)
+- [AtCoder Library Practice Contest-C Floor Sum (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67905982)

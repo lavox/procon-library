@@ -224,3 +224,12 @@ class LongLazyMaxUpdate implements LongLazyOperator
 class IntLazyMaxAdd implements IntLazyOperator
 class LongLazyMaxAdd implements LongLazyOperator
 ```
+
+## 検証
+- [RMQ and RUQ (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10826341#2) (LazySegmentTree)
+- [RMQ and RUQ (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806491#2) (IntLazySegmentTree)
+- [RSQ and RAQ (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806493#2) (LongLazySegmentTree)
+- [RMQ and RAQ (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806492#2) (LongLazySegmentTree)
+- [RSQ and RUQ (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10806500#2) (IntLazySegmentTree)
+- [AtCoder Library Practice Contest-K Range Affine Range Sum (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67375003) (LazySegmentTree)
+- [AtCoder Library Practice Contest-L Lazy Segment Tree (AtCoder)](https://atcoder.jp/contests/practice2/submissions/67375620) (LazySegmentTree)
