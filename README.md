@@ -26,6 +26,7 @@
 | Rerooting.java<br>LongRerooting.java | 全方位木DP               |
 | TopologicalSort.java     | トポロジカルソート                   |
 | TwoSat.java              | 2-SAT                                |
+| Tsp.java                 | 巡回セールスマン問題                 |
 | WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
 | LowLink.java             | Low Link(関節点・橋の検出)           |
 
@@ -53,7 +54,6 @@
 | Main.java                | アルゴリズムコンテスト用の提出ファイルテンプレート(入出力ユーティリティ含む) |
 
 ### 今後整備予定
-- 巡回セールスマン問題
 - ビット演算関連
 
 ## ライセンス
