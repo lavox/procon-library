@@ -8,7 +8,7 @@
 ### data-structure
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
-| UnionFind.java           | Union Find木                         |
+| UnionFind.java<br>WeightedUnionFind.java | Union Find木<br>ポテンシャル付きUnion Find木 |
 | Compression.java         | 座標圧縮                             |
 | FenwickTree.java         | Fenwick木                            |
 | SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
