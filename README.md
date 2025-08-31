@@ -48,6 +48,7 @@
 | SuffixArray.java         | Suffix Array                         |
 | LcpArray.java            | LCP Array                            |
 | RollingHash.java         | ローリングハッシュ                   |
+| AhoCorasick.java         | Aho-Corasick法                       |
 
 ### template
 | ファイル名               | 内容                                 |

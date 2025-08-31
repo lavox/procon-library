@@ -30,3 +30,4 @@ test/manual/**/*.json
 test/manual/**/test
 **/build
 **/*.egg-info
+**/launch.json
