@@ -160,7 +160,6 @@ public class AhoCorasick {
 		}
 		public Node next(int c) {
 			return child[c];
-			// return child == null || child[c] == null ? root : child[c];
 		}
 		@Override
 		public int hashCode() {
