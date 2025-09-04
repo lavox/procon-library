@@ -9,6 +9,8 @@ import java.util.function.UnaryOperator;
 
 import java.util.ArrayDeque;
 
+import java.util.BitSet;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -20,24 +22,28 @@ public class Main {
 		FastScanner sc = new FastScanner(System.in);
 		int vc = sc.nextInt();
 		int ec = sc.nextInt();
-		LowLink g = new LowLink(vc);
+		Graph g = new Graph(vc);
 		for (int i = 0; i < ec; i++) {
 			int s = sc.nextInt();
 			int t = sc.nextInt();
-			g.addEdge(Math.min(s, t), Math.max(s, t));
+			g.addUndirEdge(Math.min(s, t), Math.max(s, t), i);
 		}
-		g.build();
-		ArrayList<LowLink.Edge> bridges = new ArrayList<>(g.bridges());
+		LowLink ll = new LowLink(g);
+		ArrayList<int[]> bridges = new ArrayList<>();
+		for (Edge e: ll.bridges()) {
+			bridges.add(new int[] {Math.min(e.from(), e.to()), Math.max(e.from(), e.to())});
+		}
+
 		Collections.sort(bridges, (e0, e1) -> {
-			if (e0.from() != e1.from()) {
-				return e0.from() - e1.from();
+			if (e0[0] != e1[0]) {
+				return e0[0] - e1[0];
 			} else {
-				return e0.to() - e1.to();
+				return e0[1] - e1[1];
 			}
 		});
 		StringBuilder out = new StringBuilder();
-		for (LowLink.Edge e: bridges) {
-			out.append(String.format("%d %d\n", e.from(), e.to()));
+		for (int[] e: bridges) {
+			out.append(String.format("%d %d\n", e[0], e[1]));
 		}
 		System.out.print(out.toString());
 	}
@@ -227,25 +233,21 @@ class FastScanner {
 // === begin: graph/LowLink.java ===
 class LowLink {
 	private Node[] nodes = null;
-	private ArrayList<Edge> edges = null;
+	private Graph g = null;
+	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(int n) {
-		this.nodes = new Node[n];
-		for (int i = 0; i < n; i++) nodes[i] = new Node(i);
-		this.edges = new ArrayList<>();
+	public LowLink(Graph g) {
+		this.g = g;
+		this.nodes = new Node[g.size()];
+		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);
+		this.isBridge = new BitSet(g.maxEdgeId());
+		build();
 	}
-	public void addEdge(int from, int to) {
-		int eid = edges.size();
-		Edge e = new Edge(nodes[from], nodes[to], eid);
-		nodes[from].addEdge(e);
-		edges.add(e);
-		nodes[to].addEdge(new Edge(nodes[to], nodes[from], eid));
-	}
-	public void build() {
+	private void build() {
 		bridges = new ArrayList<>();
 		cnt = 0;
 		for (Node n: nodes) {
@@ -261,8 +263,11 @@ class LowLink {
 	public int componentCnt() {
 		return componentCnt;
 	}
+	public boolean isBridge(Edge e) {
+		return isBridge.get(e.id());
+	}
 	public boolean isBridge(int eid) {
-		return edges.get(eid).isBridge;
+		return isBridge.get(eid);
 	}
 	public ArrayList<Edge> bridges() {
 		return bridges;
@@ -284,6 +289,7 @@ class LowLink {
 		stack.addLast(n0);
 		while ( stack.size() > 0 ) {
 			Node n = stack.peekLast();
+			int v = n.id;
 			if (n.iter == 0) {
 				n.visited = true;
 				n.ord = cnt;
@@ -291,7 +297,8 @@ class LowLink {
 				cnt++;
 			}
 			if (n.iter > 0) {
-				Node to = n.edge.get(n.iter - 1).to;
+				Edge e = g.edge(v, n.iter - 1);
+				Node to = node(e.to());
 				if (n.parent == null || n.parent != to) {
 					n.low = Math.min(n.low, to.low);
 				}
@@ -299,24 +306,24 @@ class LowLink {
 					n.isArticulation = true;
 					n.artCnt++;
 				}
-				if ( n.ord < to.low ) {
-					Edge e = edges.get(n.edge.get(n.iter - 1).eid);
-					e.isBridge = true;
+				if (n.ord < to.low) {
+					isBridge.set(e.id());
 					bridges.add(e);
 				}
 			}
 			boolean stacked = false;
-			while (n.iter < n.edge.size()) {
-				Edge e = n.edge.get(n.iter++);
-				if (n.parent != null && e.to == n.parent) continue;
-				if (!e.to.visited) {
+			while (n.iter < g.edgeSize(v)) {
+				Edge e = g.edge(v, n.iter++);
+				Node to = node(e.to());
+				if (n.parent != null && to == n.parent) continue;
+				if (!to.visited) {
 					stacked = true;
 					n.childCnt++;
-					e.to.parent = n;
-					stack.addLast(e.to);
+					to.parent = n;
+					stack.addLast(to);
 					break;
 				} else {
-					n.low = Math.min(n.low, e.to.ord);
+					n.low = Math.min(n.low, to.ord);
 				}
 			}
 			if (!stacked) {
@@ -331,7 +338,6 @@ class LowLink {
 
 	public class Node {
 		private int id = 0;
-		private ArrayList<Edge> edge = null;
 		private Node parent = null;
 		private int ord = 0;
 		private int low = 0;
@@ -343,16 +349,9 @@ class LowLink {
 
 		private Node(int id) {
 			this.id = id;
-			edge = new ArrayList<>();
-		}
-		private void addEdge(Edge e) {
-			edge.add(e);
 		}
 		public int id() {
 			return id;
-		}
-		public int edgeCnt() {
-			return edge.size();
 		}
 		public boolean isArticulation() {
 			return isArticulation;
@@ -361,26 +360,91 @@ class LowLink {
 			return artCnt;
 		}
 	}
-	public class Edge {
-		private Node from = null;
-		private Node to = null;
-		private int eid = 0;
-
-		private boolean isBridge = false;
-		private Edge(Node from, Node to, int id) {
-			this.from = from;
-			this.to = to;
-			this.eid = id;
-		}
-		public int id() {
-			return eid;
-		}
-		public int from() {
-			return from.id;
-		}
-		public int to() {
-			return to.id;
-		}
-	}
 }
 // === end: graph/LowLink.java ===
+
+// === begin: graph/Graph.java ===
+class Graph {
+	private int n;
+	private ArrayList<Edge>[] edges;
+	private int maxEdgeId = 0;
+	private int edgeCnt = 0;
+	
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		this.n = n;
+		edges = new ArrayList[n];
+		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+	}
+	public void addDirEdge(Edge e) {
+		edges[e.from()].add(e);
+		maxEdgeId = Math.max(maxEdgeId, e.id());
+		edgeCnt++;
+	}
+	public void addDirEdge(int from, int to) {
+		edges[from].add(new Edge(from, to, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addDirEdge(int from, int to, int id) {
+		edges[from].add(new Edge(from, to, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt++;
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, edgeCnt++));
+		edges[v].add(new Edge(v, u, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt += 2;
+	}
+	public int edgeSize(int v) {
+		return edges[v].size();
+	}
+	public int edgeSize() {
+		return edgeCnt;
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
+	public Edge edge(int v, int i) {
+		return edges[v].get(i);
+	}
+	public ArrayList<Edge> edges(int v) {
+		return edges[v];
+	}
+	public int[] edgesTo(int v) {
+		int[] ret = new int[edgeSize(v)];
+		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
+		return ret;
+	}
+	public int size() {
+		return n;
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+}
+// === end: graph/Edge.java ===

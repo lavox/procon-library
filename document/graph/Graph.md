@@ -23,7 +23,7 @@ public void addDirEdge(int from, int to, int id)
 - 引数
   - `e` : 辺を表す`Edge`インスタンス
   - `from`, `to` : 頂点番号 $(0 \le \mathrm{from}, \mathrm{to} \lt n)$
-  - `id` : 辺のID。指定しなかった場合は0とみなす
+  - `id` : 辺のID。指定しなかった場合は追加済みの辺の本数をIDとみなす
 - 計算量
   - ならし $O(1)$
 
@@ -35,9 +35,25 @@ public void addUndirEdge(int u, int v, int id)
 頂点`u`と頂点`v`を結ぶ無向辺を追加する。
 - 引数
   - `u`, `v` : 頂点番号 $(0 \le u, v \lt n)$
-  - `id` : 辺のID。指定しなかった場合は0とみなす
+  - `id` : 辺のID。指定しなかった場合は追加済みの辺の本数をIDとみなす
 - 計算量
   - ならし $O(1)$
+
+### 辺の総数
+```java
+public int edgeSize()
+```
+全ての辺の本数を返す。無向辺は両方向で2本とみなす。
+- 計算量
+  - $O(1)$
+
+### 辺のIDの最大値
+```java
+public int maxEdgeId()
+```
+辺に設定されたIDの最大値を返す。
+- 計算量
+  - $O(1)$
 
 ### ある頂点から張られている辺の本数
 ```java

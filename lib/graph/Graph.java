@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class Graph {
 	private int n;
 	private ArrayList<Edge>[] edges;
+	private int maxEdgeId = 0;
+	private int edgeCnt = 0;
 	
 	@SuppressWarnings("unchecked")
 	public Graph(int n) {
@@ -14,23 +16,37 @@ public class Graph {
 	}
 	public void addDirEdge(Edge e) {
 		edges[e.from()].add(e);
+		maxEdgeId = Math.max(maxEdgeId, e.id());
+		edgeCnt++;
 	}
 	public void addDirEdge(int from, int to) {
-		edges[from].add(new Edge(from, to, 0));
+		edges[from].add(new Edge(from, to, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
 	}
 	public void addDirEdge(int from, int to, int id) {
 		edges[from].add(new Edge(from, to, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt++;
 	}
 	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, 0));
-		edges[v].add(new Edge(v, u, 0));
+		edges[u].add(new Edge(u, v, edgeCnt++));
+		edges[v].add(new Edge(v, u, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
 	}
 	public void addUndirEdge(int u, int v, int id) {
 		edges[u].add(new Edge(u, v, id));
 		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt += 2;
 	}
 	public int edgeSize(int v) {
 		return edges[v].size();
+	}
+	public int edgeSize() {
+		return edgeCnt;
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
 	}
 	public Edge edge(int v, int i) {
 		return edges[v].get(i);
