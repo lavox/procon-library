@@ -20,17 +20,17 @@ public class Main {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
 		int Q = sc.nextInt();
-		LcaTree tree = new LcaTree(N);
+		Graph g = new Graph(N);
 		for (int i = 0; i < N - 1; i++) {
 			int p = sc.nextInt();
-			tree.addEdge(i + 1, p);
+			g.addUndirEdge(i + 1, p);
 		}
-		tree.build(0);
+		Lca lca = new Lca(g, 0);
 		StringBuilder out = new StringBuilder();
 		for (int q = 0; q < Q; q++) {
 			int u = sc.nextInt();
 			int v = sc.nextInt();
-			out.append(tree.lca(u, v));
+			out.append(lca.lca(u, v));
 			out.append('\n');
 		}
 		System.out.print(out.toString());
@@ -217,30 +217,25 @@ class FastScanner {
 	}
 }
 
-// === begin: graph/LcaTree.java ===
-class LcaTree {
-	private int _n = 0;
-	private ArrayList<Integer>[] edges = null;
+// === begin: graph/Lca.java ===
+class Lca {
+	private Graph g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public LcaTree(int n) {
-		this._n = n;
+	public Lca(Graph g, int root) {
+		this.g = g;
 		this.K = 1;
-		while ((1 << this.K) < n) this.K++;
-		this.edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) this.edges[i] = new ArrayList<>();
+		while ((1 << this.K) < g.size()) this.K++;
+		build(root);
 	}
-	public void addEdge(int u, int v) {
-		edges[u].add(v);
-		edges[v].add(u);
-	}
-	public void build(int root) {
-		depth = new int[_n];
-		anc = new int[K][_n];
-		kmax = new int[_n];
+	private void build(int root) {
+		int n = g.size();
+		depth = new int[n];
+		anc = new int[K][n];
+		kmax = new int[n];
 		Arrays.fill(depth, -1);
 		for (int k = 0; k < K; k++) Arrays.fill(anc[k], -1);
 		ArrayDeque<Integer> stack = new ArrayDeque<>();
@@ -249,7 +244,8 @@ class LcaTree {
 		while (stack.size() > 0) {
 			int pos = stack.pollFirst();
 			kmax[pos] = 31 - Integer.numberOfLeadingZeros(depth[pos]);
-			for (int child: edges[pos]) {
+			for (Edge e: g.edges(pos)) {
+				int child = e.to();
 				if (depth[child] != -1) continue;
 				depth[child] = depth[pos] + 1;
 				anc[0][child] = pos;
@@ -257,7 +253,7 @@ class LcaTree {
 			}
 		}
 		for (int k = 1; k < K; k++) {
-			for (int i = 0; i < _n; i++) {
+			for (int i = 0; i < n; i++) {
 				if (anc[k - 1][i] >= 0) {
 					anc[k][i] = anc[k - 1][anc[k - 1][i]];
 				}
@@ -292,4 +288,74 @@ class LcaTree {
 		return u;
 	}
 }
-// === end: graph/LcaTree.java ===
+// === end: graph/Lca.java ===
+
+// === begin: graph/Graph.java ===
+class Graph {
+	private int n;
+	private ArrayList<Edge>[] edges;
+	
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		this.n = n;
+		edges = new ArrayList[n];
+		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+	}
+	public void addDirEdge(Edge e) {
+		edges[e.from()].add(e);
+	}
+	public void addDirEdge(int from, int to) {
+		edges[from].add(new Edge(from, to, 0));
+	}
+	public void addDirEdge(int from, int to, int id) {
+		edges[from].add(new Edge(from, to, id));
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, 0));
+		edges[v].add(new Edge(v, u, 0));
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+	}
+	public int edgeSize(int v) {
+		return edges[v].size();
+	}
+	public Edge edge(int v, int i) {
+		return edges[v].get(i);
+	}
+	public ArrayList<Edge> edges(int v) {
+		return edges[v];
+	}
+	public int[] edgesTo(int v) {
+		int[] ret = new int[edgeSize(v)];
+		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
+		return ret;
+	}
+	public int size() {
+		return n;
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+}
+// === end: graph/Edge.java ===

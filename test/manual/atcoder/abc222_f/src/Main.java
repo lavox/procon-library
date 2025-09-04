@@ -7,6 +7,9 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
+import java.util.BitSet;
+import java.util.Iterator;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -35,11 +38,11 @@ public class Main {
 				return Math.max(x, y);
 			}
 			@Override
-			public long mergeSubtree(long x, LongRerooting.Edge e) {
-				return C[e.id()] + Math.max(x, D[e.to().id()]);
+			public long mergeSubtree(long x, Edge e) {
+				return C[e.id() / 2] + Math.max(x, D[e.to()]);
 			}
 			@Override
-			public long nodeValue(long x, LongRerooting.Node n) {
+			public long nodeValue(long x, int v) {
 				return x;
 			}
 		};
@@ -234,137 +237,279 @@ class FastScanner {
 		return ret;
 	}
 }
+
+// === begin: graph/LongRerooting.java ===
 abstract class LongRerooting {
 	public abstract long e();
 	public abstract long merge(long x, long y);
 	public abstract long mergeSubtree(long x, Edge e);
-	public abstract long nodeValue(long x, Node n);
+	public abstract long nodeValue(long x, int v);
 	protected long leaf(Edge e) {
 		return mergeSubtree(e(), e);
 	}
 
-	private ArrayList<Node> nodes = null;
-	private ArrayList<Edge> edges = null;
+	private int edgeCnt = 0;
+	private long[] values = null;
+	private Edge[] edges = null;
+	private long[] edgeValues = null;
+	private Graph g = null;
 
 	public LongRerooting(int n) {
-		nodes = new ArrayList<>(n);
-		edges = new ArrayList<>(n - 1);
-		for (int i = 0; i < n; i++) nodes.add(new Node(i));
+		g = new Graph(n);
+		edges = new Edge[2 * (n - 1)];
+		values = new long[n];
+		edgeValues = new long[2 * (n - 1)];
 	}
-	private Node node(int i) {
-		return nodes.get(i);
-	}
-	public void addEdge(int from, int to) {
-		int eid = edges.size();
-		Node nFrom = node(from);
-		Node nTo = node(to);
-		Edge e = new Edge(eid, nFrom, nTo);
-		Edge re = new Edge(eid, nTo, nFrom);
-		e.rev = re;
-		re.rev = e;
-		nFrom.edge.add(e);
-		nTo.edge.add(re);
-		edges.add(e);
+	public void addEdge(int u, int v) {
+		int eid = (edgeCnt++) * 2;
+		Edge e = new Edge(u, v, eid);
+		Edge re = new Edge(v, u, eid + 1);
+		g.addDirEdge(e);
+		g.addDirEdge(re);
+		edges[e.id()] = e;
+		edges[re.id()] = re;
 	}
 	public void build() {
-		dfs(node(0));
-		bfs(node(0));
+		dfs(0);
+		bfs(0);
 	}
 	public long nodeValue(int id) {
-		return node(id).value;
+		return values[id];
+	}
+	public long edgeValue(Edge e) {
+		return edgeValues[e.id()];
+	}
+	public long edgeValue(int id) {
+		return edgeValues[id];
 	}
 	public long edgeValue(int id, boolean rev) {
-		return rev ? edges.get(id).dp : edges.get(id).rev.dp;
+		return rev ? edgeValues[id ^ 1] : edgeValues[id];
 	}
-	public ArrayList<Edge> edges() {
+	public Edge rev(Edge e) {
+		return edges[e.id() ^ 1];
+	}
+	public Edge[] edges() {
 		return edges;
 	}
 
-	private void dfs(Node n0) {
-		ArrayDeque<Node> stack = new ArrayDeque<>();
-		stack.addLast(n0);
-		while (stack.size() > 0) {
-			Node n = stack.peekLast();
-			if (n.iter < n.edge.size()) {
-				Edge e = n.edge.get(n.iter++);
-				if (n.parentEdge != null && n.parentEdge.from == e.to) continue;
-				e.to.parentEdge = e;
-				stack.add(e.to);
-				continue;
-			}
-			if (n.parentEdge != null) {
-				if (n.iter > 0) {
-					long val = e();
-					for (Edge e: n.edge) {
-						if (n.parentEdge.from == e.to) continue;
-						val = merge(val, e.dp);
+	private void dfs(int v0) {
+		Dfs dfs = new Dfs(g);
+		for (Dfs.DfsStep s: dfs.dfsPostOrder(v0)) {
+			if (s.parent != -1) {
+				long val = e();
+				Edge pe = g.edge(s.parent, s.edgeIndex);
+				if (g.edgeSize(s.cur) > 1) {
+					for (Edge e: g.edges(s.cur)) {
+						if (e.to() == s.parent) continue;
+						val = merge(val, edgeValues[e.id()]);
 					}
-					n.parentEdge.dp = mergeSubtree(val, n.parentEdge);
+					edgeValues[pe.id()] = mergeSubtree(val, pe);
 				} else {
-					n.parentEdge.dp = leaf(n.parentEdge);
+					edgeValues[pe.id()] = leaf(pe);
 				}
 			}
-			stack.pollLast();
 		}
 	}
-	private void bfs(Node n0) {
-		ArrayDeque<Node> queue = new ArrayDeque<>();
-		queue.addLast(n0);
-		while (queue.size() > 0) {
-			Node n = queue.pollFirst();
-			long[] dpl = new long[n.edge.size() + 1];
-			long[] dpr = new long[n.edge.size() + 1];
+	private void bfs(int v0) {
+		int[] queue = new int[g.size()];
+		int ri = 0;
+		int wi = 0;
+		queue[wi++] = v0;
+		BitSet visited = new BitSet(g.size());
+		while (ri < wi) {
+			int v = queue[ri++];
+			visited.set(v);
+			long[] dpl = new long[g.edgeSize(v) + 1];
+			long[] dpr = new long[g.edgeSize(v) + 1];
 			dpl[0] = e();
 			dpr[0] = e();
-			for (int i = 0; i < n.edge.size(); i++) {
-				dpl[i + 1] = merge(dpl[i], n.edge(i).dp);
-				dpr[i + 1] = merge(dpr[i], n.edge(n.edge.size() - 1 - i).dp);
+			for (int i = 0; i < g.edgeSize(v); i++) {
+				Edge e1 = g.edge(v, i);
+				Edge e2 = g.edge(v, g.edgeSize(v) - 1 - i);
+				dpl[i + 1] = merge(dpl[i], edgeValues[e1.id()]);
+				dpr[i + 1] = merge(dpr[i], edgeValues[e2.id()]);
 			}
-			for (int i = 0; i < n.edge.size(); i++) {
-				Edge e = n.edge.get(i);
-				if (n.parentEdge != null && n.parentEdge.from == e.to) continue;
-				e.rev.dp = mergeSubtree(merge(dpl[i], dpr[n.edge.size() - 1 - i]), e.rev);
-				queue.addLast(e.to);
+			for (int i = 0; i < g.edgeSize(v); i++) {
+				Edge e = g.edge(v, i);
+				Edge re = rev(e);
+				if (visited.get(e.to())) continue;
+				edgeValues[re.id()] = mergeSubtree(merge(dpl[i], dpr[g.edgeSize(v) - 1 - i]), re);
+				queue[wi++] = e.to();
 			}
-			n.value = nodeValue(dpl[n.edge.size()], n);
-		}
-	}
-
-	public class Node {
-		private int id;
-		private ArrayList<Edge> edge;
-		private Edge parentEdge = null;
-		private int iter = 0;
-		private Edge edge(int i) { return edge.get(i); }
-
-		private long value = 0;
-		private Node(int id) {
-			this.id = id;
-			edge = new ArrayList<>();
-		}
-		public int id() {
-			return id;
-		}
-	}
-	public class Edge {
-		private int id;
-		private Node from;
-		private Node to;
-		private Edge rev = null;
-		private long dp = 0;
-		private Edge(int id, Node from, Node to) {
-			this.id = id;
-			this.from = from;
-			this.to = to;
-		}
-		public int id() {
-			return id;
-		}
-		public Node from() {
-			return from;
-		}
-		public Node to() {
-			return to;
+			values[v] = nodeValue(dpl[g.edgeSize(v)], v);
 		}
 	}
 }
+// === end: graph/LongRerooting.java ===
+
+// === begin: graph/Graph.java ===
+class Graph {
+	private int n;
+	private ArrayList<Edge>[] edges;
+	
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		this.n = n;
+		edges = new ArrayList[n];
+		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+	}
+	public void addDirEdge(Edge e) {
+		edges[e.from()].add(e);
+	}
+	public void addDirEdge(int from, int to) {
+		edges[from].add(new Edge(from, to, 0));
+	}
+	public void addDirEdge(int from, int to, int id) {
+		edges[from].add(new Edge(from, to, id));
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, 0));
+		edges[v].add(new Edge(v, u, 0));
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+	}
+	public int edgeSize(int v) {
+		return edges[v].size();
+	}
+	public Edge edge(int v, int i) {
+		return edges[v].get(i);
+	}
+	public ArrayList<Edge> edges(int v) {
+		return edges[v];
+	}
+	public int[] edgesTo(int v) {
+		int[] ret = new int[edgeSize(v)];
+		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
+		return ret;
+	}
+	public int size() {
+		return n;
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/Dfs.java ===
+class Dfs {
+	private final Graph g;
+	private int[] visitedGen = null;
+	int gen = 0;
+
+	public Dfs(Graph g) {
+		this.g = g;
+		this.visitedGen = new int[g.size()];
+	}
+	public Iterable<DfsStep> dfsBothOrder(int v0) {
+		gen++;
+		return () -> new DfsIterator(v0, true, true);
+	}
+	public Iterable<DfsStep> dfsPreOrder(int v0) {
+		gen++;
+		return () -> new DfsIterator(v0, true, false);
+	}
+	public Iterable<DfsStep> dfsPostOrder(int v0) {
+		gen++;
+		return () -> new DfsIterator(v0, false, true);
+	}
+	private void setVisited(int nodeId) {
+		visitedGen[nodeId] = gen;
+	}
+	private boolean isVisited(int nodeId) {
+		return visitedGen[nodeId] >= gen;
+	}
+
+	public class DfsIterator implements Iterator<DfsStep> {
+		private final ArrayDeque<DfsStep> stack;
+		private final boolean requirePreOrder;
+		private final boolean requirePostOrder;
+		private DfsStep nextStep = null;
+		private DfsIterator(int v0, boolean requirePreOrder, boolean requirePostOrder) {
+			this.requirePreOrder = requirePreOrder;
+			this.requirePostOrder = requirePostOrder;
+			this.stack = new ArrayDeque<>();
+			this.stack.addLast(new DfsStep(v0, -1, 0, true, 0));
+			setVisited(v0);
+			_next();
+		}
+		@Override
+		public boolean hasNext() {
+			return nextStep != null;
+		}
+		@Override
+		public DfsStep next() {
+			if (nextStep == null)
+				throw new NoSuchElementException();
+			DfsStep ret = nextStep;
+			_next();
+			return ret;
+		}
+		private void _next() {
+			nextStep = null;
+			while (stack.size() > 0 && nextStep == null) {
+				DfsStep s = stack.pollLast();
+				if (s.isPre) {
+					stack.addLast(new DfsStep(s.cur, s.parent, s.edgeIndex, false, s.depth));
+					addNextEdge(s.cur, 0, s.depth + 1);
+				} else if (s.parent != -1) {
+					addNextEdge(s.parent, s.edgeIndex + 1, s.depth);
+				}
+				if ((s.isPre && requirePreOrder) || (!s.isPre && requirePostOrder)) {
+					nextStep = s;
+				}
+			}
+		}
+		private void addNextEdge(int v, int ei0, int depth) {
+			for (int ei = ei0; ei < g.edgeSize(v); ei++) {
+				Edge e = g.edge(v, ei);
+				if (isVisited(e.to()))
+					continue;
+				stack.addLast(new DfsStep(e.to(), v, ei, true, depth));
+				setVisited(e.to());
+				return;
+			}
+		}
+	}
+
+	public class DfsStep {
+		public final int cur;
+		public final int parent;
+		public final int edgeIndex;
+		public final boolean isPre;
+		public final int depth;
+
+		private DfsStep(int cur, int parent, int edgeIndex, boolean isPre, int depth) {
+			this.cur = cur;
+			this.parent = parent;
+			this.edgeIndex = edgeIndex;
+			this.isPre = isPre;
+			this.depth = depth;
+		}
+		public boolean isVisited(int nodeId) {
+			return Dfs.this.isVisited(nodeId);
+		}
+	}
+}
+// === end: graph/Dfs.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+}
+// === end: graph/Edge.java ===
