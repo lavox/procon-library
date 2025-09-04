@@ -20,9 +20,11 @@
 ### graph
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
+| Graph.java<br>Edge.java  | グラフ基本クラス                     |
+| Dfs.java                 | 深さ優先探索                         |
 | MaxFlow.java             | 最大流・最小カット                   |
 | MinCostFlow.java         | 最小費用流                           |
-| LcaTree.java             | 最近共通祖先(LCA)                    |
+| Lca.java                 | 最近共通祖先(LCA)                    |
 | SccGraph.java            | 強連結成分分解(SCC)                  |
 | Rerooting.java<br>LongRerooting.java | 全方位木DP               |
 | TopologicalSort.java     | トポロジカルソート                   |

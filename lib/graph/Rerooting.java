@@ -1,138 +1,109 @@
 package graph;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.BitSet;
 
 public abstract class Rerooting<E> {
 	public abstract E e();
 	public abstract E merge(E x, E y);
 	public abstract E mergeSubtree(E x, Edge e);
-	public abstract E nodeValue(E x, Node n);
+	public abstract E nodeValue(E x, int v);
 	protected E leaf(Edge e) {
 		return mergeSubtree(e(), e);
 	}
 
-	private ArrayList<Node> nodes = null;
-	private ArrayList<Edge> edges = null;
+	private int edgeCnt = 0;
+	private E[] values = null;
+	private Edge[] edges = null;
+	private E[] edgeValues = null;
+	private Graph g = null;
+	private Class<?> eclass = null;
 
+	@SuppressWarnings("unchecked")
 	public Rerooting(int n) {
-		nodes = new ArrayList<>(n);
-		edges = new ArrayList<>(n - 1);
-		for (int i = 0; i < n; i++) nodes.add(new Node(i));
-	}
-	private Node node(int i) {
-		return nodes.get(i);
+		g = new Graph(n);
+		edges = new Edge[2 * (n - 1)];
+		eclass = e().getClass();
+		values = (E[]) Array.newInstance(eclass, n);
+		edgeValues = (E[]) Array.newInstance(eclass, 2 * (n - 1));
 	}
 	public void addEdge(int u, int v) {
-		int eid = edges.size();
-		Node nu = node(u);
-		Node nv = node(v);
-		Edge e = new Edge(eid, nu, nv);
-		Edge re = new Edge(eid, nv, nu);
-		e.rev = re;
-		re.rev = e;
-		nu.edge.add(e);
-		nv.edge.add(re);
-		edges.add(e);
+		int eid = (edgeCnt++) * 2;
+		Edge e = new Edge(u, v, eid);
+		Edge re = new Edge(v, u, eid + 1);
+		g.addDirEdge(e);
+		g.addDirEdge(re);
+		edges[e.id()] = e;
+		edges[re.id()] = re;
 	}
 	public void build() {
-		dfs(node(0));
-		bfs(node(0));
+		dfs(0);
+		bfs(0);
 	}
 	public E nodeValue(int id) {
-		return node(id).value;
+		return values[id];
+	}
+	public E edgeValue(Edge e) {
+		return edgeValues[e.id()];
+	}
+	public E edgeValue(int id) {
+		return edgeValues[id];
 	}
 	public E edgeValue(int id, boolean rev) {
-		return rev ? edges.get(id).dp : edges.get(id).rev.dp;
+		return rev ? edgeValues[id ^ 1] : edgeValues[id];
 	}
-	public ArrayList<Edge> edges() {
+	public Edge rev(Edge e) {
+		return edges[e.id() ^ 1];
+	}
+	public Edge[] edges() {
 		return edges;
 	}
 
-	private void dfs(Node n0) {
-		ArrayDeque<Node> stack = new ArrayDeque<>();
-		stack.addLast(n0);
-		while (stack.size() > 0) {
-			Node n = stack.peekLast();
-			if (n.iter < n.edge.size()) {
-				Edge e = n.edge.get(n.iter++);
-				if (n.parentEdge != null && n.parentEdge.from == e.to) continue;
-				e.to.parentEdge = e;
-				stack.add(e.to);
-				continue;
-			}
-			if (n.parentEdge != null) {
-				if (n.iter > 0) {
-					E val = e();
-					for (Edge e: n.edge) {
-						if (n.parentEdge.from == e.to) continue;
-						val = merge(val, e.dp);
+	private void dfs(int v0) {
+		Dfs dfs = new Dfs(g);
+		for (Dfs.DfsStep s: dfs.dfsPostOrder(v0)) {
+			if (s.parent != -1) {
+				E val = e();
+				Edge pe = g.edge(s.parent, s.edgeIndex);
+				if (g.edgeSize(s.cur) > 1) {
+					for (Edge e: g.edges(s.cur)) {
+						if (e.to() == s.parent) continue;
+						val = merge(val, edgeValues[e.id()]);
 					}
-					n.parentEdge.dp = mergeSubtree(val, n.parentEdge);
+					edgeValues[pe.id()] = mergeSubtree(val, pe);
 				} else {
-					n.parentEdge.dp = leaf(n.parentEdge);
+					edgeValues[pe.id()] = leaf(pe);
 				}
 			}
-			stack.pollLast();
 		}
 	}
-	private void bfs(Node n0) {
-		ArrayDeque<Node> queue = new ArrayDeque<>();
-		queue.addLast(n0);
-		while (queue.size() > 0) {
-			Node n = queue.pollFirst();
-			ArrayList<E> dpl = new ArrayList<>(n.edge.size() + 1);
-			ArrayList<E> dpr = new ArrayList<>(n.edge.size() + 1);
-			dpl.add(e());
-			dpr.add(e());
-			for (int i = 0; i < n.edge.size(); i++) {
-				dpl.add(merge(dpl.get(i), n.edge(i).dp));
-				dpr.add(merge(dpr.get(i), n.edge(n.edge.size() - 1 - i).dp));
+	@SuppressWarnings("unchecked")
+	private void bfs(int v0) {
+		int[] queue = new int[g.size()];
+		int ri = 0;
+		int wi = 0;
+		queue[wi++] = v0;
+		BitSet visited = new BitSet(g.size());
+		while (ri < wi) {
+			int v = queue[ri++];
+			visited.set(v);
+			E[] dpl = (E[])Array.newInstance(eclass, g.edgeSize(v) + 1);
+			E[] dpr = (E[])Array.newInstance(eclass, g.edgeSize(v) + 1);
+			dpl[0] = e();
+			dpr[0] = e();
+			for (int i = 0; i < g.edgeSize(v); i++) {
+				Edge e1 = g.edge(v, i);
+				Edge e2 = g.edge(v, g.edgeSize(v) - 1 - i);
+				dpl[i + 1] = merge(dpl[i], edgeValues[e1.id()]);
+				dpr[i + 1] = merge(dpr[i], edgeValues[e2.id()]);
 			}
-			for (int i = 0; i < n.edge.size(); i++) {
-				Edge e = n.edge.get(i);
-				if (n.parentEdge != null && n.parentEdge.from == e.to) continue;
-				e.rev.dp = mergeSubtree(merge(dpl.get(i), dpr.get(n.edge.size() - 1 - i)), e.rev);
-				queue.addLast(e.to);
+			for (int i = 0; i < g.edgeSize(v); i++) {
+				Edge e = g.edge(v, i);
+				Edge re = rev(e);
+				if (visited.get(e.to())) continue;
+				edgeValues[re.id()] = mergeSubtree(merge(dpl[i], dpr[g.edgeSize(v) - 1 - i]), re);
+				queue[wi++] = e.to();
 			}
-			n.value = nodeValue(dpl.get(n.edge.size()), n);
-		}
-	}
-
-	public class Node {
-		private int id;
-		private ArrayList<Edge> edge;
-		private Edge parentEdge = null;
-		private int iter = 0;
-		private Edge edge(int i) { return edge.get(i); }
-
-		private E value = null;
-		private Node(int id) {
-			this.id = id;
-			edge = new ArrayList<>();
-		}
-		public int id() {
-			return id;
-		}
-	}
-	public class Edge {
-		private int id;
-		private Node from;
-		private Node to;
-		private Edge rev = null;
-		private E dp = null;
-		private Edge(int id, Node from, Node to) {
-			this.id = id;
-			this.from = from;
-			this.to = to;
-		}
-		public int id() {
-			return id;
-		}
-		public Node from() {
-			return from;
-		}
-		public Node to() {
-			return to;
+			values[v] = nodeValue(dpl[g.edgeSize(v)], v);
 		}
 	}
 }

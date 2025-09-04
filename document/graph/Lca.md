@@ -1,34 +1,20 @@
 # 最近共通祖先(LCA)
 木の最近共通祖先(LCA)を求める。
 
+- 依存ライブラリ
+  - Graph.java
+  - Edge.java
+
 参考情報
 - [ダブリングによる木の最近共通祖先（LCA：Lowest Common Ancestor）を求めるアルゴリズム](https://algo-logic.info/lca/)
 
 ### コンストラクタ
 ```java
-public LcaTree(int n)
+public Lca(Graph g, int root)
 ```
+インスタンスを生成し、`root`を根として、ダブリングにより各頂点の祖先情報を構築する。
 - 引数
-  - `n` : 頂点数
-- 計算量
-  - $O(n)$
-
-### 頂点間に辺を追加
-```java
-public void addEdge(int u, int v)
-```
-頂点`u`,`v`間に辺を追加する。
-- 引数
-  - `u`, `v` : 頂点番号 $(0 \le u, v \lt n)$
-- 計算量
-  - ならし $O(1)$
-
-### 祖先情報の構築(LCAを求める準備)
-```java
-public void build(int root)
-```
-`root`を根として、ダブリングにより各頂点の祖先情報を構築する。
-- 引数
+  - `g` : グラフ (頂点数を $n$ とする)
   - `root` : 木の根とする頂点番号 $(0 \le \mathrm{root} \lt n)$
 - 計算量
   - $O(n \log n)$
@@ -72,4 +58,4 @@ public int ancestor(int u, int d)
   - $O(\log d)$
 
 ## 検証
-- [Lowest Common Ancestor (Library Checker)](https://judge.yosupo.jp/submission/307928)
+- [Lowest Common Ancestor (Library Checker)](https://judge.yosupo.jp/submission/312425)

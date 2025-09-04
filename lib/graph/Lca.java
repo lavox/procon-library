@@ -1,31 +1,25 @@
 package graph;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-public class LcaTree {
-	private int _n = 0;
-	private ArrayList<Integer>[] edges = null;
+public class Lca {
+	private Graph g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public LcaTree(int n) {
-		this._n = n;
+	public Lca(Graph g, int root) {
+		this.g = g;
 		this.K = 1;
-		while ((1 << this.K) < n) this.K++;
-		this.edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) this.edges[i] = new ArrayList<>();
+		while ((1 << this.K) < g.size()) this.K++;
+		build(root);
 	}
-	public void addEdge(int u, int v) {
-		edges[u].add(v);
-		edges[v].add(u);
-	}
-	public void build(int root) {
-		depth = new int[_n];
-		anc = new int[K][_n];
-		kmax = new int[_n];
+	private void build(int root) {
+		int n = g.size();
+		depth = new int[n];
+		anc = new int[K][n];
+		kmax = new int[n];
 		Arrays.fill(depth, -1);
 		for (int k = 0; k < K; k++) Arrays.fill(anc[k], -1);
 		ArrayDeque<Integer> stack = new ArrayDeque<>();
@@ -34,7 +28,8 @@ public class LcaTree {
 		while (stack.size() > 0) {
 			int pos = stack.pollFirst();
 			kmax[pos] = 31 - Integer.numberOfLeadingZeros(depth[pos]);
-			for (int child: edges[pos]) {
+			for (Edge e: g.edges(pos)) {
+				int child = e.to();
 				if (depth[child] != -1) continue;
 				depth[child] = depth[pos] + 1;
 				anc[0][child] = pos;
@@ -42,7 +37,7 @@ public class LcaTree {
 			}
 		}
 		for (int k = 1; k < K; k++) {
-			for (int i = 0; i < _n; i++) {
+			for (int i = 0; i < n; i++) {
 				if (anc[k - 1][i] >= 0) {
 					anc[k][i] = anc[k - 1][anc[k - 1][i]];
 				}
