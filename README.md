@@ -52,6 +52,13 @@
 | RollingHash.java         | ローリングハッシュ                   |
 | AhoCorasick.java         | Aho-Corasick法                       |
 
+### primitive
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
+| LongArrayList.java       | long版ArrayList                      |
+| LongArrays.java          | Comparotorを使用したlongのソート     |
+| LongComparator.java      | long版Comparator                     |
+
 ### template
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
