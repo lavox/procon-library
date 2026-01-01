@@ -55,6 +55,9 @@
 ### primitive
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
+| IntArrayList.java        | int版ArrayList                       |
+| IntArrays.java           | Comparotorを使用したintのソート      |
+| IntComparator.java       | int版Comparator                      |
 | LongArrayList.java       | long版ArrayList                      |
 | LongArrays.java          | Comparotorを使用したlongのソート     |
 | LongComparator.java      | long版Comparator                     |

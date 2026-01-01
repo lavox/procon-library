@@ -2,6 +2,7 @@
 Javaのオートボクシングによる性能劣化を避けるためのprimitive専用各種ユーティリティ。
 
 ## ArrayList
+- IntArrayList : int版
 - LongArrayList : long版
 
 `java.util.ArrayList`のprimitive版。主要なほとんどのメソッドを実装だが一部未実装のメソッドあり。
@@ -20,6 +21,7 @@ LongArrayList,for-values         prepare:     7 ms, main:    32 ms
 ```
 
 ## Arrays, Comparator
+- IntArrays, IntComparator : int版
 - LongArrays, LongComparator : long版
 
 `java.util.Arrays`, `java.util.Comparator`のprimitive版。`Arrays`は`sort(list, comparator)`のみ実装している。`Arrays.sort()`より2倍程度遅いが、`ArrayList`を`Collections.sort()`するよりは2倍程度速い。
