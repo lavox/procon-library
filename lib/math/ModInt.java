@@ -1,5 +1,7 @@
 package math;
 
+import java.util.Arrays;
+
 public class ModInt {
 	final ModOperation mop;
 	int v = 0;
@@ -249,6 +251,12 @@ class ModOperation {
 		this.m = m;
 		this.fraction = fraction;
 	}
+	public static ModOperation mod998() {
+		return new ModOperation(MOD998);
+	}
+	public static ModOperation mod107() {
+		return new ModOperation(MOD107);
+	}
 	public ModInt create(long v) {
 		v %= m;
 		if ( v < 0 ) v += m;
@@ -298,22 +306,31 @@ class ModOperation {
 	}
 	
 	public void prepareFactorial(int max) {
-		factorialMax = max;
-		fact = new int[max + 1];
-		finv = new int[max + 1];
-		inv = new int[max + 1];
+		max = Math.max(max, 1);
+		if (max <= factorialMax) return;
+		if (factorialMax == -1) {
+			fact = new int[max + 1];
+			finv = new int[max + 1];
+			inv = new int[max + 1];
+			fact[0] = 1;
+			finv[0] = 1;
+			fact[1] = 1;
+			finv[1] = 1;
+			inv[1] = 1;
+			factorialMax = 1;
+		} else {
+			fact = Arrays.copyOf(fact, max + 1);
+			finv = Arrays.copyOf(finv, max + 1);
+			inv = Arrays.copyOf(inv, max + 1);
+		}
 
-		fact[0] = 1;
-		finv[0] = 1;
-		fact[1] = 1;
-		finv[1] = 1;
-		inv[1] = 1;
-		for (int i = 2; i <= max; i++) {
+		for (int i = factorialMax + 1; i <= max; i++) {
 			fact[i] = mul(fact[i - 1],  i);
 			inv[i] = -mul(inv[m % i], m / i);
 			if ( inv[i] < 0 ) inv[i] += m;
 			finv[i] = mul(finv[i - 1], inv[i]);
 		}
+		factorialMax = max;
 	}
 	public int fact(int a) {
 		return fact[a];

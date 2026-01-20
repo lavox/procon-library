@@ -42,6 +42,7 @@
 | Matrix.java              | 行列演算(行列累乗含む)               |
 | Vec.java                 | ベクトル演算                         |
 | Convolution.java         | 畳み込み                             |
+| FormalPowerSeries.java<br>NTTFriendlyFPS.java<br>NTT.java | 形式的冪級数(FPS)、数論変換(NTT)  |
 
 ### string
 | ファイル名               | 内容                                 |

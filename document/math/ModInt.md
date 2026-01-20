@@ -20,7 +20,10 @@ public static final int MOD107 = 1000000007;
 ```java
 public ModOperation(int m)
 public ModOperation(int m, boolean fraction)
+public static ModOperation mod998()
+public static ModOperation mod107()
 ```
+`mod998()`, `mod107()`は、それぞれ`new ModOperation(ModOperation.MOD998)`, `new ModOperation(ModOperation.MOD107)`の省略記法。
 - 引数
   - `m` : 剰余の法
   - `fraction` : `true`を指定した場合、`create(long)`メソッドで`ModInt`ではなく`ModFraction`インスタンスを生成し、割り算や逆元を実数として実行した場合の値を内部に保持(主にデバッグ用途)

@@ -33,6 +33,7 @@ public class SegmentTree<S> {
 		this(arr.size(), op, e);
 		initData(arr);
 	}
+	@SuppressWarnings("unchecked")
 	private void initialize(int n, BinaryOperator<S> op, Supplier<S> e) {
 		this.n = n;
 		this._op = op;
@@ -49,6 +50,7 @@ public class SegmentTree<S> {
 		System.arraycopy(arr, 0, d, size, n);
 		for ( int i = size - 1 ; i >= 1 ; i-- ) update(i);
 	}
+	@SuppressWarnings("unchecked")
 	public void initData(Collection<S> arr) {
 		initData((S[])arr.toArray());
 	}
