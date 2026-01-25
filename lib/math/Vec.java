@@ -109,11 +109,16 @@ public class Vec {
 	public static double dist2(long[] a, long[] b) {
 		return Math.sqrt(dist2Sq(a, b));
 	}
-	public boolean equals(Vec o) {
-		if ( a.length != o.a.length ) return false;
-		for (int i = 0; i < a.length; i++) {
-			if ( a[i] != o.a[i] ) return false;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Vec) {
+			Vec o = (Vec)obj;
+			if ( a.length != o.a.length ) return false;
+			for (int i = 0; i < a.length; i++) {
+				if ( a[i] != o.a[i] ) return false;
+			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 }
