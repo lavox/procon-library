@@ -39,6 +39,7 @@
 | ModInt.java              | 剰余演算(四則演算、逆元、累乗、階乗、階乗の逆元、二項係数、順列) |
 | MathUtil.java            | 中国剰余定理、Floor Sum、最大公約数  |
 | Prime.java               | 素数関連(素数判定、素数列挙、素因数分解、約数列挙) |
+| Bisect.java              | 二分探索                             |
 | Matrix.java              | 行列演算(行列累乗含む)               |
 | Vec.java                 | ベクトル演算                         |
 | Convolution.java         | 畳み込み                             |
