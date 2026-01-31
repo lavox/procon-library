@@ -1,6 +1,8 @@
 package string;
 import java.util.function.IntBinaryOperator;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/string.hpp
 public class LcpArray {
 	// Reference:
 	// T. Kasai, G. Lee, H. Arimura, S. Arikawa, and K. Park,

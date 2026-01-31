@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/maxflow.hpp
 public class MaxFlow {
 	private int _n = 0;
 	private ArrayList<_Edge>[] g = null;

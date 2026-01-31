@@ -3,6 +3,8 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.function.Predicate;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: hhttps://github.com/atcoder/ac-library/blob/master/atcoder/lazysegtree.hpp
 public class LazySegmentTree<S, F> {
 	private int n = 0;
 	private int size = 1;

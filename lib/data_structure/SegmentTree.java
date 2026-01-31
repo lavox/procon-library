@@ -5,6 +5,8 @@ import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/segtree.hpp
 public class SegmentTree<S> {
 	int n = 0;
 	int size = 1;

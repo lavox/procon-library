@@ -2,6 +2,8 @@ package data_structure;
 import java.util.Collection;
 import java.util.function.IntPredicate;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: hhttps://github.com/atcoder/ac-library/blob/master/atcoder/lazysegtree.hpp
 public class IntLazySegmentTree {
 	private int n = 0;
 	private int size = 1;

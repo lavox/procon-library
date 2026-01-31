@@ -1,6 +1,8 @@
 package data_structure;
 import java.util.Arrays;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/fenwicktree.hpp
 public class FenwickTree {
 	private int _n = 0;
 	private long[] data = null;

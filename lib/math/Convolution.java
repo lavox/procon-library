@@ -1,6 +1,8 @@
 package math;
 import java.util.Arrays;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp
 public class Convolution {
 	private static class FftInfo {
 		int g;

@@ -8,6 +8,8 @@ int[] z = zAlgorithm(s);
 // z = {17,0,3,0,1,10,0,3,0,1,5,0,4,0,2,0,0};
 ```
 
+ac-libraryの[string](https://github.com/atcoder/ac-library/blob/master/document_ja/string.md)の移植。
+
 ### Z Algorighm
 ```java
 public static int[] zAlgorithm(String s)

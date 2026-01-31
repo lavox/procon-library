@@ -1,5 +1,7 @@
 package graph;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/twosat.hpp
 public class TwoSat {
 	private boolean[] _answer = null;
 	private int _n = 0;

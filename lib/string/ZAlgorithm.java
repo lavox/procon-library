@@ -1,6 +1,8 @@
 package string;
 import java.util.function.IntBinaryOperator;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/string.hpp
 public class ZAlgorithm {
 	// Reference:
 	// D. Gusfield,

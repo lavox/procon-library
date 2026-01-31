@@ -1,6 +1,8 @@
 package math;
 import java.util.ArrayList;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/math.hpp
 public class MathUtil {
 	private static long mod(long x, long m) {
 		x %= m;

@@ -2,6 +2,8 @@ package graph;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/scc.hpp
 public class SccGraph {
 	private int _n = 0;
 	private ArrayList<Integer>[] edges = null;

@@ -3,6 +3,8 @@ import java.util.Collection;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntPredicate;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/segtree.hpp
 public class IntSegmentTree {
 	int n = 0;
 	int size = 1;

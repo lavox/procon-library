@@ -3,6 +3,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/string.hpp
 public class SuffixArray {
 	private static int[] convertToPrimitiveArray(Integer[] arr) {
 		int[] ret = new int[arr.length];
