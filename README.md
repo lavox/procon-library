@@ -58,6 +58,7 @@
 | LcpArray.java            | LCP Array                            |
 | RollingHash.java         | ローリングハッシュ                   |
 | AhoCorasick.java         | Aho-Corasick法                       |
+| Manacher.java            | Manacher Algorithm(最長回文半径)     |
 
 ### primitive
 | ファイル名               | 内容                                 |
