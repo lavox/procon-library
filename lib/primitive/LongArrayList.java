@@ -18,6 +18,10 @@ public class LongArrayList implements Iterable<Long> {
 		this.data = Arrays.copyOf(data, data.length);
 		this.size = data.length;
 	}
+	public LongArrayList(LongArrayList array) {
+		this.data = Arrays.copyOf(array.data, array.size);
+		this.size = array.size;
+	}
 	public boolean add(long e) {
 		ensureCapacity(size + 1);
 		data[size++] = e;
@@ -77,6 +81,10 @@ public class LongArrayList implements Iterable<Long> {
 		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
 		return data[index];
 	}
+	public long last() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[size - 1];
+	}
 	public int indexOf(long e) {
 		for (int i = 0; i < size; i++) {
 			if (data[i] == e) return i;
@@ -122,6 +130,10 @@ public class LongArrayList implements Iterable<Long> {
 		data[--size] = 0;
 		return oldValue;
 	}
+	public long removeLast() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[--size];
+	}
 	public boolean removeByVal(long e) {
 		int index = indexOf(e);
 		if (index >= 0) {
@@ -158,7 +170,7 @@ public class LongArrayList implements Iterable<Long> {
 		size = w;
 		return modified;
 	}
-	protected void removeRange(int fromIndex, int toIndex) {
+	public void removeRange(int fromIndex, int toIndex) {
 		if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -234,7 +246,6 @@ public class LongArrayList implements Iterable<Long> {
 	}
 	@Override
 	public int hashCode() {
-		Arrays.hashCode(data);
 		int hashCode = 1;
 		for (int i = 0; i < size; i++) {
 			hashCode = 31 * hashCode + (int)(data[i] ^ (data[i] >>> 32));

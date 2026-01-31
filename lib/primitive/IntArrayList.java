@@ -18,6 +18,10 @@ public class IntArrayList implements Iterable<Integer> {
 		this.data = Arrays.copyOf(data, data.length);
 		this.size = data.length;
 	}
+	public IntArrayList(IntArrayList array) {
+		this.data = Arrays.copyOf(array.data, array.size);
+		this.size = array.size;
+	}
 	public boolean add(int e) {
 		ensureCapacity(size + 1);
 		data[size++] = e;
@@ -77,6 +81,10 @@ public class IntArrayList implements Iterable<Integer> {
 		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
 		return data[index];
 	}
+	public int last() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[size - 1];
+	}
 	public int indexOf(int e) {
 		for (int i = 0; i < size; i++) {
 			if (data[i] == e) return i;
@@ -122,6 +130,10 @@ public class IntArrayList implements Iterable<Integer> {
 		data[--size] = 0;
 		return oldValue;
 	}
+	public int removeLast() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[--size];
+	}
 	public boolean removeByVal(int e) {
 		int index = indexOf(e);
 		if (index >= 0) {
@@ -158,7 +170,7 @@ public class IntArrayList implements Iterable<Integer> {
 		size = w;
 		return modified;
 	}
-	protected void removeRange(int fromIndex, int toIndex) {
+	public void removeRange(int fromIndex, int toIndex) {
 		if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
 			throw new IndexOutOfBoundsException();
 		}
