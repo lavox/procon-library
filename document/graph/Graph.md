@@ -1,11 +1,12 @@
 # グラフ
 グラフの辺の接続情報を管理する。グラフ全体を表す`Graph`クラスと、辺を表す`Edge`クラスを提供する。
 
-辺に付加情報(重み等)がある場合は、`Edge`クラスを拡張して使用することを想定。付加情報がない場合の記述を簡潔にする目的で`Graph`クラスはジェネリクスを使用していないため、`Edge`クラスを拡張した場合は、辺の取り出し時に適宜キャストして使用する。
+辺に付加情報(重み等)がある場合は、`Edge`クラスを拡張して使用することを想定。その場合は`GenericGraph<E extends Edge>`クラスを使用する。
 
-## `Graph`クラス
+## `GenericGraph<E extends Edge>`クラス、`Graph`クラス
 ### コンストラクタ
 ```java
+public GenericGraph(int n)
 public Graph(int n)
 ```
 - 引数
@@ -16,8 +17,8 @@ public Graph(int n)
 ### 頂点間に有向辺を追加
 ```java
 public void addDirEdge(Edge e)
-public void addDirEdge(int from, int to)
-public void addDirEdge(int from, int to, int id)
+public void addDirEdge(int from, int to) // Graphクラスのみ
+public void addDirEdge(int from, int to, int id) // Graphクラスのみ
 ```
 頂点`from`から頂点`to`への辺を追加する。`Edge`インスタンスを渡して追加することも可能(`Edge`クラスを拡張した場合を想定)
 - 引数
@@ -29,8 +30,8 @@ public void addDirEdge(int from, int to, int id)
 
 ### 頂点間に無向辺を追加
 ```java
-public void addUndirEdge(int u, int v)
-public void addUndirEdge(int u, int v, int id)
+public void addUndirEdge(int u, int v) // Graphクラスのみ
+public void addUndirEdge(int u, int v, int id) // Graphクラスのみ
 ```
 頂点`u`と頂点`v`を結ぶ無向辺を追加する。
 - 引数
@@ -120,6 +121,25 @@ public Edge(int from, int to, int id)
 public int from()
 public int to()
 public int id()
+```
+- 計算量
+  - $O(1)$
+
+## `CostEdge extends Edge`クラス
+### コンストラクタ
+```java
+public CostEdge(int from, int to, long cost, int id)
+```
+- 引数
+  - `from`, `to` : 頂点番号 $(0 \le \mathrm{from}, \mathrm{to} \lt n)$
+  - `cost` : コスト
+  - `id` : 辺のID
+- 計算量
+  - $O(1)$
+
+### 各情報の取得
+```java
+public long cost()
 ```
 - 計算量
   - $O(1)$

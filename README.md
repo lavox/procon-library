@@ -20,7 +20,7 @@
 ### graph
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
-| Graph.java<br>Edge.java  | グラフ基本クラス                     |
+| GenericGraph.java<br>Graph.java<br>Edge.java<br>CostEdge.java  | グラフ基本クラス                     |
 | Dfs.java                 | 深さ優先探索                         |
 | MaxFlow.java             | 最大流・最小カット                   |
 | MinCostFlow.java         | 最小費用流                           |
@@ -30,6 +30,7 @@
 | TopologicalSort.java     | トポロジカルソート                   |
 | TwoSat.java              | 2-SAT                                |
 | Tsp.java                 | 巡回セールスマン問題                 |
+| BellmanFord.java         | Bellman-Ford法 (負辺を含む最短経路)  |
 | WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
 | LowLink.java             | Low Link(関節点・橋の検出)           |
 
