@@ -2,6 +2,8 @@ package graph;
 
 import java.util.Arrays;
 
+import graph.Tsp.MinRoute;
+
 public class Tsp {
 	public static final long INF = Long.MAX_VALUE;
 	public static MinRoute search(long[][] distMap) {
@@ -27,6 +29,7 @@ public class Tsp {
 		MinRoute ret = new MinRoute();
 		for (int g = 0; g < n; g++) {
 			long d = dp[g][full];
+			if (d == INF) continue;
 			if (!oneway) {
 				if (distMap[g][s] == INF) continue;
 				d += distMap[g][s];
@@ -36,17 +39,19 @@ public class Tsp {
 				ret.g = g;
 			}
 		}
-		ret.path = new int[n];
-		for (int i = n - 1, cur = ret.g, bit = full; i >= 0; i--) {
-			ret.path[i] = cur;
-			if (i == 0) break;
-			long curDist = dp[cur][bit];
-			bit &= ~(1 << cur);
-			for (int _b = bit, prev = 0; _b != 0 ; _b &= ~(1 << prev)) {
-				prev = Integer.numberOfTrailingZeros(_b);
-				if (dp[prev][bit] != INF && distMap[prev][cur] != INF && dp[prev][bit] + distMap[prev][cur] == curDist) {
-					cur = prev;
-					break;
+		if (ret.dist != INF) {
+			ret.path = new int[n];
+			for (int i = n - 1, cur = ret.g, bit = full; i >= 0; i--) {
+				ret.path[i] = cur;
+				if (i == 0) break;
+				long curDist = dp[cur][bit];
+				bit &= ~(1 << cur);
+				for (int _b = bit, prev = 0; _b != 0 ; _b &= ~(1 << prev)) {
+					prev = Integer.numberOfTrailingZeros(_b);
+					if (dp[prev][bit] != INF && distMap[prev][cur] != INF && dp[prev][bit] + distMap[prev][cur] == curDist) {
+						cur = prev;
+						break;
+					}
 				}
 			}
 		}
