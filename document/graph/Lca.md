@@ -58,4 +58,4 @@ public int ancestor(int u, int d)
   - $O(\log d)$
 
 ## 検証
-- [Lowest Common Ancestor (Library Checker)](https://judge.yosupo.jp/submission/312425)
+- [Lowest Common Ancestor (Library Checker)](https://judge.yosupo.jp/submission/359345)

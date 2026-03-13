@@ -15,12 +15,12 @@ public abstract class Rerooting<E> {
 	private E[] values = null;
 	private Edge[] edges = null;
 	private E[] edgeValues = null;
-	private Graph g = null;
+	private GenericGraph<Edge> g = null;
 	private Class<?> eclass = null;
 
 	@SuppressWarnings("unchecked")
 	public Rerooting(int n) {
-		g = new Graph(n);
+		g = new GenericGraph<>(n);
 		edges = new Edge[2 * (n - 1)];
 		eclass = e().getClass();
 		values = (E[]) Array.newInstance(eclass, n);

@@ -9,6 +9,8 @@ import java.util.function.UnaryOperator;
 
 import java.util.BitSet;
 
+import java.util.Arrays;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -239,14 +241,14 @@ class FastScanner {
 // === begin: graph/LowLink.java ===
 class LowLink {
 	private Node[] nodes = null;
-	private Graph g = null;
+	private GenericGraph<? extends Edge> g = null;
 	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(Graph g) {
+	public LowLink(GenericGraph<? extends Edge> g) {
 		this.g = g;
 		this.nodes = new Node[g.size()];
 		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);
@@ -391,43 +393,23 @@ class Edge {
 }
 // === end: graph/Edge.java ===
 
-// === begin: graph/Graph.java ===
-class Graph {
-	private int n;
-	private ArrayList<Edge>[] edges;
-	private int maxEdgeId = 0;
-	private int edgeCnt = 0;
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> {
+	protected int n;
+	protected ArrayList<E>[] edges;
+	protected int maxEdgeId = 0;
+	protected int edgeCnt = 0;
 	
 	@SuppressWarnings("unchecked")
-	public Graph(int n) {
+	public GenericGraph(int n) {
 		this.n = n;
 		edges = new ArrayList[n];
 		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
 	}
-	public void addDirEdge(Edge e) {
+	public void addDirEdge(E e) {
 		edges[e.from()].add(e);
 		maxEdgeId = Math.max(maxEdgeId, e.id());
 		edgeCnt++;
-	}
-	public void addDirEdge(int from, int to) {
-		edges[from].add(new Edge(from, to, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addDirEdge(int from, int to, int id) {
-		edges[from].add(new Edge(from, to, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt++;
-	}
-	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, edgeCnt++));
-		edges[v].add(new Edge(v, u, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addUndirEdge(int u, int v, int id) {
-		edges[u].add(new Edge(u, v, id));
-		edges[v].add(new Edge(v, u, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt += 2;
 	}
 	public int edgeSize(int v) {
 		return edges[v].size();
@@ -441,7 +423,7 @@ class Graph {
 	public Edge edge(int v, int i) {
 		return edges[v].get(i);
 	}
-	public ArrayList<Edge> edges(int v) {
+	public ArrayList<E> edges(int v) {
 		return edges[v];
 	}
 	public int[] edgesTo(int v) {
@@ -451,6 +433,35 @@ class Graph {
 	}
 	public int size() {
 		return n;
+	}
+}
+// === end: graph/GenericGraph.java ===
+
+// === begin: graph/Graph.java ===
+class Graph extends GenericGraph<Edge> {
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addDirEdge(new Edge(from, to, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addDirEdge(new Edge(from, to, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt++;
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, edgeCnt++));
+		edges[v].add(new Edge(v, u, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt += 2;
 	}
 }
 // === end: graph/Graph.java ===
@@ -705,6 +716,12 @@ class ModOperation {
 		this.m = m;
 		this.fraction = fraction;
 	}
+	public static ModOperation mod998() {
+		return new ModOperation(MOD998);
+	}
+	public static ModOperation mod107() {
+		return new ModOperation(MOD107);
+	}
 	public ModInt create(long v) {
 		v %= m;
 		if ( v < 0 ) v += m;
@@ -754,22 +771,31 @@ class ModOperation {
 	}
 	
 	public void prepareFactorial(int max) {
-		factorialMax = max;
-		fact = new int[max + 1];
-		finv = new int[max + 1];
-		inv = new int[max + 1];
+		max = Math.max(max, 1);
+		if (max <= factorialMax) return;
+		if (factorialMax == -1) {
+			fact = new int[max + 1];
+			finv = new int[max + 1];
+			inv = new int[max + 1];
+			fact[0] = 1;
+			finv[0] = 1;
+			fact[1] = 1;
+			finv[1] = 1;
+			inv[1] = 1;
+			factorialMax = 1;
+		} else {
+			fact = Arrays.copyOf(fact, max + 1);
+			finv = Arrays.copyOf(finv, max + 1);
+			inv = Arrays.copyOf(inv, max + 1);
+		}
 
-		fact[0] = 1;
-		finv[0] = 1;
-		fact[1] = 1;
-		finv[1] = 1;
-		inv[1] = 1;
-		for (int i = 2; i <= max; i++) {
+		for (int i = factorialMax + 1; i <= max; i++) {
 			fact[i] = mul(fact[i - 1],  i);
 			inv[i] = -mul(inv[m % i], m / i);
 			if ( inv[i] < 0 ) inv[i] += m;
 			finv[i] = mul(finv[i - 1], inv[i]);
 		}
+		factorialMax = max;
 	}
 	public int fact(int a) {
 		return fact[a];

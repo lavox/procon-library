@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.PrimitiveIterator;
 import java.util.PriorityQueue;
@@ -15,7 +15,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-// https://github.com/lavox/procon-library
+// template & library : https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
 		Main o = new Main();
@@ -26,48 +26,15 @@ public class Main {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
 		int M = sc.nextInt();
-		ShortestPath.DistMap dm = ShortestPath.wfCreateMap(N + 1);
+		GenericGraph<CostEdge> g = new GenericGraph<>(N);
 		for (int i = 0; i < M; i++) {
-			int A = sc.nextInt() - 1;
-			int B = sc.nextInt() - 1;
-			long C = sc.nextLong();
-			dm.dist[A][B] = Math.min(dm.dist[A][B], C);
-			dm.dist[B][A] = Math.min(dm.dist[B][A], C);
+			int u = sc.nextInt();
+			int v = sc.nextInt();
+			long c = sc.nextLong();
+			g.addDirEdge(new CostEdge(u, v, c, i));
 		}
-		int K = sc.nextInt();
-		long T = sc.nextLong();
-		int[] D = sc.nextIntArray(K, (n) -> n - 1);
-		for (int i = 0; i < K; i++) {
-			dm.dist[D[i]][N] = T;
-			dm.dist[N][D[i]] = 0;
-		}
-		dm = ShortestPath.warshallFloyd(dm);
-		int Q = sc.nextInt();
-		ArrayList<Long> ans = new ArrayList<>();
-		for (int q = 0; q < Q; q++) {
-			int k = sc.nextInt();
-			if (k == 1) {
-				int x = sc.nextInt() - 1;
-				int y = sc.nextInt() - 1;
-				long t = sc.nextLong();
-				dm = ShortestPath.wfUpdateEdge(dm, x, y, t);
-				dm = ShortestPath.wfUpdateEdge(dm, y, x, t);
-			} else if (k == 2) {
-				int x = sc.nextInt() - 1;
-				dm = ShortestPath.wfUpdateEdge(dm, x, N, T);
-				dm = ShortestPath.wfUpdateEdge(dm, N, x, 0);
-			} else {
-				long sum = 0;
-				for (int i = 0; i < N; i++) {
-					for (int j = i + 1; j < N; j++) {
-						if (dm.dist[i][j] == ShortestPath.INF) continue;
-						sum += dm.dist[i][j] * 2;
-					}
-				}
-				ans.add(sum);
-			}
-		}
-		print(ans, LF);
+		ShortestPath.Dist d = ShortestPath.dijkstra(g, 0);
+		System.out.println(d.dist[N - 1]);
 	}
 
 	public static final char LF = '\n';
@@ -160,6 +127,7 @@ public class Main {
 	}
 	public static void print(int... a) { print(a, SPACE); }
 	public static void print(long... a) { print(a, SPACE); }
+	@SuppressWarnings("unchecked")
 	public static <T> void print(T... s) { print(s, SPACE); }
 }
 class FastScanner {
@@ -260,14 +228,14 @@ class ShortestPath {
 	public static <E extends CostEdge> Dist dijkstra(GenericGraph<E> g, int s) {
 		return dijkstra(g, new int[] {s}, null);
 	}
-	public static <E extends CostEdge> Dist dijkstra(GenericGraph<E> g, int[] starts, Predicate<E> canPass) {
+	public static <E extends CostEdge> Dist dijkstra(GenericGraph<E> g, int[] ss, Predicate<E> canPass) {
 		int n = g.size();
 		Dist d = new Dist(n);
 		final long[] dist = d.dist;
 		final int[] parent = d.parent;
 		PriorityQueue<Step> queue = new PriorityQueue<>();
 		Step[] step = new Step[n];
-		for (int s: starts) {
+		for (int s: ss) {
 			step[s] = new Step(s, 0, -1);
 			queue.add(step[s]);
 		}
@@ -293,7 +261,7 @@ class ShortestPath {
 	public static <E extends Edge> Dist bfs(GenericGraph<E> g, int s) {
 		return bfs(g, new int[] {s}, null);
 	}
-	public static <E extends Edge> Dist bfs(GenericGraph<E> g, int[] starts, Predicate<E> canPass) {
+	public static <E extends Edge> Dist bfs(GenericGraph<E> g, int[] ss, Predicate<E> canPass) {
 		int n = g.size();
 		Dist d = new Dist(n);
 		final long[] dist = d.dist;
@@ -301,7 +269,7 @@ class ShortestPath {
 		int[] queue = new int[n];
 		int ri = 0;
 		int wi = 0;
-		for (int s: starts) {
+		for (int s: ss) {
 			dist[s] = 0;
 			queue[wi++] = s;
 		}
@@ -323,14 +291,14 @@ class ShortestPath {
 	public static <E extends Edge> Dist bfs01(GenericGraph<E> g, int s, Predicate<E> edge1) {
 		return bfs01(g, new int[] {s}, edge1, null);
 	}
-	public static <E extends Edge> Dist bfs01(GenericGraph<E> g, int[] starts, Predicate<E> edge1, Predicate<E> canPass) {
+	public static <E extends Edge> Dist bfs01(GenericGraph<E> g, int[] ss, Predicate<E> edge1, Predicate<E> canPass) {
 		int n = g.size();
 		Dist d = new Dist(n);
 		final long[] dist = d.dist;
 		final int[] parent = d.parent;
 		ArrayDeque<Step> queue = new ArrayDeque<>();
 		Step[] step = new Step[n];
-		for (int s: starts) {
+		for (int s: ss) {
 			step[s] = new Step(s, 0, -1);
 			queue.addLast(step[s]);
 		}
@@ -588,28 +556,6 @@ class ShortestPath {
 }
 // === end: graph/ShortestPath.java ===
 
-// === begin: graph/Edge.java ===
-class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
-	public Edge(int from, int to, int id) {
-		this.from = from;
-		this.to = to;
-		this.id = id;
-	}
-	public int from() {
-		return from;
-	}
-	public int to() {
-		return to;
-	}
-	public int id() {
-		return id;
-	}
-}
-// === end: graph/Edge.java ===
-
 // === begin: graph/GenericGraph.java ===
 class GenericGraph<E extends Edge> {
 	protected int n;
@@ -666,6 +612,28 @@ class CostEdge extends Edge {
 	}
 }
 // === end: graph/CostEdge.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+}
+// === end: graph/Edge.java ===
 
 // === begin: primitive/IntArrayList.java ===
 class IntArrayList implements Iterable<Integer> {

@@ -2,8 +2,6 @@ package graph;
 
 import java.util.Arrays;
 
-import graph.Tsp.MinRoute;
-
 public class Tsp {
 	public static final long INF = Long.MAX_VALUE;
 	public static MinRoute search(long[][] distMap) {

@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.PrimitiveIterator;
 import java.util.PriorityQueue;
@@ -15,7 +15,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-// https://github.com/lavox/procon-library
+// template & library : https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
 		Main o = new Main();
@@ -25,46 +25,19 @@ public class Main {
 	public void solve() {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
-		int M = sc.nextInt();
-		ShortestPath.DistMap dm = ShortestPath.wfCreateMap(N + 1);
-		for (int i = 0; i < M; i++) {
-			int A = sc.nextInt() - 1;
-			int B = sc.nextInt() - 1;
-			long C = sc.nextLong();
-			dm.dist[A][B] = Math.min(dm.dist[A][B], C);
-			dm.dist[B][A] = Math.min(dm.dist[B][A], C);
+		int X = sc.nextInt() - 1;
+		int Y = sc.nextInt() - 1;
+		Graph g = new Graph(N);
+		for (int i = 0; i < N - 1; i++) {
+			g.addUndirEdge(i, i + 1);
 		}
-		int K = sc.nextInt();
-		long T = sc.nextLong();
-		int[] D = sc.nextIntArray(K, (n) -> n - 1);
-		for (int i = 0; i < K; i++) {
-			dm.dist[D[i]][N] = T;
-			dm.dist[N][D[i]] = 0;
-		}
-		dm = ShortestPath.warshallFloyd(dm);
-		int Q = sc.nextInt();
-		ArrayList<Long> ans = new ArrayList<>();
-		for (int q = 0; q < Q; q++) {
-			int k = sc.nextInt();
-			if (k == 1) {
-				int x = sc.nextInt() - 1;
-				int y = sc.nextInt() - 1;
-				long t = sc.nextLong();
-				dm = ShortestPath.wfUpdateEdge(dm, x, y, t);
-				dm = ShortestPath.wfUpdateEdge(dm, y, x, t);
-			} else if (k == 2) {
-				int x = sc.nextInt() - 1;
-				dm = ShortestPath.wfUpdateEdge(dm, x, N, T);
-				dm = ShortestPath.wfUpdateEdge(dm, N, x, 0);
-			} else {
-				long sum = 0;
-				for (int i = 0; i < N; i++) {
-					for (int j = i + 1; j < N; j++) {
-						if (dm.dist[i][j] == ShortestPath.INF) continue;
-						sum += dm.dist[i][j] * 2;
-					}
-				}
-				ans.add(sum);
+		g.addUndirEdge(X, Y);
+
+		int[] ans = new int[N - 1];
+		for (int s = 0; s < N - 1; s++) {
+			ShortestPath.Dist d = ShortestPath.bfs(g, s);
+			for (int t = s + 1; t < N; t++) {
+				if (d.dist[t] > 0) ans[(int)d.dist[t] - 1]++;
 			}
 		}
 		print(ans, LF);
@@ -160,6 +133,7 @@ public class Main {
 	}
 	public static void print(int... a) { print(a, SPACE); }
 	public static void print(long... a) { print(a, SPACE); }
+	@SuppressWarnings("unchecked")
 	public static <T> void print(T... s) { print(s, SPACE); }
 }
 class FastScanner {
@@ -588,72 +562,6 @@ class ShortestPath {
 }
 // === end: graph/ShortestPath.java ===
 
-// === begin: graph/Edge.java ===
-class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
-	public Edge(int from, int to, int id) {
-		this.from = from;
-		this.to = to;
-		this.id = id;
-	}
-	public int from() {
-		return from;
-	}
-	public int to() {
-		return to;
-	}
-	public int id() {
-		return id;
-	}
-}
-// === end: graph/Edge.java ===
-
-// === begin: graph/GenericGraph.java ===
-class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
-	public GenericGraph(int n) {
-		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
-	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
-	}
-	public int maxEdgeId() {
-		return maxEdgeId;
-	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
-	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
-	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
-	public int size() {
-		return n;
-	}
-}
-// === end: graph/GenericGraph.java ===
-
 // === begin: graph/CostEdge.java ===
 class CostEdge extends Edge {
 	private final long cost;
@@ -918,6 +826,79 @@ class IntArrayList implements Iterable<Integer> {
 }
 // === end: primitive/IntArrayList.java ===
 
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+}
+// === end: graph/Edge.java ===
+
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> {
+	protected int n;
+	protected ArrayList<E>[] edges;
+	protected int maxEdgeId = 0;
+	protected int edgeCnt = 0;
+	
+	@SuppressWarnings("unchecked")
+	public GenericGraph(int n) {
+		this.n = n;
+		edges = new ArrayList[n];
+		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+	}
+	public void addDirEdge(E e) {
+		edges[e.from()].add(e);
+		maxEdgeId = Math.max(maxEdgeId, e.id());
+		edgeCnt++;
+	}
+	public int edgeSize(int v) {
+		return edges[v].size();
+	}
+	public int edgeSize() {
+		return edgeCnt;
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
+	public Edge edge(int v, int i) {
+		return edges[v].get(i);
+	}
+	public ArrayList<E> edges(int v) {
+		return edges[v];
+	}
+	public int[] edgesTo(int v) {
+		int[] ret = new int[edgeSize(v)];
+		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
+		return ret;
+	}
+	public int size() {
+		return n;
+	}
+}
+// === end: graph/GenericGraph.java ===
+
+// === begin: primitive/IntComparator.java ===
+@FunctionalInterface
+interface IntComparator {
+    int compare(int a, int b);
+}
+// === end: primitive/IntComparator.java ===
+
 // === begin: primitive/IntArrays.java ===
 class IntArrays {
 	public static void sort(int[] a, IntComparator comp) {
@@ -1003,9 +984,31 @@ class IntArrays {
 }
 // === end: primitive/IntArrays.java ===
 
-// === begin: primitive/IntComparator.java ===
-@FunctionalInterface
-interface IntComparator {
-    int compare(int a, int b);
+// === begin: graph/Graph.java ===
+class Graph extends GenericGraph<Edge> {
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addDirEdge(new Edge(from, to, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addDirEdge(new Edge(from, to, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt++;
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, edgeCnt++));
+		edges[v].add(new Edge(v, u, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt += 2;
+	}
 }
-// === end: primitive/IntComparator.java ===
+// === end: graph/Graph.java ===

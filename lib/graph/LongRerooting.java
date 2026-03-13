@@ -14,10 +14,10 @@ public abstract class LongRerooting {
 	private long[] values = null;
 	private Edge[] edges = null;
 	private long[] edgeValues = null;
-	private Graph g = null;
+	private GenericGraph<Edge> g = null;
 
 	public LongRerooting(int n) {
-		g = new Graph(n);
+		g = new GenericGraph<>(n);
 		edges = new Edge[2 * (n - 1)];
 		values = new long[n];
 		edgeValues = new long[2 * (n - 1)];

@@ -3,13 +3,13 @@ import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public class Lca {
-	private Graph g = null;
+	private GenericGraph<? extends Edge> g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public Lca(Graph g, int root) {
+	public Lca(GenericGraph<? extends Edge> g, int root) {
 		this.g = g;
 		this.K = 1;
 		while ((1 << this.K) < g.size()) this.K++;

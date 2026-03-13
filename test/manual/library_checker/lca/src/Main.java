@@ -219,13 +219,13 @@ class FastScanner {
 
 // === begin: graph/Lca.java ===
 class Lca {
-	private Graph g = null;
+	private GenericGraph<? extends Edge> g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public Lca(Graph g, int root) {
+	public Lca(GenericGraph<? extends Edge> g, int root) {
 		this.g = g;
 		this.K = 1;
 		while ((1 << this.K) < g.size()) this.K++;
@@ -290,41 +290,37 @@ class Lca {
 }
 // === end: graph/Lca.java ===
 
-// === begin: graph/Graph.java ===
-class Graph {
-	private int n;
-	private ArrayList<Edge>[] edges;
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> {
+	protected int n;
+	protected ArrayList<E>[] edges;
+	protected int maxEdgeId = 0;
+	protected int edgeCnt = 0;
 	
 	@SuppressWarnings("unchecked")
-	public Graph(int n) {
+	public GenericGraph(int n) {
 		this.n = n;
 		edges = new ArrayList[n];
 		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
 	}
-	public void addDirEdge(Edge e) {
+	public void addDirEdge(E e) {
 		edges[e.from()].add(e);
-	}
-	public void addDirEdge(int from, int to) {
-		edges[from].add(new Edge(from, to, 0));
-	}
-	public void addDirEdge(int from, int to, int id) {
-		edges[from].add(new Edge(from, to, id));
-	}
-	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, 0));
-		edges[v].add(new Edge(v, u, 0));
-	}
-	public void addUndirEdge(int u, int v, int id) {
-		edges[u].add(new Edge(u, v, id));
-		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, e.id());
+		edgeCnt++;
 	}
 	public int edgeSize(int v) {
 		return edges[v].size();
 	}
+	public int edgeSize() {
+		return edgeCnt;
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
 	public Edge edge(int v, int i) {
 		return edges[v].get(i);
 	}
-	public ArrayList<Edge> edges(int v) {
+	public ArrayList<E> edges(int v) {
 		return edges[v];
 	}
 	public int[] edgesTo(int v) {
@@ -336,7 +332,7 @@ class Graph {
 		return n;
 	}
 }
-// === end: graph/Graph.java ===
+// === end: graph/GenericGraph.java ===
 
 // === begin: graph/Edge.java ===
 class Edge {
@@ -359,3 +355,32 @@ class Edge {
 	}
 }
 // === end: graph/Edge.java ===
+
+// === begin: graph/Graph.java ===
+class Graph extends GenericGraph<Edge> {
+	@SuppressWarnings("unchecked")
+	public Graph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addDirEdge(new Edge(from, to, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addDirEdge(new Edge(from, to, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt++;
+	}
+	public void addUndirEdge(int u, int v) {
+		edges[u].add(new Edge(u, v, edgeCnt++));
+		edges[v].add(new Edge(v, u, edgeCnt));
+		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		edges[u].add(new Edge(u, v, id));
+		edges[v].add(new Edge(v, u, id));
+		maxEdgeId = Math.max(maxEdgeId, id);
+		edgeCnt += 2;
+	}
+}
+// === end: graph/Graph.java ===

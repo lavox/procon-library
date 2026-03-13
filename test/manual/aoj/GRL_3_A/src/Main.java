@@ -222,14 +222,14 @@ class FastScanner {
 // === begin: graph/LowLink.java ===
 class LowLink {
 	private Node[] nodes = null;
-	private Graph g = null;
+	private GenericGraph<? extends Edge> g = null;
 	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(Graph g) {
+	public LowLink(GenericGraph<? extends Edge> g) {
 		this.g = g;
 		this.nodes = new Node[g.size()];
 		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);
@@ -352,6 +352,50 @@ class LowLink {
 }
 // === end: graph/LowLink.java ===
 
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> {
+	protected int n;
+	protected ArrayList<E>[] edges;
+	protected int maxEdgeId = 0;
+	protected int edgeCnt = 0;
+	
+	@SuppressWarnings("unchecked")
+	public GenericGraph(int n) {
+		this.n = n;
+		edges = new ArrayList[n];
+		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+	}
+	public void addDirEdge(E e) {
+		edges[e.from()].add(e);
+		maxEdgeId = Math.max(maxEdgeId, e.id());
+		edgeCnt++;
+	}
+	public int edgeSize(int v) {
+		return edges[v].size();
+	}
+	public int edgeSize() {
+		return edgeCnt;
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
+	public Edge edge(int v, int i) {
+		return edges[v].get(i);
+	}
+	public ArrayList<E> edges(int v) {
+		return edges[v];
+	}
+	public int[] edgesTo(int v) {
+		int[] ret = new int[edgeSize(v)];
+		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
+		return ret;
+	}
+	public int size() {
+		return n;
+	}
+}
+// === end: graph/GenericGraph.java ===
+
 // === begin: graph/Edge.java ===
 class Edge {
 	private final int from;
@@ -375,29 +419,17 @@ class Edge {
 // === end: graph/Edge.java ===
 
 // === begin: graph/Graph.java ===
-class Graph {
-	private int n;
-	private ArrayList<Edge>[] edges;
-	private int maxEdgeId = 0;
-	private int edgeCnt = 0;
-	
+class Graph extends GenericGraph<Edge> {
 	@SuppressWarnings("unchecked")
 	public Graph(int n) {
-		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
-	}
-	public void addDirEdge(Edge e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
+		super(n);
 	}
 	public void addDirEdge(int from, int to) {
-		edges[from].add(new Edge(from, to, edgeCnt));
+		addDirEdge(new Edge(from, to, edgeCnt));
 		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
 	}
 	public void addDirEdge(int from, int to, int id) {
-		edges[from].add(new Edge(from, to, id));
+		addDirEdge(new Edge(from, to, id));
 		maxEdgeId = Math.max(maxEdgeId, id);
 		edgeCnt++;
 	}
@@ -411,29 +443,6 @@ class Graph {
 		edges[v].add(new Edge(v, u, id));
 		maxEdgeId = Math.max(maxEdgeId, id);
 		edgeCnt += 2;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
-	}
-	public int maxEdgeId() {
-		return maxEdgeId;
-	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
-	}
-	public ArrayList<Edge> edges(int v) {
-		return edges[v];
-	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
-	public int size() {
-		return n;
 	}
 }
 // === end: graph/Graph.java ===

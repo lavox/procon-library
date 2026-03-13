@@ -82,6 +82,6 @@ public Node node(int i)
   - $O(1)$
 
 ## 検証
-- [Articulation Points (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10857824#2)
-- [Bridges (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10857826#2)
-- [ABC334G Christmas Color Grid 2 (AtCoder)](https://atcoder.jp/contests/abc334/submissions/69047413)
+- [Articulation Points (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11369671#2)
+- [Bridges (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11369676#2)
+- [ABC334G Christmas Color Grid 2 (AtCoder)](https://atcoder.jp/contests/abc334/submissions/74050064)

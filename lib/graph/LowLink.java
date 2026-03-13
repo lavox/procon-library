@@ -5,14 +5,14 @@ import java.util.BitSet;
 
 public class LowLink {
 	private Node[] nodes = null;
-	private Graph g = null;
+	private GenericGraph<? extends Edge> g = null;
 	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(Graph g) {
+	public LowLink(GenericGraph<? extends Edge> g) {
 		this.g = g;
 		this.nodes = new Node[g.size()];
 		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);

@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.PrimitiveIterator;
 import java.util.PriorityQueue;
@@ -15,7 +15,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 
-// https://github.com/lavox/procon-library
+// template & library : https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
 		Main o = new Main();
@@ -26,48 +26,27 @@ public class Main {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
 		int M = sc.nextInt();
-		ShortestPath.DistMap dm = ShortestPath.wfCreateMap(N + 1);
+		int s = sc.nextInt();
+		int t = sc.nextInt();
+		GenericGraph<CostEdge> g = new GenericGraph<>(N);
 		for (int i = 0; i < M; i++) {
-			int A = sc.nextInt() - 1;
-			int B = sc.nextInt() - 1;
-			long C = sc.nextLong();
-			dm.dist[A][B] = Math.min(dm.dist[A][B], C);
-			dm.dist[B][A] = Math.min(dm.dist[B][A], C);
+			int a = sc.nextInt();
+			int b = sc.nextInt();
+			long c = sc.nextLong();
+			g.addDirEdge(new CostEdge(a, b, c, i));
 		}
-		int K = sc.nextInt();
-		long T = sc.nextLong();
-		int[] D = sc.nextIntArray(K, (n) -> n - 1);
-		for (int i = 0; i < K; i++) {
-			dm.dist[D[i]][N] = T;
-			dm.dist[N][D[i]] = 0;
+		ShortestPath.Dist d = ShortestPath.dijkstra(g, s);
+		if (d.dist[t] == ShortestPath.INF) {
+			System.out.println(-1);
+			return;
 		}
-		dm = ShortestPath.warshallFloyd(dm);
-		int Q = sc.nextInt();
-		ArrayList<Long> ans = new ArrayList<>();
-		for (int q = 0; q < Q; q++) {
-			int k = sc.nextInt();
-			if (k == 1) {
-				int x = sc.nextInt() - 1;
-				int y = sc.nextInt() - 1;
-				long t = sc.nextLong();
-				dm = ShortestPath.wfUpdateEdge(dm, x, y, t);
-				dm = ShortestPath.wfUpdateEdge(dm, y, x, t);
-			} else if (k == 2) {
-				int x = sc.nextInt() - 1;
-				dm = ShortestPath.wfUpdateEdge(dm, x, N, T);
-				dm = ShortestPath.wfUpdateEdge(dm, N, x, 0);
-			} else {
-				long sum = 0;
-				for (int i = 0; i < N; i++) {
-					for (int j = i + 1; j < N; j++) {
-						if (dm.dist[i][j] == ShortestPath.INF) continue;
-						sum += dm.dist[i][j] * 2;
-					}
-				}
-				ans.add(sum);
-			}
+		int[] path = d.path(t);
+		StringBuilder ans = new StringBuilder();
+		ans.append(String.format("%d %d\n", d.dist[t], path.length - 1));
+		for (int i = 0; i < path.length - 1; i++) {
+			ans.append(String.format("%d %d\n", path[i], path[i + 1]));
 		}
-		print(ans, LF);
+		System.out.print(ans.toString());
 	}
 
 	public static final char LF = '\n';
@@ -160,6 +139,7 @@ public class Main {
 	}
 	public static void print(int... a) { print(a, SPACE); }
 	public static void print(long... a) { print(a, SPACE); }
+	@SuppressWarnings("unchecked")
 	public static <T> void print(T... s) { print(s, SPACE); }
 }
 class FastScanner {
@@ -588,28 +568,6 @@ class ShortestPath {
 }
 // === end: graph/ShortestPath.java ===
 
-// === begin: graph/Edge.java ===
-class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
-	public Edge(int from, int to, int id) {
-		this.from = from;
-		this.to = to;
-		this.id = id;
-	}
-	public int from() {
-		return from;
-	}
-	public int to() {
-		return to;
-	}
-	public int id() {
-		return id;
-	}
-}
-// === end: graph/Edge.java ===
-
 // === begin: graph/GenericGraph.java ===
 class GenericGraph<E extends Edge> {
 	protected int n;
@@ -654,18 +612,27 @@ class GenericGraph<E extends Edge> {
 }
 // === end: graph/GenericGraph.java ===
 
-// === begin: graph/CostEdge.java ===
-class CostEdge extends Edge {
-	private final long cost;
-	public CostEdge(int from, int to, long cost, int id) {
-		super(from, to, id);
-		this.cost = cost;
+// === begin: graph/Edge.java ===
+class Edge {
+	private final int from;
+	private final int to;
+	private final int id;
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
 	}
-	public long cost() {
-		return cost;
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
 	}
 }
-// === end: graph/CostEdge.java ===
+// === end: graph/Edge.java ===
 
 // === begin: primitive/IntArrayList.java ===
 class IntArrayList implements Iterable<Integer> {
@@ -917,6 +884,19 @@ class IntArrayList implements Iterable<Integer> {
 	}
 }
 // === end: primitive/IntArrayList.java ===
+
+// === begin: graph/CostEdge.java ===
+class CostEdge extends Edge {
+	private final long cost;
+	public CostEdge(int from, int to, long cost, int id) {
+		super(from, to, id);
+		this.cost = cost;
+	}
+	public long cost() {
+		return cost;
+	}
+}
+// === end: graph/CostEdge.java ===
 
 // === begin: primitive/IntArrays.java ===
 class IntArrays {

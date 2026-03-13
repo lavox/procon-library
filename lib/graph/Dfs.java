@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Dfs {
-	private final Graph g;
+	private final GenericGraph<?> g;
 	private int[] visitedGen = null;
 	int gen = 0;
 
-	public Dfs(Graph g) {
+	public Dfs(GenericGraph<?> g) {
 		this.g = g;
 		this.visitedGen = new int[g.size()];
 	}

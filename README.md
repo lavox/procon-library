@@ -29,9 +29,7 @@
 | Rerooting.java<br>LongRerooting.java | 全方位木DP               |
 | TopologicalSort.java     | トポロジカルソート                   |
 | TwoSat.java              | 2-SAT                                |
-| Tsp.java                 | 巡回セールスマン問題                 |
-| BellmanFord.java         | Bellman-Ford法 (負辺を含む最短経路)  |
-| WarshallFloyd.java       | Warshall-Floyd法 (全頂点間最短経路)  |
+| ShortestPath.java        | 最短距離探索アルゴリズム<br>・Dijkstra法<br>・BF<br>・01-BFS<br>・Bellman-Ford法(負辺を含む最短経路)<br>・Warshall-Floyd法(全頂点間最短経路)<br>・巡回セールスマン問題 |
 | LowLink.java             | Low Link(関節点・橋の検出)           |
 
 ### math
