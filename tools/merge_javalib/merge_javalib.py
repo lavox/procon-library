@@ -73,6 +73,11 @@ def collect_referenced_simple_types(unit) -> set[str]:
       simple = node.name.split('.')[-1]
       if simple and simple not in PRIMITIVES:
         names.add(simple)
+  for _, node in unit.filter(javalang.tree.MethodInvocation):
+      if node.qualifier:
+          simple = node.qualifier.split('.')[-1]
+          if simple not in PRIMITIVES:
+              names.add(simple)
   for _, node in unit.filter(javalang.tree.Annotation):
     if node.name:
       simple = node.name.split('.')[-1]
