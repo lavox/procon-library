@@ -1,0 +1,8 @@
+{
+  "editor.fontFamily": "'Ricty-Regular', Menlo, Monaco, 'Courier New', monospace",
+  "workbench.tree.indent": 16,
+  "java.project.sourcePaths": [
+    "src"
+  ],
+  "java.project.outputPath": "bin"
+}
