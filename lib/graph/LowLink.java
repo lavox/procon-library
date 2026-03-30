@@ -2,25 +2,29 @@ package graph;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Iterator;
 
 public class LowLink {
 	private Node[] nodes = null;
-	private GenericGraph<? extends Edge> g = null;
+	private Graph g = null;
 	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(GenericGraph<? extends Edge> g) {
+	public LowLink(Graph g) {
+		this(g, -1);
+	}
+	public LowLink(Graph g, int maxEdgeId) {
 		this.g = g;
 		this.nodes = new Node[g.size()];
 		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);
-		this.isBridge = new BitSet(g.maxEdgeId());
+		if (maxEdgeId >= 0) this.isBridge = new BitSet(maxEdgeId + 1);
 		build();
 	}
 	private void build() {
-		bridges = new ArrayList<>();
+		if (isBridge != null) bridges = new ArrayList<>();
 		cnt = 0;
 		for (Node n: nodes) {
 			if (n.visited) continue;
@@ -41,7 +45,7 @@ public class LowLink {
 	public boolean isBridge(int eid) {
 		return isBridge.get(eid);
 	}
-	public ArrayList<Edge> bridges() {
+	public ArrayList<? extends Edge> bridges() {
 		return bridges;
 	}
 	public boolean isArticulation(int i) {
@@ -61,15 +65,14 @@ public class LowLink {
 		stack.addLast(n0);
 		while ( stack.size() > 0 ) {
 			Node n = stack.peekLast();
-			int v = n.id;
-			if (n.iter == 0) {
+			if (!n.hasPrevEdge()) {
 				n.visited = true;
 				n.ord = cnt;
 				n.low = cnt;
 				cnt++;
 			}
-			if (n.iter > 0) {
-				Edge e = g.edge(v, n.iter - 1);
+			if (n.hasPrevEdge()) {
+				Edge e = n.prevEdge; 
 				Node to = node(e.to());
 				if (n.parent == null || n.parent != to) {
 					n.low = Math.min(n.low, to.low);
@@ -78,14 +81,14 @@ public class LowLink {
 					n.isArticulation = true;
 					n.artCnt++;
 				}
-				if (n.ord < to.low) {
-					isBridge.set(e.id());
+				if (n.ord < to.low && isBridge != null) {
+					if (0 <= e.id() && e.id() < isBridge.size()) isBridge.set(e.id());
 					bridges.add(e);
 				}
 			}
 			boolean stacked = false;
-			while (n.iter < g.edgeSize(v)) {
-				Edge e = g.edge(v, n.iter++);
+			while (n.hasNextEdge()) {
+				Edge e = n.nextEdge();
 				Node to = node(e.to());
 				if (n.parent != null && to == n.parent) continue;
 				if (!to.visited) {
@@ -117,10 +120,12 @@ public class LowLink {
 		private boolean isArticulation = false;
 		private int artCnt = 0;
 		private int childCnt = 0;
-		private int iter = 0;
+		private Iterator<? extends Edge> iter = null;
+		private Edge prevEdge = null;
 
 		private Node(int id) {
 			this.id = id;
+			this.iter = g.edges(id).iterator();
 		}
 		public int id() {
 			return id;
@@ -130,6 +135,16 @@ public class LowLink {
 		}
 		public int articulationCnt() {
 			return artCnt;
+		}
+		private boolean hasPrevEdge() {
+			return prevEdge != null;
+		}
+		private boolean hasNextEdge() {
+			return iter.hasNext();
+		}
+		private Edge nextEdge() {
+			prevEdge = iter.next();
+			return prevEdge;
 		}
 	}
 }

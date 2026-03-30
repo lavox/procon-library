@@ -1,62 +1,70 @@
 package graph;
 
-import java.util.Arrays;
 import java.util.BitSet;
 
-public class BellmanFord {
-	public static final long INF = Long.MAX_VALUE;
-	public static final long NINF = Long.MIN_VALUE;
-	public static long[] bellmanFord(GenericGraph<? extends CostEdge> g, int s) {
-		int n = g.size();
-		long[] ret = new long[n];
-		Arrays.fill(ret, INF);
-		ret[s] = 0;
-		for (int i = 0; i < n - 1; i++) {
-			boolean update = false;
-			for (int v = 0; v < n; v++) {
-				if (ret[v] == INF) continue;
-				for (CostEdge e: g.edges(v)) {
-					if (ret[v] + e.cost() < ret[e.to()]) {
-						ret[e.to()] = ret[v] + e.cost();
-						update = true;
-					}
-				}
-			}
-			if (!update) return ret;
-		}
-		BitSet visited = new BitSet(n);
-		int[] queue = new int[n];
-		int wi = 0;
-		boolean update = false;
-		for (int v = 0; v < n; v++) {
-			if (ret[v] == INF) continue;
-			for (CostEdge e: g.edges(v)) {
-				if (ret[e.to()] == NINF) continue;
-				if (ret[v] == NINF || ret[v] + e.cost() < ret[e.to()]) {
-					ret[e.to()] = NINF;
-					visited.set(e.to());
-					queue[wi++] = e.to();
-					update = true;
-				}
-			}
-		}
-		if (!update) return ret;
-		int ri = 0;
-		while (ri < wi) {
-			int v = queue[ri++];
-			for (CostEdge e: g.edges(v)) {
-				if (visited.get(e.to())) continue;
-				visited.set(e.to());
-				ret[e.to()] = NINF;
-				queue[ri++] = e.to();
-			}
-		}
-		return ret;
+import primitive.IntArrayList;
+
+public class BellmanFord extends ShortestPath {
+	public static Dist search(Graph g, int s) {
+		return search(g, new int[] {s});
 	}
-	public static boolean hasNegativeLoop(long[] dist) {
-		for (long d: dist) {
-			if (d == NINF) return true;
+	public static Dist search(Graph g, int[] starts) {
+		int n = g.size();
+		Dist d = new Dist(n);
+		final long[] dist = d.dist;
+		final int[] parent = d.parent;
+		for (int s: starts) {
+			dist[s] = 0;
 		}
-		return false;
+
+		boolean[] update = new boolean[] {false};
+		Graph.EdgeConsumer action1 = (from, to, id, cost) -> {
+			if (dist[from] + cost < dist[to]) {
+				dist[to] = dist[from] + cost;
+				parent[to] = from;
+				update[0] = true;
+			}
+		};
+		for (int i = 0; i < n - 1; i++) {
+			update[0] = false;
+			for (int v = 0; v < n; v++) {
+				if (dist[v] == INF) continue;
+				g.forEachEdge(v, action1);
+			}
+			if (!update[0]) return d;
+		}
+
+		BitSet visited = new BitSet(n);
+		IntArrayList queue = new IntArrayList(n);
+		update[0] = false;
+		Graph.EdgeConsumer action2 = (from, to, id, cost) -> {
+			if (dist[to] == NINF) return;
+			if (dist[from] == NINF || dist[from] + cost < dist[to]) {
+				dist[to] = NINF;
+				parent[to] = from;
+				d.hasNegativeLoop = true;
+				visited.set(to);
+				queue.add(to);
+				update[0] = true;
+			}
+		};
+		for (int v = 0; v < n; v++) {
+			if (dist[v] == INF) continue;
+			g.forEachEdge(v, action2);
+		}
+		if (!update[0]) return d;
+		int ri = 0;
+		Graph.EdgeConsumer action3 = (from, to, id, cost) -> {
+			if (visited.get(to)) return;
+			visited.set(to);
+			dist[to] = NINF;
+			parent[to] = from;
+			queue.add(to);
+		};
+		while (ri < queue.size()) {
+			int v = queue.get(ri++);
+			g.forEachEdge(v, action3);
+		}
+		return d;
 	}
 }

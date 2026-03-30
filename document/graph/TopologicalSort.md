@@ -65,4 +65,4 @@ public int[] indexArray()
   - $O(1)$
 
 ## 検証
-- [Topological Sort (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=10750908#2)
+- [Topological Sort (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11388989#2)

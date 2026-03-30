@@ -7,6 +7,8 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
+import java.util.Iterator;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -187,9 +189,12 @@ class FastScanner {
 	}
 }
 
+// === begin: graph/SccGraph.java ===
+// Ported to Java from the original C++ implementation by Atcoder.
+// Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/scc.hpp
 class SccGraph {
 	private int _n = 0;
-	private ArrayList<Integer>[] edges = null;
+	private SimpleGraph g = null;
 
 	private int[] ids = null;
 	private int group_num = 0;
@@ -197,16 +202,14 @@ class SccGraph {
 
 	public SccGraph(int n) {
 		this._n = n;
-		this.edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) {
-			this.edges[i] = new ArrayList<>();
-		}
+		this.g = new SimpleGraph(n);
 	}
 	public void addEdge(int from, int to) {
-		edges[from].add(to);
+		g.addDirEdge(from, to);
 	}
 
 	public void decompose() {
+		g.build();
 		int now_ord = 0;
 		int[] low = new int[_n];
 		int[] ord = new int[_n];
@@ -229,8 +232,8 @@ class SccGraph {
 					low[v] = ord[v] = now_ord++;
 					visited[vi++] = v;
 				}
-				if (si[s] < edges[v].size()) {
-					int to = edges[v].get(si[s]++);
+				if (si[s] < g.edgeSize(v)) {
+					int to = g.edge(v, si[s]++).to;
 					if (ord[to] == -1) {
 						sv[++s] = to;
 						si[s] = 0;
@@ -281,3 +284,167 @@ class SccGraph {
 		return groups;
 	}
 }
+// === end: graph/SccGraph.java ===
+
+// === begin: graph/SimpleGraph.java ===
+class SimpleGraph extends GenericGraph<Edge> {
+	SimpleGraph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addEdge(new Edge(from, to));
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addEdge(new Edge(from, to, id));
+	}
+	public void addDirEdge(int from, int to, int id, long cost) {
+		addEdge(new Edge(from, to, id, cost));
+	}
+	public void addUndirEdge(int u, int v) {
+		addEdge(new Edge(u, v));
+		addEdge(new Edge(v, u));
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		addEdge(new Edge(u, v, id));
+		addEdge(new Edge(v, u, id));
+	}
+	public void addUndirEdge(int u, int v, int id, long cost) {
+		addEdge(new Edge(u, v, id, cost));
+		addEdge(new Edge(v, u, id, cost));
+	}
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			action.accept(v, ((Edge)edges[ei]).to, -1, 1);
+		}
+	}
+}
+// === end: graph/SimpleGraph.java ===
+
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> implements Graph {
+	private ArrayList<E> _edges = null;
+	private int maxEdgeId = 0;
+	protected int n = 0;
+	protected int[] start = null;
+	protected Object[] edges = null;
+	GenericGraph(int n) {
+		this.n = n;
+		this._edges = new ArrayList<>();
+	}
+	public void addEdge(E e) {
+		maxEdgeId = Math.max(maxEdgeId, e.id);
+		_edges.add(e);
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			E e = (E) edges[ei];
+			action.accept(e.from, e.to, e.id, e.cost);
+		}
+	}
+
+	public void build() {
+		start = new int[n + 1];
+		for (Edge e: _edges) start[e.from + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		edges = new Object[_edges.size()];
+		for (Edge e: _edges) edges[cnt[e.from]++] = e;
+	}
+
+	@Override
+	public int size() {
+		return n;
+	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	@SuppressWarnings("unchecked")
+	public E edge(int v, int i) {
+		return (E)edges[start[v] + i];
+	}
+	public Iterable<E> edges(int v) {
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int ei = 0;
+					int ecnt = edgeSize(v);
+					@Override
+					public boolean hasNext() {
+						return ei < ecnt;
+					}
+					@Override
+					public E next() {
+						return edge(v, ei++);
+					}
+				};
+			}
+		};
+	}
+}
+// === end: graph/GenericGraph.java ===
+
+// === begin: graph/Graph.java ===
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
+	}
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = cost;
+	}
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+	public long cost() {
+		return cost;
+	}
+}
+// === end: graph/Edge.java ===

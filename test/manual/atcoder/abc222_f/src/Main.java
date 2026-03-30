@@ -264,12 +264,13 @@ abstract class LongRerooting {
 		int eid = (edgeCnt++) * 2;
 		Edge e = new Edge(u, v, eid);
 		Edge re = new Edge(v, u, eid + 1);
-		g.addDirEdge(e);
-		g.addDirEdge(re);
+		g.addEdge(e);
+		g.addEdge(re);
 		edges[e.id()] = e;
 		edges[re.id()] = re;
 	}
 	public void build() {
+		g.build();
 		dfs(0);
 		bfs(0);
 	}
@@ -297,7 +298,7 @@ abstract class LongRerooting {
 		for (Dfs.DfsStep s: dfs.dfsPostOrder(v0)) {
 			if (s.parent != -1) {
 				long val = e();
-				Edge pe = g.edge(s.parent, s.edgeIndex);
+				Edge pe = edges[s.edgeIndex];
 				if (g.edgeSize(s.cur) > 1) {
 					for (Edge e: g.edges(s.cur)) {
 						if (e.to() == s.parent) continue;
@@ -342,79 +343,83 @@ abstract class LongRerooting {
 }
 // === end: graph/LongRerooting.java ===
 
-// === begin: graph/Edge.java ===
-class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
-	public Edge(int from, int to, int id) {
-		this.from = from;
-		this.to = to;
-		this.id = id;
-	}
-	public int from() {
-		return from;
-	}
-	public int to() {
-		return to;
-	}
-	public int id() {
-		return id;
-	}
-}
-// === end: graph/Edge.java ===
-
 // === begin: graph/GenericGraph.java ===
-class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
-	public GenericGraph(int n) {
+class GenericGraph<E extends Edge> implements Graph {
+	private ArrayList<E> _edges = null;
+	private int maxEdgeId = 0;
+	protected int n = 0;
+	protected int[] start = null;
+	protected Object[] edges = null;
+	GenericGraph(int n) {
 		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+		this._edges = new ArrayList<>();
 	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
+	public void addEdge(E e) {
+		maxEdgeId = Math.max(maxEdgeId, e.id);
+		_edges.add(e);
 	}
 	public int maxEdgeId() {
 		return maxEdgeId;
 	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			E e = (E) edges[ei];
+			action.accept(e.from, e.to, e.id, e.cost);
+		}
 	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
+
+	public void build() {
+		start = new int[n + 1];
+		for (Edge e: _edges) start[e.from + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		edges = new Object[_edges.size()];
+		for (Edge e: _edges) edges[cnt[e.from]++] = e;
 	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
+
+	@Override
 	public int size() {
 		return n;
+	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	@SuppressWarnings("unchecked")
+	public E edge(int v, int i) {
+		return (E)edges[start[v] + i];
+	}
+	public Iterable<E> edges(int v) {
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int ei = 0;
+					int ecnt = edgeSize(v);
+					@Override
+					public boolean hasNext() {
+						return ei < ecnt;
+					}
+					@Override
+					public E next() {
+						return edge(v, ei++);
+					}
+				};
+			}
+		};
 	}
 }
 // === end: graph/GenericGraph.java ===
 
 // === begin: graph/Dfs.java ===
 class Dfs {
-	private final GenericGraph<?> g;
+	private final Graph g;
 	private int[] visitedGen = null;
 	int gen = 0;
 
-	public Dfs(GenericGraph<?> g) {
+	public Dfs(Graph g) {
 		this.g = g;
 		this.visitedGen = new int[g.size()];
 	}
@@ -446,7 +451,7 @@ class Dfs {
 			this.requirePreOrder = requirePreOrder;
 			this.requirePostOrder = requirePostOrder;
 			this.stack = new ArrayDeque<>();
-			this.stack.addLast(new DfsStep(v0, -1, 0, true, 0));
+			this.stack.addLast(new DfsStep(v0, -1, 0, null, true, 0));
 			setVisited(v0);
 			_next();
 		}
@@ -467,22 +472,22 @@ class Dfs {
 			while (stack.size() > 0 && nextStep == null) {
 				DfsStep s = stack.pollLast();
 				if (s.isPre) {
-					stack.addLast(new DfsStep(s.cur, s.parent, s.edgeIndex, false, s.depth));
-					addNextEdge(s.cur, 0, s.depth + 1);
+					stack.addLast(new DfsStep(s.cur, s.parent, s.edgeIndex, s.eit, false, s.depth));
+					addNextEdge(s.cur, g.edges(s.cur).iterator(), s.depth + 1);
 				} else if (s.parent != -1) {
-					addNextEdge(s.parent, s.edgeIndex + 1, s.depth);
+					addNextEdge(s.parent, s.eit, s.depth);
 				}
 				if ((s.isPre && requirePreOrder) || (!s.isPre && requirePostOrder)) {
 					nextStep = s;
 				}
 			}
 		}
-		private void addNextEdge(int v, int ei0, int depth) {
-			for (int ei = ei0; ei < g.edgeSize(v); ei++) {
-				Edge e = g.edge(v, ei);
-				if (isVisited(e.to()))
-					continue;
-				stack.addLast(new DfsStep(e.to(), v, ei, true, depth));
+		private void addNextEdge(int v, Iterator<? extends Edge> eit, int depth) {
+			if (eit == null) return;
+			while (eit.hasNext()) {
+				Edge e = eit.next();
+				if (isVisited(e.to())) continue;
+				stack.addLast(new DfsStep(e.to(), v, e.id(), eit, true, depth));
 				setVisited(e.to());
 				return;
 			}
@@ -492,14 +497,16 @@ class Dfs {
 	public class DfsStep {
 		public final int cur;
 		public final int parent;
-		public final int edgeIndex;
+		public final int edgeIndex; // edgeのid
 		public final boolean isPre;
 		public final int depth;
+		private final Iterator<? extends Edge> eit; // parentのedgeのiterator
 
-		private DfsStep(int cur, int parent, int edgeIndex, boolean isPre, int depth) {
+		private DfsStep(int cur, int parent, int edgeIndex, Iterator<? extends Edge> eit, boolean isPre, int depth) {
 			this.cur = cur;
 			this.parent = parent;
 			this.edgeIndex = edgeIndex;
+			this.eit = eit;
 			this.isPre = isPre;
 			this.depth = depth;
 		}
@@ -509,3 +516,61 @@ class Dfs {
 	}
 }
 // === end: graph/Dfs.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = cost;
+	}
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+	public long cost() {
+		return cost;
+	}
+}
+// === end: graph/Edge.java ===
+
+// === begin: graph/Graph.java ===
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
+	}
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
+	}
+}
+// === end: graph/Graph.java ===

@@ -1,12 +1,11 @@
 package graph;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/scc.hpp
 public class SccGraph {
 	private int _n = 0;
-	private ArrayList<Integer>[] edges = null;
+	private SimpleGraph g = null;
 
 	private int[] ids = null;
 	private int group_num = 0;
@@ -14,16 +13,14 @@ public class SccGraph {
 
 	public SccGraph(int n) {
 		this._n = n;
-		this.edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) {
-			this.edges[i] = new ArrayList<>();
-		}
+		this.g = new SimpleGraph(n);
 	}
 	public void addEdge(int from, int to) {
-		edges[from].add(to);
+		g.addDirEdge(from, to);
 	}
 
 	public void decompose() {
+		g.build();
 		int now_ord = 0;
 		int[] low = new int[_n];
 		int[] ord = new int[_n];
@@ -46,8 +43,8 @@ public class SccGraph {
 					low[v] = ord[v] = now_ord++;
 					visited[vi++] = v;
 				}
-				if (si[s] < edges[v].size()) {
-					int to = edges[v].get(si[s]++);
+				if (si[s] < g.edgeSize(v)) {
+					int to = g.edge(v, si[s]++).to;
 					if (ord[to] == -1) {
 						sv[++s] = to;
 						si[s] = 0;

@@ -1,15 +1,16 @@
 package graph;
+
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
 public class Lca {
-	private GenericGraph<? extends Edge> g = null;
+	private Graph g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public Lca(GenericGraph<? extends Edge> g, int root) {
+	public Lca(Graph g, int root) {
 		this.g = g;
 		this.K = 1;
 		while ((1 << this.K) < g.size()) this.K++;
@@ -25,16 +26,16 @@ public class Lca {
 		ArrayDeque<Integer> stack = new ArrayDeque<>();
 		depth[root] = 0;
 		stack.add(root);
+		Graph.EdgeConsumer action = (from, to, id, cost) -> {
+			if (depth[to] != -1) return;
+			depth[to] = depth[from] + 1;
+			anc[0][to] = from;
+			stack.addLast(to);
+		};
 		while (stack.size() > 0) {
 			int pos = stack.pollFirst();
 			kmax[pos] = 31 - Integer.numberOfLeadingZeros(depth[pos]);
-			for (Edge e: g.edges(pos)) {
-				int child = e.to();
-				if (depth[child] != -1) continue;
-				depth[child] = depth[pos] + 1;
-				anc[0][child] = pos;
-				stack.addLast(child);
-			}
+			g.forEachEdge(pos, action);
 		}
 		for (int k = 1; k < K; k++) {
 			for (int i = 0; i < n; i++) {

@@ -41,6 +41,6 @@ public class DfsStep {
 ```
 - `cur` : 現在頂点番号
 - `parent` : 遷移元の頂点番号。初期頂点の場合は-1。
-- `edgeIndex` : 遷移元の頂点からの辺の何番目の辺をたどったか
+- `edgeIndex` : 遷移元の頂点からたどった辺のid
 - `isPre` : 行きがけの場合は`true`、帰りがけの場合は`false`
 - `depth` : 初期頂点からのDFS遷移における深さ

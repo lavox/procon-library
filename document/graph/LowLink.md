@@ -6,9 +6,11 @@
 ### コンストラクタ
 ```java
 public LowLink(Graph g)
+public LowLink(Graph g, int maxEdgeId)
 ```
 - 引数
   - `g` : 頂点数`n`、辺数`m`のグラフ
+  - `maxEdgeId` : 辺につけられたIDの最大値。`isBridge()`を使用する場合は必ず指定すること
 - 計算量
   - $O(n+m)$
 
@@ -25,7 +27,7 @@ public int componentCnt()
 public boolean isBridge(Edge e)
 public boolean isBridge(int eid)
 ```
-橋かどうかを判定する。
+橋かどうかを判定する。使用する場合は、コンストラクタで`maxEdgeId`を指定すること。
 - 引数
   - `e` : 辺
   - `eid` : 辺番号 $(0 \le \mathrm{eid} \lt m)$
@@ -36,7 +38,7 @@ public boolean isBridge(int eid)
 ```java
 public ArrayList<Edge> bridges()
 ```
-すべての橋を取得する。
+すべての橋を取得する。使用する場合は、コンストラクタで`maxEdgeId`を指定すること。
 - 計算量
   - $O(1)$
 
@@ -82,6 +84,6 @@ public Node node(int i)
   - $O(1)$
 
 ## 検証
-- [Articulation Points (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11369671#2)
-- [Bridges (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11369676#2)
-- [ABC334G Christmas Color Grid 2 (AtCoder)](https://atcoder.jp/contests/abc334/submissions/74050064)
+- [Articulation Points (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11388977#2)
+- [Bridges (Aizu Online Judge)](https://judge.u-aizu.ac.jp/onlinejudge/review.jsp?rid=11388965#2)
+- [ABC334G Christmas Color Grid 2 (AtCoder)](https://atcoder.jp/contests/abc334/submissions/74545914)

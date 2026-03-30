@@ -20,11 +20,12 @@ public class Main {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
 		int Q = sc.nextInt();
-		Graph g = new Graph(N);
+		SimpleGraph g = new SimpleGraph(N);
 		for (int i = 0; i < N - 1; i++) {
 			int p = sc.nextInt();
 			g.addUndirEdge(i + 1, p);
 		}
+		g.build();
 		Lca lca = new Lca(g, 0);
 		StringBuilder out = new StringBuilder();
 		for (int q = 0; q < Q; q++) {
@@ -219,13 +220,13 @@ class FastScanner {
 
 // === begin: graph/Lca.java ===
 class Lca {
-	private GenericGraph<? extends Edge> g = null;
+	private Graph g = null;
 	private int[] depth = null;
 	private int[][] anc = null;
 	private int K = 1;
 	private int[] kmax = null;
 
-	public Lca(GenericGraph<? extends Edge> g, int root) {
+	public Lca(Graph g, int root) {
 		this.g = g;
 		this.K = 1;
 		while ((1 << this.K) < g.size()) this.K++;
@@ -241,16 +242,16 @@ class Lca {
 		ArrayDeque<Integer> stack = new ArrayDeque<>();
 		depth[root] = 0;
 		stack.add(root);
+		Graph.EdgeConsumer action = (from, to, id, cost) -> {
+			if (depth[to] != -1) return;
+			depth[to] = depth[from] + 1;
+			anc[0][to] = from;
+			stack.addLast(to);
+		};
 		while (stack.size() > 0) {
 			int pos = stack.pollFirst();
 			kmax[pos] = 31 - Integer.numberOfLeadingZeros(depth[pos]);
-			for (Edge e: g.edges(pos)) {
-				int child = e.to();
-				if (depth[child] != -1) continue;
-				depth[child] = depth[pos] + 1;
-				anc[0][child] = pos;
-				stack.addLast(child);
-			}
+			g.forEachEdge(pos, action);
 		}
 		for (int k = 1; k < K; k++) {
 			for (int i = 0; i < n; i++) {
@@ -290,59 +291,48 @@ class Lca {
 }
 // === end: graph/Lca.java ===
 
-// === begin: graph/GenericGraph.java ===
-class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
-	public GenericGraph(int n) {
-		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+// === begin: graph/Graph.java ===
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
 	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
-	}
-	public int maxEdgeId() {
-		return maxEdgeId;
-	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
-	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
-	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
-	public int size() {
-		return n;
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
 	}
 }
-// === end: graph/GenericGraph.java ===
+// === end: graph/Graph.java ===
 
 // === begin: graph/Edge.java ===
 class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = cost;
+	}
 	public Edge(int from, int to, int id) {
 		this.from = from;
 		this.to = to;
 		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
 	}
 	public int from() {
 		return from;
@@ -353,34 +343,55 @@ class Edge {
 	public int id() {
 		return id;
 	}
+	public long cost() {
+		return cost;
+	}
 }
 // === end: graph/Edge.java ===
 
-// === begin: graph/Graph.java ===
-class Graph extends GenericGraph<Edge> {
-	@SuppressWarnings("unchecked")
-	public Graph(int n) {
-		super(n);
+// === begin: graph/SimpleGraph.java ===
+class SimpleGraph implements Graph {
+	private ArrayList<int[]> _edges = null;
+	protected int n = 0;
+	protected int[] start = null;
+	protected int[] to = null;
+	SimpleGraph(int n) {
+		this.n = n;
+		this._edges = new ArrayList<>();
 	}
 	public void addDirEdge(int from, int to) {
-		addDirEdge(new Edge(from, to, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addDirEdge(int from, int to, int id) {
-		addDirEdge(new Edge(from, to, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt++;
+		_edges.add(new int[] {from, to});
 	}
 	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, edgeCnt++));
-		edges[v].add(new Edge(v, u, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
+		_edges.add(new int[] {u, v});
+		_edges.add(new int[] {v, u});
 	}
-	public void addUndirEdge(int u, int v, int id) {
-		edges[u].add(new Edge(u, v, id));
-		edges[v].add(new Edge(v, u, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt += 2;
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			action.accept(v, to[ei], -1, 1);
+		}
+	}
+	public void build() {
+		start = new int[n + 1];
+		for (int[] e: _edges) start[e[0] + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		to = new int[_edges.size()];
+		for (int[] e: _edges) to[cnt[e[0]]++] = e[1];
+	}
+	@Override
+	public int size() {
+		return n;
+	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	public int edge(int v, int i) {
+		return to[start[v] + i];
+	}
+	public int[] edgesTo(int v) {
+		return Arrays.copyOfRange(to, start[v], start[v + 1]);
 	}
 }
-// === end: graph/Graph.java ===
+// === end: graph/SimpleGraph.java ===

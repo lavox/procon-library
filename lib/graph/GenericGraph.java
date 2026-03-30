@@ -1,45 +1,72 @@
 package graph;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
+public class GenericGraph<E extends Edge> implements Graph {
+	private ArrayList<E> _edges = null;
+	private int maxEdgeId = 0;
+	protected int n = 0;
+	protected int[] start = null;
+	protected Object[] edges = null;
 	public GenericGraph(int n) {
 		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+		this._edges = new ArrayList<>();
 	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
+	public void addEdge(E e) {
+		maxEdgeId = Math.max(maxEdgeId, e.id);
+		_edges.add(e);
 	}
 	public int maxEdgeId() {
 		return maxEdgeId;
 	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			E e = (E) edges[ei];
+			action.accept(e.from, e.to, e.id, e.cost);
+		}
 	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
+
+	public void build() {
+		start = new int[n + 1];
+		for (Edge e: _edges) start[e.from + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		edges = new Object[_edges.size()];
+		for (Edge e: _edges) edges[cnt[e.from]++] = e;
 	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
+
+	@Override
 	public int size() {
 		return n;
+	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	@SuppressWarnings("unchecked")
+	public E edge(int v, int i) {
+		return (E)edges[start[v] + i];
+	}
+	public Iterable<E> edges(int v) {
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int ei = 0;
+					int ecnt = edgeSize(v);
+					@Override
+					public boolean hasNext() {
+						return ei < ecnt;
+					}
+					@Override
+					public E next() {
+						return edge(v, ei++);
+					}
+				};
+			}
+		};
 	}
 }

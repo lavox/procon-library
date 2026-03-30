@@ -7,7 +7,7 @@ public class LcaTest {
   @Test
   public void test() {
     int n = 11;
-    Graph g = new Graph(n);
+    SimpleGraph g = new SimpleGraph(n);
     g.addUndirEdge(10, 9);
     g.addUndirEdge(10, 8);
     g.addUndirEdge(9, 7);
@@ -18,6 +18,7 @@ public class LcaTest {
     g.addUndirEdge(6, 2);
     g.addUndirEdge(6, 1);
     g.addUndirEdge(4, 0);
+    g.build();
     Lca lca = new Lca(g, 10);
     int[] d = new int[]{4,3,3,3,3,2,2,2,1,1,0};
     for (int i = 0; i < n; i++) {

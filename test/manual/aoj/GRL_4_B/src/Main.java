@@ -7,6 +7,11 @@ import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
+import java.util.Iterator;
+import java.util.PrimitiveIterator;
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -208,93 +213,663 @@ class FastScanner {
 	}
 }
 
+// === begin: graph/TopologicalSort.java ===
 class TopologicalSort {
 	private int _n = 0;
-	private ArrayList<Integer>[] edge = null;
-  private Permutation nodes = null;
+	private SimpleGraph g = null;
+	private Permutation nodes = null;
 	
-	@SuppressWarnings("unchecked")
 	public TopologicalSort(int n) {
 		this._n = n;
-		edge = new ArrayList[n];
-		for ( int i = 0 ; i < n ; i++ ) {
-			edge[i] = new ArrayList<>();
-		}
+		g = new SimpleGraph(n);
 	}
-	public void addEdge(int v1, int v2) {
-		edge[v1].add(v2);
+	public void addEdge(int from, int to) {
+		g.addDirEdge(from, to);
 	}
 	public boolean sort() {
+		g.build();
 		int[] index = new int[_n];
-		for ( ArrayList<Integer> edges : edge ) {
-			for ( int to : edges ) {
-				index[to]++;
-			}
-		}
+		Graph.EdgeConsumer action1 = (from, to, id, cost) -> {
+			index[to]++;
+		};
+		for (int i = 0; i < g.size(); i++) g.forEachEdge(i, action1);
 		
-    int[] queue = new int[_n];
-    int qw = 0;
-    int qr = 0;
+		IntArrayList queue = new IntArrayList(_n);
+		int ri = 0;
 		for ( int i = 0 ; i < _n ; i++ ) {
-			if ( index[i] == 0 ) queue[qw++] = i;
+			if (index[i] == 0) queue.add(i);
 		}
 		
-    nodes = new Permutation(_n);
+		nodes = new Permutation(_n);
 		int i = 0;
-		while (qr < qw) {
-			int pos = queue[qr++];
-      nodes.swapVal(pos, nodes.valAt(i++));
-			for (int next: edge[pos]) {
-				index[next]--;
-				if (index[next] == 0) queue[qw++] = next;
-			}
+		Graph.EdgeConsumer action2 = (from, to, id, cost) -> {
+			index[to]--;
+			if (index[to] == 0) queue.add(to);
+		};
+		while (ri < queue.size()) {
+			int pos = queue.get(ri++);
+			nodes.swapVal(pos, nodes.valAt(i++));
+			g.forEachEdge(pos, action2);
 		}
 		return i == _n;
 	}
-  public int nodeAt(int i) {
-    return nodes.valAt(i);
-  }
-  public int idxOf(int v) {
-    return nodes.idxOf(v);
-  }
-  public int[] nodeArray() {
-    return nodes.values();
-  }
-  public int[] indexArray() {
-    return nodes.indexes();
-  }
-
-  class Permutation {
-    private int[] value = null;
-    private int[] index = null;
-    public Permutation(int n) {
-      value = new int[n];
-      for (int i = 0; i < n; i++) value[i] = i;
-      index = Arrays.copyOf(value, n);
-    }
-    public int idxOf(int v) {
-      return index[v];
-    }
-    public int valAt(int i) {
-      return value[i];
-    }
-    public void swapVal(int u, int v) {
-      swapIdx(index[u], index[v]);
-    }
-    public void swapIdx(int i, int j) {
-      if (i == j) return;
-      int u = value[i];
-      int v = value[j];
-      value[i] = v;
-      value[j] = u;
-      index[u] = j;
-      index[v] = i;
-    }
-    public int[] values() {
-      return value;
-    }
-    public int[] indexes() {
-      return index;
-    }
-  }
+	public int nodeAt(int i) {
+		return nodes.valAt(i);
+	}
+	public int idxOf(int v) {
+		return nodes.idxOf(v);
+	}
+	public int[] nodeArray() {
+		return nodes.values();
+	}
+	public int[] indexArray() {
+		return nodes.indexes();
+	}
 }
+// === end: graph/TopologicalSort.java ===
+
+// === begin: primitive/IntArrayList.java ===
+class IntArrayList implements Iterable<Integer> {
+	private int[] data = null;
+	private int size = 0;
+	private static final int DEFAULT_CAPACITY = 10;
+
+	public IntArrayList() {}
+	public IntArrayList(int initialCapacity) {
+		data = new int[initialCapacity];
+	}
+	public IntArrayList(int[] data) {
+		this.data = Arrays.copyOf(data, data.length);
+		this.size = data.length;
+	}
+	public IntArrayList(IntArrayList array) {
+		this.data = Arrays.copyOf(array.data, array.size);
+		this.size = array.size;
+	}
+	public boolean add(int e) {
+		ensureCapacity(size + 1);
+		data[size++] = e;
+		return true;
+	}
+	public void add(int index, int element) {
+		if (index < 0 || index > size) throw new IndexOutOfBoundsException();
+		ensureCapacity(size + 1);
+		System.arraycopy(data, index, data, index + 1, size - index);
+		data[index] = element;
+		size++;
+	}
+	public void addAll(IntArrayList c) {
+		addAll(size, c);
+	}
+	public void addAll(int index, IntArrayList c) {
+		if (index < 0 || index > size) throw new IndexOutOfBoundsException();
+		if (c.size() == 0) return;
+		ensureCapacity(size + c.size);
+		System.arraycopy(data, index, data, index + c.size(), size - index);
+		System.arraycopy(c.data, 0, data, index, c.size());
+		size += c.size();
+	}
+	public void clear() {
+		size = 0;
+	}
+	public IntArrayList clone() {
+		IntArrayList copy = new IntArrayList();
+		if (data != null) {
+			copy.data = new int[data.length];
+			System.arraycopy(data, 0, copy.data, 0, data.length);
+		}
+		copy.size = size;
+		return copy;
+	}
+	public boolean contains(int e) {
+		for (int value : data) {
+			if (value == e) return true;
+		}
+		return false;
+	}
+	public void ensureCapacity(int minCapacity) {
+		if (data == null) {
+			data = new int[Math.max(DEFAULT_CAPACITY, minCapacity)];
+		} else if (data.length < minCapacity) {
+			data = Arrays.copyOf(data, Math.max(data.length * 2, minCapacity));
+		}
+	}
+	public void forEach(IntConsumer action) {
+		if (data != null) {
+			for (int i = 0; i < size; i++) {
+				action.accept(data[i]);
+			}
+		}
+	}
+	public int get(int index) {
+		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
+		return data[index];
+	}
+	public int last() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[size - 1];
+	}
+	public int indexOf(int e) {
+		for (int i = 0; i < size; i++) {
+			if (data[i] == e) return i;
+		}
+		return -1;
+	}
+	public boolean isEmpty() {
+		return size == 0;
+	}
+	public PrimitiveIterator.OfInt iterator() {
+		return new IntArrayIterator(data, size);
+	}
+	private final class IntArrayIterator implements PrimitiveIterator.OfInt {
+		private int index = 0;
+		private int size;
+		private int[] data;
+		IntArrayIterator(int[] data, int size) {
+			this.data = data;
+			this.size = size;
+		}
+		@Override
+		public boolean hasNext() {
+			return index != size;
+		}
+		@Override
+		public int nextInt() {
+			int i = index;
+			if (i == size) throw new IndexOutOfBoundsException();
+			index = i + 1;
+			return data[i];
+		}
+	}
+	public int lastIndexOf(int e) {
+		for (int i = size - 1; i >= 0; i--) {
+			if (data[i] == e) return i;
+		}
+		return -1;
+	}
+	public int removeByIndex(int index) {
+		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
+		int oldValue = data[index];
+		System.arraycopy(data, index + 1, data, index, size - index - 1);
+		data[--size] = 0;
+		return oldValue;
+	}
+	public int removeLast() {
+		if (size == 0) throw new IndexOutOfBoundsException();
+		return data[--size];
+	}
+	public boolean removeByVal(int e) {
+		int index = indexOf(e);
+		if (index >= 0) {
+			removeByIndex(index);
+			return true;
+		}
+		return false;
+	}
+	public boolean removeAll(IntArrayList c) {
+		if (size == 0 || c.size() == 0) return false;
+		int w = 0;
+		boolean removed = false;
+		for (int r = 0; r < size; r++) {
+			if (c.indexOf(data[r]) < 0) {
+				data[w++] = data[r];
+			} else {
+				removed = true;
+			}
+		}
+		size = w;
+		return removed;
+	}
+	public boolean removeIf(IntPredicate filter) {
+		if (data == null || size == 0) return false;
+		int w = 0;
+		boolean modified = false;
+		for (int r = 0; r < size; r++) {
+			if (!filter.test(data[r])) {
+				data[w++] = data[r];
+			} else {
+				modified = true;
+			}
+		}
+		size = w;
+		return modified;
+	}
+	public void removeRange(int fromIndex, int toIndex) {
+		if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
+			throw new IndexOutOfBoundsException();
+		}
+		System.arraycopy(data, toIndex, data, fromIndex, size - toIndex);
+		size -= (toIndex - fromIndex);
+	}
+	public void replaceAll(IntUnaryOperator operator) {
+		if (data == null) return;
+		for (int i = 0; i < size; i++) {
+			data[i] = operator.applyAsInt(data[i]);
+		}
+	}
+	public boolean retainAll(IntArrayList c) {
+		if (size == 0 || c.size() == 0) return false;
+		int w = 0;
+		boolean removed = false;
+		for (int r = 0; r < size; r++) {
+			if (c.indexOf(data[r]) >= 0) {
+				data[w++] = data[r];
+			} else {
+				removed = true;
+			}
+		}
+		size = w;
+		return removed;
+	}
+	public int set(int index, int element) {
+		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
+		int oldValue = data[index];
+		data[index] = element;
+		return oldValue;
+	}
+	public int size() {
+		return size;
+	}
+	public void sort() {
+		Arrays.sort(data, 0, size);
+	}
+	public void sort(IntComparator c) {
+		IntArrays.sort(data, 0, size, c);
+	}
+	public void sort(int fromIndex, int toIndex, IntComparator c) {
+		if (toIndex < 0 || toIndex > size) throw new IndexOutOfBoundsException();
+		IntArrays.sort(data, fromIndex, toIndex, c);
+	}
+	public int[] toArray() {
+		if (data == null) return new int[0];
+		return Arrays.copyOf(data, size);
+	}
+	public int[] toArray(int[] a) {
+		if (a.length < size) {
+			return Arrays.copyOf(data, size);
+		}
+		System.arraycopy(data, 0, a, 0, size);
+		if (a.length > size) a[size] = 0;
+		return a;
+	}
+	public void trimToSize() {
+		if (data == null || data.length == size) return;
+		data = Arrays.copyOf(data, size);
+	}
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof IntArrayList) {
+			IntArrayList ol = (IntArrayList)o;
+			if (size != ol.size) return false;
+			for (int i = 0; i < size; i++) {
+				if (data[i] != ol.data[i]) return false;
+			}
+			return true;
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		int hashCode = 1;
+		for (int i = 0; i < size; i++) {
+			hashCode = 31 * hashCode + data[i];
+		}
+		return hashCode;
+	}
+}
+// === end: primitive/IntArrayList.java ===
+
+// === begin: data_structure/Permutation.java ===
+class Permutation {
+	private int[] value = null;
+	private int[] index = null;
+	public Permutation(int n) {
+		value = new int[n];
+		for (int i = 0; i < n; i++) value[i] = i;
+		index = Arrays.copyOf(value, n);
+	}
+	private Permutation(int[] value, int[] index) {
+		assert value.length == index.length;
+		this.value = value;
+		this.index = index;
+	}
+	public static Permutation createPermutationByValue(int[] val) {
+		return new Permutation(val, createIndexArray(val));
+	}
+	public static Permutation createPermutationByIndex(int[] idx) {
+		return new Permutation(createValueArray(idx), idx);
+	}
+	private static int[] createIndexArray(int[] val) {
+		int[] idx = new int[val.length];
+		for (int i = 0; i < val.length; i++) idx[val[i]] = i;
+		return idx;
+	}
+	private static int[] createValueArray(int[] idx) {
+		return createIndexArray(idx);
+	}
+	public int idxOf(int v) {
+		return index[v];
+	}
+	public int valAt(int i) {
+		return value[i];
+	}
+	public void swapVal(int u, int v) {
+		swapIdx(index[u], index[v]);
+	}
+	public void swapIdx(int i, int j) {
+		if (i == j) return;
+		int u = value[i];
+		int v = value[j];
+		value[i] = v;
+		value[j] = u;
+		index[u] = j;
+		index[v] = i;
+	}
+	public int[] values() {
+		return value;
+	}
+	public int[] indexes() {
+		return index;
+	}
+	public boolean nextPermutation() {
+		int len = value.length;
+		int l = len - 2;
+		while (l >= 0 && value[l] >= value[l + 1]) l--;
+		if (l < 0) return false;
+		int r = len - 1;
+		while (value[l] >= value[r]) r--;
+		swapIdx(l, r);
+		l++; r = len - 1;
+		while (l < r) {
+			swapIdx(l, r);
+			l++; r--;
+		}
+		return true;
+	}
+	public static boolean nextPermutation(int[] array) {
+		int len = array.length;
+		int l = len - 2;
+		while (l >= 0 && array[l] >= array[l + 1]) l--;
+		if (l < 0) return false;
+		int r = len - 1;
+		while (array[l] >= array[r]) r--;
+		int tmp = array[l]; array[l] = array[r]; array[r] = tmp;
+		l++; r = len - 1;
+		while (l < r) {
+			tmp = array[l]; array[l] = array[r]; array[r] = tmp;
+			l++; r--;
+		}
+		return true;
+	}
+	public static boolean nextPermutation(long[] array) {
+		int len = array.length;
+		int l = len - 2;
+		while (l >= 0 && array[l] >= array[l + 1]) l--;
+		if (l < 0) return false;
+		int r = len - 1;
+		while (array[l] >= array[r]) r--;
+		long tmp = array[l]; array[l] = array[r]; array[r] = tmp;
+		l++; r = len - 1;
+		while (l < r) {
+			tmp = array[l]; array[l] = array[r]; array[r] = tmp;
+			l++; r--;
+		}
+		return true;
+	}
+}
+// === end: data_structure/Permutation.java ===
+
+// === begin: graph/Graph.java ===
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
+	}
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/SimpleGraph.java ===
+class SimpleGraph extends GenericGraph<Edge> {
+	SimpleGraph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addEdge(new Edge(from, to));
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addEdge(new Edge(from, to, id));
+	}
+	public void addDirEdge(int from, int to, int id, long cost) {
+		addEdge(new Edge(from, to, id, cost));
+	}
+	public void addUndirEdge(int u, int v) {
+		addEdge(new Edge(u, v));
+		addEdge(new Edge(v, u));
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		addEdge(new Edge(u, v, id));
+		addEdge(new Edge(v, u, id));
+	}
+	public void addUndirEdge(int u, int v, int id, long cost) {
+		addEdge(new Edge(u, v, id, cost));
+		addEdge(new Edge(v, u, id, cost));
+	}
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			action.accept(v, ((Edge)edges[ei]).to, -1, 1);
+		}
+	}
+}
+// === end: graph/SimpleGraph.java ===
+
+// === begin: primitive/IntArrays.java ===
+class IntArrays {
+	public static void sort(int[] a, IntComparator comp) {
+		sort(a, 0, a.length, comp);
+	}
+	public static void sort(int[] a, int fromIndex, int toIndex, IntComparator comp) {
+		if (toIndex - fromIndex <= 1) return;
+		int maxDepth = 2 * (31 - Integer.numberOfLeadingZeros(toIndex - fromIndex));
+		introSort(a, fromIndex, toIndex, maxDepth, comp);
+	}
+
+	private static void introSort(int[] a, int left, int right, int maxDepth, IntComparator comp) {
+		while (right - left > 32) {
+			if (maxDepth == 0) {
+				heapSort(a, left, right, comp);
+				return;
+			}
+			maxDepth--;
+			
+			int mid = (left + right) >>> 1;
+			if (comp.compare(a[left], a[mid]) > 0) swap(a, left, mid);
+			if (comp.compare(a[mid], a[right - 1]) > 0) {
+				swap(a, mid, right - 1);
+				if (comp.compare(a[left], a[mid]) > 0) swap(a, left, mid);
+			}
+			int pivot = a[mid];
+			int i = left + 1, j = right - 2;
+			while (i <= j) {
+				while (comp.compare(a[i], pivot) < 0) i++;
+				while (comp.compare(a[j], pivot) > 0) j--;
+				if (i <= j) {
+						swap(a, i, j);
+						i++; j--;
+				}
+			}
+
+			if (j - left < right - i) {
+				introSort(a, left, j + 1, maxDepth, comp);
+				left = i;
+			} else {
+				introSort(a, i, right, maxDepth, comp);
+				right = j + 1;
+			}
+		}
+		insertionSort(a, left, right, comp);
+	}
+	private static void insertionSort(int[] a, int left, int right, IntComparator comp) {
+		for (int i = left + 1; i < right; i++) {
+			int v = a[i];
+			int j = i - 1;
+			while (j >= left && comp.compare(a[j], v) > 0) {
+				a[j + 1] = a[j];
+				j--;
+			}
+			a[j + 1] = v;
+		}
+	}
+	private static void heapSort(int[] a, int left, int right, IntComparator comp) {
+		int n = right - left;
+		for (int i = (n >>> 1) - 1; i >= 0; i--) downHeap(a, i, n, left, comp);
+		for (int i = n - 1; i > 0; i--) {
+			swap(a, left, left + i);
+			downHeap(a, 0, i, left, comp);
+		}
+	}
+	private static void downHeap(int[] a, int i, int n, int base, IntComparator comp) {
+		while (true) {
+			int l = (i << 1) + 1;
+			if (l >= n) break;
+			int r = l + 1;
+			int largest = l;
+			if (r < n && comp.compare(a[base + l], a[base + r]) < 0) largest = r;
+			if (comp.compare(a[base + i], a[base + largest]) >= 0) break;
+			swap(a, base + i, base + largest);
+			i = largest;
+		}
+	}
+	private static void swap(int[] a, int i, int j) {
+			int tmp = a[i];
+			a[i] = a[j];
+			a[j] = tmp;
+	}
+}
+// === end: primitive/IntArrays.java ===
+
+// === begin: primitive/IntComparator.java ===
+@FunctionalInterface
+interface IntComparator {
+    int compare(int a, int b);
+}
+// === end: primitive/IntComparator.java ===
+
+// === begin: graph/Edge.java ===
+class Edge {
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = cost;
+	}
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
+	}
+	public long cost() {
+		return cost;
+	}
+}
+// === end: graph/Edge.java ===
+
+// === begin: graph/GenericGraph.java ===
+class GenericGraph<E extends Edge> implements Graph {
+	private ArrayList<E> _edges = null;
+	private int maxEdgeId = 0;
+	protected int n = 0;
+	protected int[] start = null;
+	protected Object[] edges = null;
+	GenericGraph(int n) {
+		this.n = n;
+		this._edges = new ArrayList<>();
+	}
+	public void addEdge(E e) {
+		maxEdgeId = Math.max(maxEdgeId, e.id);
+		_edges.add(e);
+	}
+	public int maxEdgeId() {
+		return maxEdgeId;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			E e = (E) edges[ei];
+			action.accept(e.from, e.to, e.id, e.cost);
+		}
+	}
+
+	public void build() {
+		start = new int[n + 1];
+		for (Edge e: _edges) start[e.from + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		edges = new Object[_edges.size()];
+		for (Edge e: _edges) edges[cnt[e.from]++] = e;
+	}
+
+	@Override
+	public int size() {
+		return n;
+	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	@SuppressWarnings("unchecked")
+	public E edge(int v, int i) {
+		return (E)edges[start[v] + i];
+	}
+	public Iterable<E> edges(int v) {
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int ei = 0;
+					int ecnt = edgeSize(v);
+					@Override
+					public boolean hasNext() {
+						return ei < ecnt;
+					}
+					@Override
+					public E next() {
+						return edge(v, ei++);
+					}
+				};
+			}
+		};
+	}
+}
+// === end: graph/GenericGraph.java ===

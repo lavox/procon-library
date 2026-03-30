@@ -11,6 +11,8 @@ import java.util.BitSet;
 
 import java.util.Arrays;
 
+import java.util.Iterator;
+
 // https://github.com/lavox/procon-library
 public class Main {
 	public static void main(String[] args) {
@@ -23,7 +25,7 @@ public class Main {
 		int H = sc.nextInt();
 		int W = sc.nextInt();
 		String[] S = sc.nextStringArray(H);
-		Graph g = new Graph(H * W);
+		SimpleGraph g = new SimpleGraph(H * W);
 		int green = 0;
 		for (int i = 0; i < H; i++) {
 			for (int j = 0; j < W; j++) {
@@ -37,6 +39,7 @@ public class Main {
 				}
 			}
 		}
+		g.build();
 		LowLink ll = new LowLink(g);
 		ModOperation mop = new ModOperation(ModOperation.MOD998);
 		ModInt ans = mop.zero();
@@ -241,22 +244,25 @@ class FastScanner {
 // === begin: graph/LowLink.java ===
 class LowLink {
 	private Node[] nodes = null;
-	private GenericGraph<? extends Edge> g = null;
+	private Graph g = null;
 	private BitSet isBridge = null;
 	private ArrayList<Edge> bridges = null;
 	private ArrayList<Node> articulations = null;
 	private int cnt = 0;
 	private int componentCnt = 0;
 
-	public LowLink(GenericGraph<? extends Edge> g) {
+	public LowLink(Graph g) {
+		this(g, -1);
+	}
+	public LowLink(Graph g, int maxEdgeId) {
 		this.g = g;
 		this.nodes = new Node[g.size()];
 		for (int i = 0; i < g.size(); i++) nodes[i] = new Node(i);
-		this.isBridge = new BitSet(g.maxEdgeId());
+		if (maxEdgeId >= 0) this.isBridge = new BitSet(maxEdgeId + 1);
 		build();
 	}
 	private void build() {
-		bridges = new ArrayList<>();
+		if (isBridge != null) bridges = new ArrayList<>();
 		cnt = 0;
 		for (Node n: nodes) {
 			if (n.visited) continue;
@@ -277,7 +283,7 @@ class LowLink {
 	public boolean isBridge(int eid) {
 		return isBridge.get(eid);
 	}
-	public ArrayList<Edge> bridges() {
+	public ArrayList<? extends Edge> bridges() {
 		return bridges;
 	}
 	public boolean isArticulation(int i) {
@@ -297,15 +303,14 @@ class LowLink {
 		stack.addLast(n0);
 		while ( stack.size() > 0 ) {
 			Node n = stack.peekLast();
-			int v = n.id;
-			if (n.iter == 0) {
+			if (!n.hasPrevEdge()) {
 				n.visited = true;
 				n.ord = cnt;
 				n.low = cnt;
 				cnt++;
 			}
-			if (n.iter > 0) {
-				Edge e = g.edge(v, n.iter - 1);
+			if (n.hasPrevEdge()) {
+				Edge e = n.prevEdge; 
 				Node to = node(e.to());
 				if (n.parent == null || n.parent != to) {
 					n.low = Math.min(n.low, to.low);
@@ -314,14 +319,14 @@ class LowLink {
 					n.isArticulation = true;
 					n.artCnt++;
 				}
-				if (n.ord < to.low) {
-					isBridge.set(e.id());
+				if (n.ord < to.low && isBridge != null) {
+					if (0 <= e.id() && e.id() < isBridge.size()) isBridge.set(e.id());
 					bridges.add(e);
 				}
 			}
 			boolean stacked = false;
-			while (n.iter < g.edgeSize(v)) {
-				Edge e = g.edge(v, n.iter++);
+			while (n.hasNextEdge()) {
+				Edge e = n.nextEdge();
 				Node to = node(e.to());
 				if (n.parent != null && to == n.parent) continue;
 				if (!to.visited) {
@@ -353,10 +358,12 @@ class LowLink {
 		private boolean isArticulation = false;
 		private int artCnt = 0;
 		private int childCnt = 0;
-		private int iter = 0;
+		private Iterator<? extends Edge> iter = null;
+		private Edge prevEdge = null;
 
 		private Node(int id) {
 			this.id = id;
+			this.iter = g.edges(id).iterator();
 		}
 		public int id() {
 			return id;
@@ -367,19 +374,43 @@ class LowLink {
 		public int articulationCnt() {
 			return artCnt;
 		}
+		private boolean hasPrevEdge() {
+			return prevEdge != null;
+		}
+		private boolean hasNextEdge() {
+			return iter.hasNext();
+		}
+		private Edge nextEdge() {
+			prevEdge = iter.next();
+			return prevEdge;
+		}
 	}
 }
 // === end: graph/LowLink.java ===
 
 // === begin: graph/Edge.java ===
 class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = cost;
+	}
 	public Edge(int from, int to, int id) {
 		this.from = from;
 		this.to = to;
 		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
 	}
 	public int from() {
 		return from;
@@ -390,81 +421,135 @@ class Edge {
 	public int id() {
 		return id;
 	}
+	public long cost() {
+		return cost;
+	}
 }
 // === end: graph/Edge.java ===
 
+// === begin: graph/Graph.java ===
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
+	}
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
+	}
+}
+// === end: graph/Graph.java ===
+
+// === begin: graph/SimpleGraph.java ===
+class SimpleGraph extends GenericGraph<Edge> {
+	SimpleGraph(int n) {
+		super(n);
+	}
+	public void addDirEdge(int from, int to) {
+		addEdge(new Edge(from, to));
+	}
+	public void addDirEdge(int from, int to, int id) {
+		addEdge(new Edge(from, to, id));
+	}
+	public void addDirEdge(int from, int to, int id, long cost) {
+		addEdge(new Edge(from, to, id, cost));
+	}
+	public void addUndirEdge(int u, int v) {
+		addEdge(new Edge(u, v));
+		addEdge(new Edge(v, u));
+	}
+	public void addUndirEdge(int u, int v, int id) {
+		addEdge(new Edge(u, v, id));
+		addEdge(new Edge(v, u, id));
+	}
+	public void addUndirEdge(int u, int v, int id, long cost) {
+		addEdge(new Edge(u, v, id, cost));
+		addEdge(new Edge(v, u, id, cost));
+	}
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			action.accept(v, ((Edge)edges[ei]).to, -1, 1);
+		}
+	}
+}
+// === end: graph/SimpleGraph.java ===
+
 // === begin: graph/GenericGraph.java ===
-class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
-	public GenericGraph(int n) {
+class GenericGraph<E extends Edge> implements Graph {
+	private ArrayList<E> _edges = null;
+	private int maxEdgeId = 0;
+	protected int n = 0;
+	protected int[] start = null;
+	protected Object[] edges = null;
+	GenericGraph(int n) {
 		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
+		this._edges = new ArrayList<>();
 	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
+	public void addEdge(E e) {
+		maxEdgeId = Math.max(maxEdgeId, e.id);
+		_edges.add(e);
 	}
 	public int maxEdgeId() {
 		return maxEdgeId;
 	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void forEachEdge(int v, Graph.EdgeConsumer action) {
+		for (int ei = start[v]; ei < start[v + 1]; ei++) {
+			E e = (E) edges[ei];
+			action.accept(e.from, e.to, e.id, e.cost);
+		}
 	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
+
+	public void build() {
+		start = new int[n + 1];
+		for (Edge e: _edges) start[e.from + 1]++;
+		for (int i = 0; i < n; i++) start[i + 1] += start[i];
+		int[] cnt = start.clone();
+		edges = new Object[_edges.size()];
+		for (Edge e: _edges) edges[cnt[e.from]++] = e;
 	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
+
+	@Override
 	public int size() {
 		return n;
 	}
+	public int edgeSize(int v) {
+		return start[v + 1] - start[v];
+	}
+	@SuppressWarnings("unchecked")
+	public E edge(int v, int i) {
+		return (E)edges[start[v] + i];
+	}
+	public Iterable<E> edges(int v) {
+		return new Iterable<E>() {
+			@Override
+			public Iterator<E> iterator() {
+				return new Iterator<E>() {
+					int ei = 0;
+					int ecnt = edgeSize(v);
+					@Override
+					public boolean hasNext() {
+						return ei < ecnt;
+					}
+					@Override
+					public E next() {
+						return edge(v, ei++);
+					}
+				};
+			}
+		};
+	}
 }
 // === end: graph/GenericGraph.java ===
-
-// === begin: graph/Graph.java ===
-class Graph extends GenericGraph<Edge> {
-	@SuppressWarnings("unchecked")
-	public Graph(int n) {
-		super(n);
-	}
-	public void addDirEdge(int from, int to) {
-		addDirEdge(new Edge(from, to, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addDirEdge(int from, int to, int id) {
-		addDirEdge(new Edge(from, to, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt++;
-	}
-	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, edgeCnt++));
-		edges[v].add(new Edge(v, u, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addUndirEdge(int u, int v, int id) {
-		edges[u].add(new Edge(u, v, id));
-		edges[v].add(new Edge(v, u, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt += 2;
-	}
-}
-// === end: graph/Graph.java ===
 
 // === begin: math/ModInt.java ===
 class ModInt {

@@ -106,5 +106,5 @@ public Edge[] edges()
   - $O(1)$
 
 ## 検証
-- [ABC348E Minimize Sum of Distances (AtCoder)](https://atcoder.jp/contests/abc348/submissions/69043695) (Rerooting)
-- [ABC222F Expensive Expense (AtCoder)](https://atcoder.jp/contests/abc222/submissions/me) (LongRerooting)
+- [ABC348E Minimize Sum of Distances (AtCoder)](https://atcoder.jp/contests/abc348/submissions/74546017) (Rerooting)
+- [ABC222F Expensive Expense (AtCoder)](https://atcoder.jp/contests/abc222/submissions/74546052) (LongRerooting)

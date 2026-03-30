@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Dfs {
-	private final GenericGraph<?> g;
+	private final Graph g;
 	private int[] visitedGen = null;
 	int gen = 0;
 
-	public Dfs(GenericGraph<?> g) {
+	public Dfs(Graph g) {
 		this.g = g;
 		this.visitedGen = new int[g.size()];
 	}
@@ -41,7 +41,7 @@ public class Dfs {
 			this.requirePreOrder = requirePreOrder;
 			this.requirePostOrder = requirePostOrder;
 			this.stack = new ArrayDeque<>();
-			this.stack.addLast(new DfsStep(v0, -1, 0, true, 0));
+			this.stack.addLast(new DfsStep(v0, -1, 0, null, true, 0));
 			setVisited(v0);
 			_next();
 		}
@@ -62,22 +62,22 @@ public class Dfs {
 			while (stack.size() > 0 && nextStep == null) {
 				DfsStep s = stack.pollLast();
 				if (s.isPre) {
-					stack.addLast(new DfsStep(s.cur, s.parent, s.edgeIndex, false, s.depth));
-					addNextEdge(s.cur, 0, s.depth + 1);
+					stack.addLast(new DfsStep(s.cur, s.parent, s.edgeIndex, s.eit, false, s.depth));
+					addNextEdge(s.cur, g.edges(s.cur).iterator(), s.depth + 1);
 				} else if (s.parent != -1) {
-					addNextEdge(s.parent, s.edgeIndex + 1, s.depth);
+					addNextEdge(s.parent, s.eit, s.depth);
 				}
 				if ((s.isPre && requirePreOrder) || (!s.isPre && requirePostOrder)) {
 					nextStep = s;
 				}
 			}
 		}
-		private void addNextEdge(int v, int ei0, int depth) {
-			for (int ei = ei0; ei < g.edgeSize(v); ei++) {
-				Edge e = g.edge(v, ei);
-				if (isVisited(e.to()))
-					continue;
-				stack.addLast(new DfsStep(e.to(), v, ei, true, depth));
+		private void addNextEdge(int v, Iterator<? extends Edge> eit, int depth) {
+			if (eit == null) return;
+			while (eit.hasNext()) {
+				Edge e = eit.next();
+				if (isVisited(e.to())) continue;
+				stack.addLast(new DfsStep(e.to(), v, e.id(), eit, true, depth));
 				setVisited(e.to());
 				return;
 			}
@@ -87,14 +87,16 @@ public class Dfs {
 	public class DfsStep {
 		public final int cur;
 		public final int parent;
-		public final int edgeIndex;
+		public final int edgeIndex; // edgeのid
 		public final boolean isPre;
 		public final int depth;
+		private final Iterator<? extends Edge> eit; // parentのedgeのiterator
 
-		private DfsStep(int cur, int parent, int edgeIndex, boolean isPre, int depth) {
+		private DfsStep(int cur, int parent, int edgeIndex, Iterator<? extends Edge> eit, boolean isPre, int depth) {
 			this.cur = cur;
 			this.parent = parent;
 			this.edgeIndex = edgeIndex;
+			this.eit = eit;
 			this.isPre = isPre;
 			this.depth = depth;
 		}

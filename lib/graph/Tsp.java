@@ -2,12 +2,11 @@ package graph;
 
 import java.util.Arrays;
 
-public class Tsp {
-	public static final long INF = Long.MAX_VALUE;
-	public static MinRoute search(long[][] distMap) {
+public class Tsp extends ShortestPath {
+	public static TspRoute search(long[][] distMap) {
 		return search(distMap, 0, false);
 	}
-	public static MinRoute search(long[][] distMap, int s, boolean oneway) {
+	public static TspRoute search(long[][] distMap, int s, boolean oneway) {
 		int n = distMap.length;
 		long[][] dp = new long[n][1 << n];
 		for (int i = 0; i < n; i++) Arrays.fill(dp[i], INF);
@@ -24,7 +23,7 @@ public class Tsp {
 				}
 			}
 		}
-		MinRoute ret = new MinRoute();
+		TspRoute ret = new TspRoute(n, distMap);
 		for (int g = 0; g < n; g++) {
 			long d = dp[g][full];
 			if (d == INF) continue;
@@ -37,10 +36,26 @@ public class Tsp {
 				ret.g = g;
 			}
 		}
-		if (ret.dist != INF) {
-			ret.path = new int[n];
-			for (int i = n - 1, cur = ret.g, bit = full; i >= 0; i--) {
-				ret.path[i] = cur;
+		ret.dp = dp;
+		return ret;
+	}
+
+	public static class TspRoute {
+		public int n;
+		public int g = -1;
+		public long dist = INF;
+		public long[][] dp = null;
+		public long[][] distMap = null;
+		private TspRoute(int n, long[][] distMap) {
+			this.n = n;
+			this.distMap = distMap;
+		}
+
+		public int[] path() {
+			if (dist == INF) return null;
+			int[] path = new int[n];
+			for (int i = n - 1, cur = g, bit = (1 << n) - 1; i >= 0; i--) {
+				path[i] = cur;
 				if (i == 0) break;
 				long curDist = dp[cur][bit];
 				bit &= ~(1 << cur);
@@ -52,14 +67,7 @@ public class Tsp {
 					}
 				}
 			}
+			return path;
 		}
-		ret.dp = dp;
-		return ret;
-	}
-	public static class MinRoute {
-		int g = -1;
-		long dist = INF;
-		int[] path = null;
-		long[][] dp = null;
 	}
 }

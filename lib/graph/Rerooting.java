@@ -30,12 +30,13 @@ public abstract class Rerooting<E> {
 		int eid = (edgeCnt++) * 2;
 		Edge e = new Edge(u, v, eid);
 		Edge re = new Edge(v, u, eid + 1);
-		g.addDirEdge(e);
-		g.addDirEdge(re);
+		g.addEdge(e);
+		g.addEdge(re);
 		edges[e.id()] = e;
 		edges[re.id()] = re;
 	}
 	public void build() {
+		g.build();
 		dfs(0);
 		bfs(0);
 	}
@@ -63,7 +64,7 @@ public abstract class Rerooting<E> {
 		for (Dfs.DfsStep s: dfs.dfsPostOrder(v0)) {
 			if (s.parent != -1) {
 				E val = e();
-				Edge pe = g.edge(s.parent, s.edgeIndex);
+				Edge pe = edges[s.edgeIndex];
 				if (g.edgeSize(s.cur) > 1) {
 					for (Edge e: g.edges(s.cur)) {
 						if (e.to() == s.parent) continue;

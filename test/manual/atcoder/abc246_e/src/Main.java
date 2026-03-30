@@ -8,12 +8,9 @@ import java.util.function.UnaryOperator;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.PrimitiveIterator;
-import java.util.PriorityQueue;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
-import java.util.function.Predicate;
 
 // template & library : https://github.com/lavox/procon-library
 public class Main {
@@ -35,9 +32,9 @@ public class Main {
 		int[] starts = new int[] {
 			id(Ax, Ay, 0, N), id(Ax, Ay, 1, N), id(Ax, Ay, 2, N), id(Ax, Ay, 3, N)
 		};
-		ShortestPath.Dist dist = ShortestPath.bfs01(board, starts, e -> {
-			int fd = d(e.from(), N);
-			int td = d(e.to(), N);
+		ShortestPath.Dist dist = Bfs01.search(board, starts, (from, to, id, cost) -> {
+			int fd = d(from, N);
+			int td = d(to, N);
 			return fd != td;
 		}, null);
 		long ans = ShortestPath.INF;
@@ -62,30 +59,30 @@ public class Main {
 	int d(int id, int N) {
 		return id % 4;
 	}
-	class Board extends GenericGraph<Edge> {
+	class Board implements Graph {
 		String[] S;
 		int N;
 		Board(int N, String[] S) {
-			super(N * N * 4);
 			this.N = N;
 			this.S = S;
 		}
 		@Override
-		public ArrayList<Edge> edges(int v) {
+		public int size() {
+			return N * N * 4;
+		}
+		@Override
+		public void forEachEdge(int v, Graph.EdgeConsumer action) {
 			int x = x(v, N);
 			int y = y(v, N);
-			int d = d(v, N);
-			ArrayList<Edge> ret = new ArrayList<>();
-			if (S[x].charAt(y) == '#') return ret;
+			if (S[x].charAt(y) == '#') return;
 			for (int ad = 0; ad < 4; ad++) {
 				int ax = x + DIR[ad][0];
 				int ay = y + DIR[ad][1];
 				if (ax < 0 || ax >= N || ay < 0 || ay >= N) continue;
 				if (S[ax].charAt(ay) == '#') continue;
 				int aid = id(ax, ay, ad, N);
-				ret.add(new Edge(v, aid, ad));
+				action.accept(v, aid, 0, 1);
 			}
-			return ret;
 		}
 	}
 
@@ -271,346 +268,84 @@ class FastScanner {
 	}
 }
 
+// === begin: graph/Bfs01.java ===
+class Bfs01 extends ShortestPath {
+	public static Dist search(Graph g, int s) {
+		return search(g, s, (from, to, id, cost) -> cost > 0);
+	}
+	public static Dist search(Graph g, int s, EdgePredicate edge1) {
+		return search(g, new int[] {s}, edge1, null);
+	}
+	public static Dist search(Graph g, int[] starts, EdgePredicate edge1, EdgePredicate canPass) {
+		int n = g.size();
+		Dist d = new Dist(n);
+		final long[] dist = d.dist;
+		final int[] parent = d.parent;
+		Arrays.fill(dist, INF);
+		Arrays.fill(parent, -1);
+		ArrayDeque<Step> queue = new ArrayDeque<>();
+		for (int s: starts) {
+			dist[s] = 0;
+			queue.addLast(new Step(s, 0, -1));
+		}
+
+		Graph.EdgeConsumer action = (from, to, id, cost) -> {
+			if (canPass != null && !canPass.test(from, to, id, cost)) return;
+			int dd = edge1.test(from, to, id, cost) ? 1 : 0;
+			long nd = dist[from] + dd;
+			if (nd < dist[to]) {
+				dist[to] = nd;
+				parent[to] = from;
+				if (dd == 0) {
+					queue.addFirst(new Step(to, nd, from));
+				} else {
+					queue.addLast(new Step(to, nd, from));
+				}
+			}
+		};
+
+		while (queue.size() > 0) {
+			Step st = queue.pollFirst();
+			if (dist[st.p] != st.d) continue;
+			g.forEachEdge(st.p, action);
+		}
+		return d;
+	}
+}
+// === end: graph/Bfs01.java ===
+
 // === begin: graph/Graph.java ===
-class Graph extends GenericGraph<Edge> {
-	@SuppressWarnings("unchecked")
-	public Graph(int n) {
-		super(n);
+interface Graph {
+	public int size();
+	public void forEachEdge(int v, EdgeConsumer action);
+	public default Iterable<? extends Edge> edges(int v) {
+		return () -> {
+			ArrayList<Edge> edges = new ArrayList<>();
+			forEachEdge(v, (from, to, id, cost) -> edges.add(new Edge(from, to, id, cost)));
+			return edges.iterator();
+		};
 	}
-	public void addDirEdge(int from, int to) {
-		addDirEdge(new Edge(from, to, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addDirEdge(int from, int to, int id) {
-		addDirEdge(new Edge(from, to, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt++;
-	}
-	public void addUndirEdge(int u, int v) {
-		edges[u].add(new Edge(u, v, edgeCnt++));
-		edges[v].add(new Edge(v, u, edgeCnt));
-		maxEdgeId = Math.max(maxEdgeId, edgeCnt++);
-	}
-	public void addUndirEdge(int u, int v, int id) {
-		edges[u].add(new Edge(u, v, id));
-		edges[v].add(new Edge(v, u, id));
-		maxEdgeId = Math.max(maxEdgeId, id);
-		edgeCnt += 2;
+
+	@FunctionalInterface
+	public interface EdgeConsumer {
+		public void accept(int from, int to, int id, long cost);
 	}
 }
 // === end: graph/Graph.java ===
-
-// === begin: graph/Edge.java ===
-class Edge {
-	private final int from;
-	private final int to;
-	private final int id;
-	public Edge(int from, int to, int id) {
-		this.from = from;
-		this.to = to;
-		this.id = id;
-	}
-	public int from() {
-		return from;
-	}
-	public int to() {
-		return to;
-	}
-	public int id() {
-		return id;
-	}
-}
-// === end: graph/Edge.java ===
-
-// === begin: graph/GenericGraph.java ===
-class GenericGraph<E extends Edge> {
-	protected int n;
-	protected ArrayList<E>[] edges;
-	protected int maxEdgeId = 0;
-	protected int edgeCnt = 0;
-	
-	@SuppressWarnings("unchecked")
-	public GenericGraph(int n) {
-		this.n = n;
-		edges = new ArrayList[n];
-		for (int i = 0; i < n; i++) edges[i] = new ArrayList<>();
-	}
-	public void addDirEdge(E e) {
-		edges[e.from()].add(e);
-		maxEdgeId = Math.max(maxEdgeId, e.id());
-		edgeCnt++;
-	}
-	public int edgeSize(int v) {
-		return edges[v].size();
-	}
-	public int edgeSize() {
-		return edgeCnt;
-	}
-	public int maxEdgeId() {
-		return maxEdgeId;
-	}
-	public Edge edge(int v, int i) {
-		return edges[v].get(i);
-	}
-	public ArrayList<E> edges(int v) {
-		return edges[v];
-	}
-	public int[] edgesTo(int v) {
-		int[] ret = new int[edgeSize(v)];
-		for (int i = 0; i < ret.length; i++) ret[i] = edges[v].get(i).to();
-		return ret;
-	}
-	public int size() {
-		return n;
-	}
-}
-// === end: graph/GenericGraph.java ===
 
 // === begin: graph/ShortestPath.java ===
 class ShortestPath {
 	public static final long INF = Long.MAX_VALUE;
 	public static final long NINF = Long.MIN_VALUE;
 
-	// Dijkstra
-	public static <E extends CostEdge> Dist dijkstra(GenericGraph<E> g, int s) {
-		return dijkstra(g, new int[] {s}, null);
-	}
-	public static <E extends CostEdge> Dist dijkstra(GenericGraph<E> g, int[] starts, Predicate<E> canPass) {
-		int n = g.size();
-		Dist d = new Dist(n);
-		final long[] dist = d.dist;
-		final int[] parent = d.parent;
-		PriorityQueue<Step> queue = new PriorityQueue<>();
-		Step[] step = new Step[n];
-		for (int s: starts) {
-			step[s] = new Step(s, 0, -1);
-			queue.add(step[s]);
-		}
-		while (queue.size() > 0) {
-			Step st = queue.poll();
-			if (step[st.p] != st) continue;
-			dist[st.p] = st.d;
-			parent[st.p] = st.parent;
-			for (E e: g.edges(st.p)) {
-				if (canPass != null && !canPass.test(e)) continue;
-				int np = e.to();
-				long nd = st.d + e.cost();
-				if (step[np] == null || nd < step[np].d) {
-					step[np] = new Step(np, nd, st.p);
-					queue.add(step[np]);
-				}
-			}
-		}
-		return d;
-	}
-
-	// BFS
-	public static <E extends Edge> Dist bfs(GenericGraph<E> g, int s) {
-		return bfs(g, new int[] {s}, null);
-	}
-	public static <E extends Edge> Dist bfs(GenericGraph<E> g, int[] starts, Predicate<E> canPass) {
-		int n = g.size();
-		Dist d = new Dist(n);
-		final long[] dist = d.dist;
-		final int[] parent = d.parent;
-		int[] queue = new int[n];
-		int ri = 0;
-		int wi = 0;
-		for (int s: starts) {
-			dist[s] = 0;
-			queue[wi++] = s;
-		}
-		while (ri < wi) {
-			int p = queue[ri++];
-			for (E e: g.edges(p)) {
-				if (canPass != null && !canPass.test(e)) continue;
-				int np = e.to();
-				if (dist[np] != INF) continue;
-				dist[np] = dist[p] + 1;
-				parent[np] = p;
-				queue[wi++] = np;
-			}
-		}
-		return d;
-	}
-
-	// 01-BFS
-	public static <E extends Edge> Dist bfs01(GenericGraph<E> g, int s, Predicate<E> edge1) {
-		return bfs01(g, new int[] {s}, edge1, null);
-	}
-	public static <E extends Edge> Dist bfs01(GenericGraph<E> g, int[] starts, Predicate<E> edge1, Predicate<E> canPass) {
-		int n = g.size();
-		Dist d = new Dist(n);
-		final long[] dist = d.dist;
-		final int[] parent = d.parent;
-		ArrayDeque<Step> queue = new ArrayDeque<>();
-		Step[] step = new Step[n];
-		for (int s: starts) {
-			step[s] = new Step(s, 0, -1);
-			queue.addLast(step[s]);
-		}
-		while (queue.size() > 0) {
-			Step st = queue.pollFirst();
-			if (step[st.p] != st) continue;
-			dist[st.p] = st.d;
-			parent[st.p] = st.parent;
-			for (E e: g.edges(st.p)) {
-				if (canPass != null && !canPass.test(e)) continue;
-				int dd = edge1.test(e) ? 1 : 0;
-				int np = e.to();
-				long nd = st.d + dd;
-				if (step[np] == null || nd < step[np].d) {
-					step[np] = new Step(np, nd, st.p);
-					if (dd == 0) {
-						queue.addFirst(step[np]);
-					} else {
-						queue.addLast(step[np]);
-					}
-				}
-			}
-		}
-		return d;
-	}
-
-	// Bellman Ford
-	public static <E extends CostEdge> Dist bellmanFord(GenericGraph<E> g, int s) {
-		return bellmanFord(g, new int[] {s});
-	}
-	public static <E extends CostEdge> Dist bellmanFord(GenericGraph<E> g, int[] starts) {
-		int n = g.size();
-		Dist d = new Dist(n);
-		final long[] dist = d.dist;
-		final int[] parent = d.parent;
-		for (int s: starts) {
-			dist[s] = 0;
-		}
-		for (int i = 0; i < n - 1; i++) {
-			boolean update = false;
-			for (int v = 0; v < n; v++) {
-				if (dist[v] == INF) continue;
-				for (E e: g.edges(v)) {
-					int np = e.to();
-					if (dist[v] + e.cost() < dist[np]) {
-						dist[np] = dist[v] + e.cost();
-						parent[np] = v;
-						update = true;
-					}
-				}
-			}
-			if (!update) return d;
-		}
-		BitSet visited = new BitSet(n);
-		int[] queue = new int[n];
-		int wi = 0;
-		boolean update = false;
-		for (int v = 0; v < n; v++) {
-			if (dist[v] == INF) continue;
-			for (E e: g.edges(v)) {
-				int np = e.to();
-				if (dist[np] == NINF) continue;
-				if (dist[v] == NINF || dist[v] + e.cost() < dist[np]) {
-					dist[np] = NINF;
-					parent[np] = v;
-					d.hasNegativeLoop = true;
-					visited.set(np);
-					queue[wi++] = np;
-					update = true;
-				}
-			}
-		}
-		if (!update) return d;
-		int ri = 0;
-		while (ri < wi) {
-			int v = queue[ri++];
-			for (E e: g.edges(v)) {
-				int np = e.to();
-				if (visited.get(np)) continue;
-				visited.set(np);
-				dist[np] = NINF;
-				parent[np] = v;
-				queue[ri++] = np;
-			}
-		}
-		return d;
-	}
-
-	// Warshall Floyd
-	public static DistMap wfCreateMap(int n) {
-		DistMap d = new DistMap(n);
-		d.init();
-		return d;
-	}
-	public static DistMap warshallFloyd(DistMap d) {
-		int n = d.n;
-		for (int k = 0; k < n; k++) {
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < n; j++) {
-					if (d.dist[i][k] == INF || d.dist[k][j] == INF) continue;
-					d.dist[i][j] = Math.min(d.dist[i][j], d.dist[i][k] + d.dist[k][j]);
-				}
-			}
-		}
-		return d;
-	}
-	public static DistMap wfUpdateEdge(DistMap d, int from, int to, long dist) {
-		if (d.dist[from][to] <= dist) return d;
-		d.dist[from][to] = dist;
-		int n = d.n;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				if (d.dist[i][from] == INF || d.dist[to][j] == INF) continue;
-				d.dist[i][j] = Math.min(d.dist[i][j], d.dist[i][from] + dist + d.dist[to][j]);
-			}
-		}
-		return d;
-	}
-
-	// TSP
-	public static TspRoute tsp(long[][] distMap) {
-		return tsp(distMap, 0, false);
-	}
-	public static TspRoute tsp(long[][] distMap, int s, boolean oneway) {
-		int n = distMap.length;
-		long[][] dp = new long[n][1 << n];
-		for (int i = 0; i < n; i++) Arrays.fill(dp[i], INF);
-		dp[s][1 << s] = 0;
-		int full = (1 << n) - 1;
-		for (int bit = 0; bit <= full; bit++) {
-			for (int _b = bit, i = 0; _b != 0; _b &= ~(1 << i)) {
-				i = Integer.numberOfTrailingZeros(_b);
-				if (dp[i][bit] == INF) continue;
-				for (int rb = full & ~bit, j = 0; rb != 0; rb &= ~(1 << j)) {
-					j = Integer.numberOfTrailingZeros(rb);
-					if (distMap[i][j] == INF) continue;
-					dp[j][bit | (1 << j)] = Math.min(dp[j][bit | (1 << j)], dp[i][bit] + distMap[i][j]);
-				}
-			}
-		}
-		TspRoute ret = new TspRoute(n, distMap);
-		for (int g = 0; g < n; g++) {
-			long d = dp[g][full];
-			if (d == INF) continue;
-			if (!oneway) {
-				if (distMap[g][s] == INF) continue;
-				d += distMap[g][s];
-			}
-			if (d < ret.dist) {
-				ret.dist = d;
-				ret.g = g;
-			}
-		}
-		ret.dp = dp;
-		return ret;
-	}	
-
 	public static class DistMap {
 		public final int n;
 		public final long[][] dist;
-		private DistMap(int n) {
+		protected DistMap(int n) {
 			this.n = n;
 			this.dist = new long[n][n];
 		}
-		private void init() {
+		protected void init() {
 			for (int i = 0; i < n; i++) {
 				Arrays.fill(dist[i], INF);
 				dist[i][i] = 0;
@@ -627,8 +362,8 @@ class ShortestPath {
 		public int n = 0;
 		public long[] dist = null;
 		public int[] parent = null;
-		private boolean hasNegativeLoop = false;
-		private Dist(int n) {
+		protected boolean hasNegativeLoop = false;
+		protected Dist(int n) {
 			this.n = n;
 			this.dist = new long[n];
 			this.parent = new int[n];
@@ -651,42 +386,12 @@ class ShortestPath {
 			return hasNegativeLoop;
 		}
 	}
-	public static class TspRoute {
-		public int n;
-		public int g = -1;
-		public long dist = INF;
-		public long[][] dp = null;
-		public long[][] distMap = null;
-		private TspRoute(int n, long[][] distMap) {
-			this.n = n;
-			this.distMap = distMap;
-		}
 
-		public int[] path() {
-			if (dist == INF) return null;
-			int[] path = new int[n];
-			for (int i = n - 1, cur = g, bit = (1 << n) - 1; i >= 0; i--) {
-				path[i] = cur;
-				if (i == 0) break;
-				long curDist = dp[cur][bit];
-				bit &= ~(1 << cur);
-				for (int _b = bit, prev = 0; _b != 0 ; _b &= ~(1 << prev)) {
-					prev = Integer.numberOfTrailingZeros(_b);
-					if (dp[prev][bit] != INF && distMap[prev][cur] != INF && dp[prev][bit] + distMap[prev][cur] == curDist) {
-						cur = prev;
-						break;
-					}
-				}
-			}
-			return path;
-		}
-	}
-
-	private static class Step implements Comparable<Step> {
-		private final int p;
-		private final long d;
-		private final int parent;
-		private Step(int p, long d, int parent) {
+	protected static class Step implements Comparable<Step> {
+		protected final int p;
+		protected final long d;
+		protected final int parent;
+		protected Step(int p, long d, int parent) {
 			this.p = p;
 			this.d = d;
 			this.parent = parent;
@@ -700,21 +405,52 @@ class ShortestPath {
 			}
 		}
 	}
+
+	@FunctionalInterface
+	public interface EdgePredicate {
+		public boolean test(int from, int to, int id, long cost);
+	}
 }
 // === end: graph/ShortestPath.java ===
 
-// === begin: graph/CostEdge.java ===
-class CostEdge extends Edge {
-	private final long cost;
-	public CostEdge(int from, int to, long cost, int id) {
-		super(from, to, id);
+// === begin: graph/Edge.java ===
+class Edge {
+	public int from;
+	public int to;
+	public int id;
+	public long cost;
+	public Edge(int from, int to, int id, long cost) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
 		this.cost = cost;
+	}
+	public Edge(int from, int to, int id) {
+		this.from = from;
+		this.to = to;
+		this.id = id;
+		this.cost = 1;
+	}
+	public Edge(int from, int to) {
+		this.from = from;
+		this.to = to;
+		this.id = -1;
+		this.cost = 1;
+	}
+	public int from() {
+		return from;
+	}
+	public int to() {
+		return to;
+	}
+	public int id() {
+		return id;
 	}
 	public long cost() {
 		return cost;
 	}
 }
-// === end: graph/CostEdge.java ===
+// === end: graph/Edge.java ===
 
 // === begin: primitive/IntArrayList.java ===
 class IntArrayList implements Iterable<Integer> {
