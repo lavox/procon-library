@@ -20,7 +20,7 @@
 ### graph
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
-| Graph.java<br>GenericGraph.java<br>SimpleGraph.java<br>Edge.java  | グラフ基本クラス                     |
+| Graph.java<br>GenericGraph.java<br>SimpleGraph.java<br>GridGraph.java<br>Edge.java  | グラフ基本クラス                     |
 | Dfs.java                 | 深さ優先探索                         |
 | MaxFlow.java             | 最大流・最小カット                   |
 | MinCostFlow.java         | 最小費用流                           |

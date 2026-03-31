@@ -2,6 +2,7 @@ package graph;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.PrimitiveIterator;
 
 public class GenericGraph<E extends Edge> implements Graph {
 	private ArrayList<E> _edges = null;
@@ -50,6 +51,7 @@ public class GenericGraph<E extends Edge> implements Graph {
 	public E edge(int v, int i) {
 		return (E)edges[start[v] + i];
 	}
+	@Override
 	public Iterable<E> edges(int v) {
 		return new Iterable<E>() {
 			@Override
@@ -67,6 +69,16 @@ public class GenericGraph<E extends Edge> implements Graph {
 					}
 				};
 			}
+		};
+	}
+	@Override
+	public PrimitiveIterator.OfInt edgesTo(int v) {
+		return new PrimitiveIterator.OfInt() {
+			int i = 0;
+			@Override
+			public boolean hasNext() { return i < edgeSize(v); }
+			@Override
+			public int nextInt() { return edge(v, i++).to; }
 		};
 	}
 }

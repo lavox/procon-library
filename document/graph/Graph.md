@@ -9,6 +9,8 @@
   - 一般のグラフ向けの実装クラス。
 - `SimpleGraph`
   - 辺の接続関係、コストのみを簡易に扱える実装クラス。
+- `GridGraph`
+  - 2次元盤面をグラフとして扱うための実装クラス。
 - `Edge`
   - 辺を表すクラス
 
@@ -29,7 +31,9 @@ public void forEachEdge(int v, EdgeConsumer action);
 ### 各頂点の辺のイテレータ
 ```java
 public default Iterable<? extends Edge> edges(int v)
+public default PrimitiveIterator.OfInt edgesTo(int v)
 ```
+`edges()`は`Edge`オブジェクトのイテレータ、`edgesTo()`は接続先の頂点番号のイテレータを取得する。
 - 引数
   - `v` : 頂点番号
 
@@ -170,3 +174,74 @@ public long cost()
 ```
 - 計算量
   - $O(1)$
+
+## `GridGraph`クラス
+### コンストラクタ
+```java
+public GridGraph(int height, int width)
+public GridGraph(int height, int width, int[][] dir)
+```
+- 引数
+  - `height` : 高さ
+  - `width` : 幅
+  - `dir` : 隣接マスを表す2次元配列。隣接マスの数を $a$ とすると、$a\times 2$ の2次元配列で、各隣接マスの方向ベクトルを指定する。省略すると辺で接する4マスを隣接とみなす。
+    - 4方向の場合は`DIR4`を、8方向の場合は`DIR8`を指定する
+- 計算量
+  - $O(1)$
+
+### 通行不可辺の指定
+```java
+public void setForbiddenEdge(EdgePredicate forbiddenEdge)
+public boolean isForbiddenEdge(int r0, int c0, int r1, int c1)
+```
+`EdgePredicate`を使用して通行不可の辺を指定するか、本クラスを継承した上で`isForbiddenEdge()`をオーバーライドして通行不可の辺を指定する。
+
+いずれの場合も、`(r0, c0)`から`(r1, c1)`へ向かうのが不可の場合は`true`を返すようにする。
+
+### 辺のコストの指定
+```java
+public void setEdgeCostProvider(EdgeToLongFunction edgeCostProvider)
+public long edgeCost(int r0, int c0, int r1, int c1)
+```
+`EdgeToLongFunction`を使用して辺のコストを指定するか、本クラスを継承した上で`edgeCost()`をオーバーライドして通行不可の辺を指定する。
+
+いずれの場合も、`(r0, c0)`から`(r1, c1)`へ向かう辺のコストを指定する。
+指定しなかった場合は、コストは1とみなす。
+
+### グラフのサイズの取得
+```java
+public int size()
+public int height()
+public int width()
+```
+グラフのマス数、高さ、幅を取得する。
+
+### 座標と頂点番号の変換
+```java
+public int r(int v)
+public int c(int v)
+public int v(int r, int c)
+```
+`(r, c)`座標と、頂点番号を変換する。`r`は高さ方向、`c`は幅方向の座標とする。
+- 引数
+  - `v` : 頂点番号
+  - `r` : 高さ方向の座標
+  - `c` : 幅方向の座標
+- 計算量
+  - $O(1)$
+
+### マスが盤の範囲内かどうかを判定
+```java
+public boolean isValid(int r, int c)
+public boolean isValid(int v)
+```
+- 引数
+  - `v` : 頂点番号
+  - `r` : 高さ方向の座標
+  - `c` : 幅方向の座標
+- 計算量
+  - $O(1)$
+
+## 検証
+- `GridGraph`
+  - [ABC363E Sinking Land (AtCoder)](https://atcoder.jp/contests/abc363/submissions/74570319)
