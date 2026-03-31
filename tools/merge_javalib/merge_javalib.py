@@ -310,7 +310,7 @@ def choose_file_in_lib(lib_dir: str) -> str:
       display_names.append(".. (parent directory)")
       paths.append(os.path.dirname(current_dir))
 
-    for entry in os.listdir(current_dir):
+    for entry in sorted(os.listdir(current_dir)):
       full_path = os.path.join(current_dir, entry)
       if os.path.isdir(full_path):
         display_name = f"{entry}/"

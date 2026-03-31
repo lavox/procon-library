@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
   name="merge_javalib",
-  version="0.1.1",
+  version="0.1.2",
   py_modules=["merge_javalib"],
   install_requires=[
       "Javalang",
