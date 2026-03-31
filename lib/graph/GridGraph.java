@@ -34,7 +34,7 @@ public class GridGraph implements Graph {
 		return height;
 	}
 	public int width() {
-		return width();
+		return width;
 	}
 	public int r(int v) {
 		return v / width;
