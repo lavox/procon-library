@@ -5,17 +5,21 @@
 よく使用するデータ構造やアルゴリズム、コンテスト用のテンプレートなどがあります。本家[ac-library](https://github.com/atcoder/ac-library/tree/master)からの移植も含みます(全て移植しているわけではありません)。
 
 ## ライブラリ・テンプレート
-### data-structure
+### data_structure
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
 | UnionFind.java<br>WeightedUnionFind.java | Union Find木<br>ポテンシャル付きUnion Find木 |
 | Compression.java         | 座標圧縮                             |
 | FenwickTree.java         | Fenwick木                            |
+| Permutation.java         | 順列(順列全列挙含む)                 |
+| RunLengthCompression.java| ランレングス圧縮                   |
+
+### data_structure.segment_tree
+| ファイル名               | 内容                                 |
+|:-------------------------|:-------------------------------------|
 | SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
 | LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
 | DynamicSegmentTree.java  | 動的セグメント木                     |
-| Permutation.java         | 順列(順列全列挙含む)                 |
-| RunLengthCompression.java| ランレングス圧縮                   |
 
 ### graph
 | ファイル名               | 内容                                 |

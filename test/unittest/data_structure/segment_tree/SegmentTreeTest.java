@@ -1,4 +1,4 @@
-package data_structure;
+package data_structure.segment_tree;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;

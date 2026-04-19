@@ -1,42 +1,39 @@
-package data_structure;
-import java.lang.reflect.Array;
+package data_structure.segment_tree;
 import java.util.Collection;
-import java.util.function.BinaryOperator;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.IntBinaryOperator;
+import java.util.function.IntPredicate;
 
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/segtree.hpp
-public class SegmentTree<S> {
+public class IntSegmentTree {
 	int n = 0;
 	int size = 1;
 	int log = 0;
-	S[] d = null;
+	int[] d = null;
 
-	Supplier<S> _e = null;
-	BinaryOperator<S> _op = null;
+	int _e = 0;
+	IntBinaryOperator _op = null;
 
-	S e() {
-		return _e.get();
+	int e() {
+		return _e;
 	}
-	S op(S a, S b) {
-		return _op.apply(a, b);
+	int op(int a, int b) {
+		return _op.applyAsInt(a, b);
 	}
 
-	public SegmentTree(int n, BinaryOperator<S> op, Supplier<S> e) {
+	public IntSegmentTree(int n, IntBinaryOperator op, int e) {
 		initialize(n, op, e);
 		for (int i = 0; i < 2 * size; i++) d[i] = e();
 	}
-	public SegmentTree(S[] arr, BinaryOperator<S> op, Supplier<S> e) {
+	public IntSegmentTree(int[] arr, IntBinaryOperator op, int e) {
 		this(arr.length, op, e);
 		initData(arr);
 	}
-	public SegmentTree(Collection<S> arr, BinaryOperator<S> op, Supplier<S> e) {
+	public IntSegmentTree(Collection<Integer> arr, IntBinaryOperator op, int e) {
 		this(arr.size(), op, e);
 		initData(arr);
 	}
-	@SuppressWarnings("unchecked")
-	private void initialize(int n, BinaryOperator<S> op, Supplier<S> e) {
+	private void initialize(int n, IntBinaryOperator op, int e) {
 		this.n = n;
 		this._op = op;
 		this._e = e;
@@ -44,34 +41,36 @@ public class SegmentTree<S> {
 		size = 1;
 		while ( size < n ) size *= 2;
 		log = Integer.numberOfTrailingZeros(size);
-		d = (S[]) Array.newInstance(e().getClass(), 2 * size);
+		d = new int[2 * size];
 	}
 
-	public void initData(S[] arr) {
+	public void initData(int[] arr) {
 		assert arr.length == n;
 		System.arraycopy(arr, 0, d, size, n);
 		for ( int i = size - 1 ; i >= 1 ; i-- ) update(i);
 	}
-	@SuppressWarnings("unchecked")
-	public void initData(Collection<S> arr) {
-		initData((S[])arr.toArray());
+	public void initData(Collection<Integer> arr) {
+		int[] iarr = new int[arr.size()];
+		int i = 0;
+		for (Integer a: arr) iarr[i++] = a;
+		initData(iarr);
 	}
 
-	public void set(int p, S x) {
+	public void set(int p, int x) {
 		assert 0 <= p && p < n;
 		p += size;
 		d[p] = x;
 		for (int i = 1; i <= log; i++) update(p >> i);
 	}
 
-	public S get(int p) {
+	public int get(int p) {
 		assert 0 <= p && p < n;
 		return d[p + size];
 	}
 
-	public S query(int l, int r) {
+	public int query(int l, int r) {
 		assert 0 <= l && l <= r && r <= n;
-		S sml = e(); S smr = e();
+		int sml = e(); int smr = e();
 		l += size;
 		r += size;
 
@@ -84,16 +83,16 @@ public class SegmentTree<S> {
 		return op(sml, smr);
 	}
 
-	public S allQuery() {
+	public int allQuery() {
 		return d[1];
 	}
 
-	public int maxRight(int l, Predicate<S> f) {
+	public int maxRight(int l, IntPredicate f) {
 		assert 0 <= l && l <= n;
 		assert f.test(e());
 		if ( l == n ) return n;
 		l += size;
-		S sm = e();
+		int sm = e();
 		do {
 			while ( l % 2 == 0 ) l >>= 1;
 			if ( !f.test(op(sm, d[l])) ) {
@@ -112,12 +111,12 @@ public class SegmentTree<S> {
 		return n;
 	}
 
-	public int minLeft(int r, Predicate<S> f) {
+	public int minLeft(int r, IntPredicate f) {
 		assert 0 <= r && r <= n;
 		assert f.test(e());
 		if ( r == 0 ) return 0;
 		r += size;
-		S sm = e();
+		int sm = e();
 		do {
 			r--;
 			while ( r > 1 && r % 2 == 1 ) r >>= 1;

@@ -1,4 +1,4 @@
-package data_structure;
+package data_structure.segment_tree;
 import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
