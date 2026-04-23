@@ -19,6 +19,7 @@
 |:-------------------------|:-------------------------------------|
 | SegmentTree.java<br>IntSegmentTree.java<br>LongSegmentTree.java | セグメント木  |
 | LazySegmentTree.java<br>IntLazySegmentTree.java<br>LongLazySegmentTree.java | 遅延評価セグメント木  |
+| PersistentSegmentTree.java<br>IntPersistentSegmentTree.java<br>LongPersistentSegmentTree.java | 永続セグメント木  |
 | DynamicSegmentTree.java  | 動的セグメント木                     |
 
 ### graph
