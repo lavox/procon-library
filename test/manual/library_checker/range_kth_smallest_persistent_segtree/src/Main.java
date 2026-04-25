@@ -1,12 +1,20 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.NoSuchElementException;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
 import java.util.Arrays;
+
+import java.util.List;
+import java.util.function.IntBinaryOperator;
+
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
 
 // template & library : https://github.com/lavox/procon-library
 public class Main {
@@ -22,20 +30,36 @@ public class Main {
 		long[] a = sc.nextLongArray(N);
 		Compression comp = new Compression(a);
 
-		int[] ca = new int[N];
+		Number[] nums = new Number[N];
 		for (int i = 0; i < N; i++) {
-			ca[i] = comp.toIndex(a[i]);
+			nums[i] = new Number(i, comp.toIndex(a[i]));
 		}
-		WaveletMatrix wm = new WaveletMatrix(ca);
+		Arrays.sort(nums, CMP);
+		IntPersistentSegmentTree[] tree = new IntPersistentSegmentTree[comp.size()];
+		tree[0] = new IntPersistentSegmentTree(N, (x, y) -> x + y, 0);
+		for (Number n: nums) {
+			int prev = tree[n.z] == null ? n.z - 1: n.z;
+			tree[n.z] = tree[prev].update(n.i, 1);
+		}
 
 		long[] ans = new long[Q];
 		for (int q = 0; q < Q; q++) {
 			int l = sc.nextInt();
 			int r = sc.nextInt();
 			int k = sc.nextInt();
-			ans[q] = comp.toValue(wm.quantile(l, r, k));
+			int z = Bisect.maxTrueInt(-1, comp.size(), x -> tree[x].query(l, r) <= k);
+			ans[q] = comp.toValue(z + 1);
 		}
 		print(ans, LF);
+	}
+	static final Comparator<Number> CMP = Comparator.<Number>comparingInt(n -> n.z).thenComparingInt(n -> n.i);
+	class Number {
+		int i = 0;
+		int z = 0;
+		Number(int i, int z) {
+			this.i = i;
+			this.z = z;
+		}
 	}
 
 	public static final char LF = '\n';
@@ -270,183 +294,197 @@ class Compression {
 }
 // === end: data_structure/Compression.java ===
 
-// === begin: data_structure/WaveletMatrix.java ===
-class WaveletMatrix {
-	private int n = 0;
-	private int m = 0;
-	private int height = 0;
-	private long[][] bits = null;
-	private int[][] cum = null;
-	private int[] cnt0 = null;
-	private static final int BLEN = 6;
-	private static final int BMASK = (1 << BLEN) - 1;
-
-	public WaveletMatrix(int[] arr, int height) {
-		this.n = arr.length;
-		this.m = (n + 63) >>> BLEN;
-		this.height = height;
-		this.build(arr);
-	}
-	public WaveletMatrix(int[] arr) {
-		this(arr, 32 - Integer.numberOfLeadingZeros(Arrays.stream(arr).max().orElse(0)));
-	}
-	private void build(int[] arr) {
-		this.bits = new long[height][m + 1];
-		this.cum = new int[height][m + 1];
-		this.cnt0 = new int[height];
-		int[] cur = arr.clone();
-		int[] tmp = new int[n];
-		for (int h = height - 1; h >= 0; h--) {
-			int i0 = 0;
-			int i1 = 0;
-			for (int i = 0; i < n; i++) {
-				if (((cur[i] >>> h) & 1) == 0) {
-					cur[i0++] = cur[i];
-				} else {
-					tmp[i1++] = cur[i];
-					set(h, i);
-				}
-			}
-			this.cnt0[h] = i0;
-			System.arraycopy(tmp, 0, cur, i0, i1);
-			prepareCumulative(h);
-		}
-	}
-	private void prepareCumulative(int h) {
-		for (int idx = 0; idx < m; idx++) {
-			cum[h][idx + 1] = cum[h][idx] + Long.bitCount(bits[h][idx]);
-		}
-	}
-
-	private void set(int h, int i) {
-		bits[h][i >>> BLEN] |= 1L << (i & BMASK);
-	}
-	public int get(int h, int i) {
-		return (int)((bits[h][i >>> BLEN] >>> (i & BMASK)) & 1L);
-	}
-	public int rank1(int h, int i) {
-		int idx = i >>> BLEN;
-		return cum[h][idx] + Long.bitCount(bits[h][idx] & ((1L << (i & BMASK)) - 1L));
-	}
-	public int rank0(int h, int i) {
-		return i - rank1(h, i);
-	}
-	public int next_i0(int h, int i) {
-		return rank0(h, i);
-	}
-	public int next_i1(int h, int i) {
-		return cnt0[h] + rank1(h, i);
-	}
-	public int access(int i) {
-		int ret = 0;
-		int c = i;
-		for (int h = height - 1; h >= 0; h--) {
-			int b = get(h, c);
-			int c1 = rank1(h, c);
-			if (b == 0) {
-				c -= c1;
+// === begin: math/Bisect.java ===
+class Bisect {
+	public static int minTrueInt(int low, int high, IntPredicate condition) {
+		assert low <= high;
+		while (high - low > 1) {
+			int mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				high = mid;
 			} else {
-				ret |= 1 << h;
-				c = cnt0[h] + c1;
+				low = mid;
 			}
 		}
-		return ret;
+		return high;
 	}
-	public int quantile(int l, int r, int k) {
-		if (k >= r - l) throw new IllegalArgumentException();
-		int ret = 0;
-		for (int h = height - 1; h >= 0; h--) {
-			int lc1 = rank1(h, l);
-			int rc1 = rank1(h, r);
-			int len = (r - rc1) - (l - lc1);
-			if (k < len) {
-				l -= lc1;
-				r -= rc1;
+	public static long minTrueLong(long low, long high, LongPredicate condition) {
+		assert low <= high;
+		while (high - low > 1) {
+			long mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				high = mid;
 			} else {
-				ret |= 1 << h;
-				k -= len;
-				l = cnt0[h] + lc1;
-				r = cnt0[h] + rc1;
+				low = mid;
 			}
 		}
-		return ret;
+		return high;
 	}
-	public int rangeFreq(int l, int r, int vmin, int vmax) {
-		return rangeFreqBelow(l, r, vmax) - rangeFreqBelow(l, r, vmin);
-	}
-	public int rangeFreqBelow(int l, int r, int vmax) {
-		if (vmax >= 1 << height) return r - l;
-		int ret = 0;
-		for (int h = height - 1; h >= 0; h--) {
-			int lc1 = rank1(h, l);
-			int rc1 = rank1(h, r);
-			if (((vmax >>> h) & 1) == 0) {
-				l -= lc1;
-				r -= rc1;
+	public static double minTrueDouble(double low, double high, double eps, DoublePredicate condition) {
+		assert low <= high;
+		while (high - low > eps) {
+			double mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				high = mid;
 			} else {
-				ret += (r - rc1) - (l - lc1);
-				l = cnt0[h] + lc1;
-				r = cnt0[h] + rc1;
+				low = mid;
 			}
 		}
-		return ret;
+		return high;
 	}
-	public int rangeFreqAbove(int l, int r, int vmin) {
-		return r - l - rangeFreqBelow(l, r, vmin);
-	}
-	public int prevValue(int l, int r, int vmax) {
-		int cnt = rangeFreqBelow(l, r, vmax);
-		return cnt == 0 ? -1 : quantile(l, r, cnt - 1);
-	}
-	public int nextValue(int l, int r, int vmin) {
-		int cnt = rangeFreqBelow(l, r, vmin);
-		return cnt == r - l ? -1 : quantile(l, r, cnt);
-	}
-
-	public Range createRange(int l, int r) {
-		return new Range(height - 1, l, r);
-	}
-	public class Range {
-		int h = 0;
-		int l = 0;
-		int r = 0;
-		int next_l0 = 0;
-		int next_r0 = 0;
-		int next_l1 = 0;
-		int next_r1 = 0;
-		public Range(int h, int l, int r) {
-			this.h = h;
-			this.l = l;
-			this.r = r;
-			calcNext();
+	public static int maxTrueInt(int low, int high, IntPredicate condition) {
+		assert low <= high;
+		while (high - low > 1) {
+			int mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				low = mid;
+			} else {
+				high = mid;
+			}
 		}
-		private void calcNext() {
-			this.next_l0 = rank0(h, l);
-			this.next_r0 = rank0(h, r);
-			this.next_l1 = cnt0[h] + l - this.next_l0;
-			this.next_r1 = cnt0[h] + r - this.next_r0;
+		return low;
+	}
+	public static long maxTrueLong(long low, long high, LongPredicate condition) {
+		assert low <= high;
+		while (high - low > 1) {
+			long mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				low = mid;
+			} else {
+				high = mid;
+			}
 		}
-		public void move0() {
-			h--;
-			l = next_l0;
-			r = next_r0;
-			if (h >= 0) calcNext();
+		return low;
+	}
+	public static double maxTrueDouble(double low, double high, double eps, DoublePredicate condition) {
+		assert low <= high;
+		while (high - low > eps) {
+			double mid = low + (high - low) / 2;
+			if (condition.test(mid)) {
+				low = mid;
+			} else {
+				high = mid;
+			}
 		}
-		public void move1() {
-			h--;
-			l = next_l1;
-			r = next_r1;
-			if (h >= 0) calcNext();
-		}
-		public int l() { return l; }
-		public int r() { return r; }
-		public int len() { return r - l; }
-		public int next_l0() { return next_l0; }
-		public int next_r0() { return next_r0; }
-		public int next_l1() { return next_l1; }
-		public int next_r1() { return next_r1; }
-		public int next_len0() { return next_r0 - next_l0; }
-		public int next_len1() { return next_r1 - next_l1; }
+		return low;
 	}
 }
-// === end: data_structure/WaveletMatrix.java ===
+// === end: math/Bisect.java ===
+
+// === begin: data_structure/segment_tree/IntPersistentSegmentTree.java ===
+class IntPersistentSegmentTree {
+	private final int n;
+	private final Monoid monoid;
+	private final Node root;
+
+	public IntPersistentSegmentTree(int n, IntBinaryOperator op, int e) {
+		this(n, i -> e, op, e);
+	}
+	public IntPersistentSegmentTree(int[] arr, IntBinaryOperator op, int e) {
+		this(arr.length, i -> i < arr.length ? arr[i] : e, op, e);
+	}
+	public IntPersistentSegmentTree(List<Integer> arr, IntBinaryOperator op, int e) {
+		this(arr.size(), i -> i < arr.size() ? arr.get(i): e, op, e);
+	}
+	public IntPersistentSegmentTree(int n, IntUnaryOperator dataProvider, IntBinaryOperator op, int e) {
+		this(n, dataProvider, new Monoid(op, e));
+	}
+	private IntPersistentSegmentTree(int n, IntUnaryOperator dataProvider, Monoid monoid) {
+		this.root = new Node(0, n, dataProvider, monoid);
+		this.n = n;
+		this.monoid = monoid;
+	}
+	private IntPersistentSegmentTree(IntPersistentSegmentTree from, Node root) {
+		this.n = from.n;
+		this.monoid = from.monoid;
+		this.root = root;
+	}
+
+	public IntPersistentSegmentTree update(int p, int x) {
+		if (p >= n) throw new IndexOutOfBoundsException();
+		return new IntPersistentSegmentTree(this, root.update(p, x, 0, n, monoid));
+	}
+	public int get(int p) {
+		if (p >= n) throw new IndexOutOfBoundsException();
+		return root.get(p, 0, n);
+	}
+	public int query(int l, int r) {
+		if (n == 0) return monoid.e();
+		return root.query(l, r, 0, n, monoid);
+	}
+	public int allQuery() {
+		return query(0, n);
+	}
+
+	private static class Node {
+		private final int data;
+		private final Node ln;
+		private final Node rn;
+
+		protected Node(int data, Node ln, Node rn) {
+			this.data = data;
+			this.ln = ln;
+			this.rn = rn;
+		}
+		protected Node(int l, int r, IntUnaryOperator dataProvider, Monoid monoid) {
+			if (l + 1 >= r) {
+				this.ln = null;
+				this.rn = null;
+				this.data = l + 1 == r ? dataProvider.applyAsInt(l) : monoid.e();
+			} else {
+				int m = l + ((r - l) >> 1);
+				this.ln = new Node(l, m, dataProvider, monoid);
+				this.rn = new Node(m, r, dataProvider, monoid);
+				this.data = monoid.op(ln.data, rn.data);
+			}
+		}
+		protected Node createNode(int data, Node ln, Node rn) {
+			return new Node(data, ln, rn);
+		}
+		protected Node merge(Node ln, Node rn, Monoid monoid) {
+			return createNode(monoid.op(ln.data, rn.data), ln, rn);
+		}
+		protected int mid(int l, int r) {
+			return l + ((r - l) >> 1);
+		}
+
+		protected int get(int p, int node_l, int node_r) {
+			assert node_l <= p && p < node_r;
+			if (node_l + 1 == node_r) return data;
+			int node_m = mid(node_l, node_r);
+			return p < node_m ? ln.get(p, node_l, node_m) : rn.get(p, node_m, node_r);
+		}
+		protected Node update(int p, int x, int node_l, int node_r, Monoid monoid) {
+			assert node_l <= p && p < node_r;
+			if (node_l + 1 == node_r) return createNode(x, null, null);
+			int node_m = mid(node_l, node_r);
+			return p < node_m 
+				? merge(ln.update(p, x, node_l, node_m, monoid), rn, monoid) 
+				: merge(ln, rn.update(p, x, node_m, node_r, monoid), monoid);
+		}
+		protected int query(int l, int r, int node_l, int node_r, Monoid monoid) {
+			if (r <= node_l || node_r <= l) return monoid.e();
+			else if (l <= node_l && node_r <= r) return data;
+			else {
+				int node_m = mid(node_l, node_r);
+				return monoid.op(ln.query(l, r, node_l, node_m, monoid), rn.query(l, r, node_m, node_r, monoid));
+			}
+		}
+	}
+
+	private static class Monoid {
+		private final IntBinaryOperator _op;
+		private final int _e;
+		protected Monoid(IntBinaryOperator _op, int _e) {
+			this._op = _op;
+			this._e = _e;
+		}
+		protected int e() {
+			return _e;
+		}
+		protected int op(int a, int b) {
+			return _op.applyAsInt(a, b);
+		}
+	}
+}
+// === end: data_structure/segment_tree/IntPersistentSegmentTree.java ===

@@ -12,7 +12,8 @@
 | Compression.java         | 座標圧縮                             |
 | FenwickTree.java         | Fenwick木                            |
 | Permutation.java         | 順列(順列全列挙含む)                 |
-| RunLengthCompression.java| ランレングス圧縮                   |
+| RunLengthCompression.java| ランレングス圧縮                     |
+| WaveletMatrix.java       | Wavelet Matrix                       |
 
 ### data_structure.segment_tree
 | ファイル名               | 内容                                 |

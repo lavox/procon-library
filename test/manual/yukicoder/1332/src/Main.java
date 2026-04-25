@@ -18,22 +18,19 @@ public class Main {
 	public void solve() {
 		FastScanner sc = new FastScanner(System.in);
 		int N = sc.nextInt();
+		int[] X = sc.nextIntArray(N);
 		int Q = sc.nextInt();
-		long[] a = sc.nextLongArray(N);
-		Compression comp = new Compression(a);
-
-		int[] ca = new int[N];
-		for (int i = 0; i < N; i++) {
-			ca[i] = comp.toIndex(a[i]);
-		}
-		WaveletMatrix wm = new WaveletMatrix(ca);
-
-		long[] ans = new long[Q];
+		WaveletMatrix wm = new WaveletMatrix(X);
+		int[] ans = new int[Q];
+		Arrays.fill(ans, Integer.MAX_VALUE);
 		for (int q = 0; q < Q; q++) {
-			int l = sc.nextInt();
+			int l = sc.nextInt() - 1;
 			int r = sc.nextInt();
-			int k = sc.nextInt();
-			ans[q] = comp.toValue(wm.quantile(l, r, k));
+			int x = sc.nextInt();
+			int x0 = wm.prevValue(l, r, x);
+			if (x0 != -1) ans[q] = x - x0;
+			int x1 = wm.nextValue(l, r, x);
+			if (x1 != -1) ans[q] = Math.min(ans[q], x1 - x);
 		}
 		print(ans, LF);
 	}
@@ -219,56 +216,6 @@ class FastScanner {
 		return ret;
 	}
 }
-
-// === begin: data_structure/Compression.java ===
-class Compression {
-	long[] vals = null;
-	
-	public Compression(long[] vals) {
-		long[] arr = Arrays.copyOf(vals, vals.length);
-		int sz = 0;
-		Arrays.sort(arr);
-		for ( int i = 0 ; i < vals.length ; i++ ) {
-			if ( i == 0 || arr[i] != arr[i - 1] ) sz++;
-		}
-		this.vals = new long[sz];
-		int vi = 0;
-		for ( int i = 0 ; i < vals.length ; i++ ) {
-			if ( i == 0 || arr[i] != arr[i - 1] ) this.vals[vi++] = arr[i];
-		}
-	}
-	public long toValue(int i) {
-		return vals[i];
-	}
-	public int toIndex(long v) {
-		int idx = search(v);
-		if ( idx < 0 ) return -1;
-		return vals[idx] == v ? idx : -1;
-	}
-	public int toIndexFloor(long v) {
-		return search(v);
-	}
-	public int toIndexCeiling(long v) {
-		int idx = search(v);
-		if ( idx < 0 ) return 0;
-		return vals[idx] == v ? idx : idx + 1;
-	}
-	public int size() {
-		return vals.length;
-	}
-	private int search(long v) {
-		if ( vals[vals.length - 1] <= v ) return vals.length - 1;
-		if ( v < vals[0] ) return -1;
-		int min = 0;
-		int max = vals.length - 1;
-		while ( max - min > 1 ) {
-			int mid = ( min + max ) / 2;
-			if ( vals[mid] <= v ) { min = mid; } else { max = mid; }
-		}
-		return min;
-	}
-}
-// === end: data_structure/Compression.java ===
 
 // === begin: data_structure/WaveletMatrix.java ===
 class WaveletMatrix {
