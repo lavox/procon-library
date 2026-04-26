@@ -5,8 +5,10 @@
 - `rangeFreq(l, r, vmin, vmax)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、`vmin` 以上 `vmax` 未満の要素の個数を求める
 - `rangeFreqBelow(l, r, vmax)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、`vmax` 未満の要素の個数を求める
 - `rangeFreqAbove(l, r, vmin)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、`vmin` 以上の要素の個数を求める
+- `rank(l, r, v)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、値=`v`の要素の個数を求める
 - `prevValue(l, r, vmax)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、`vmax` 未満で最も大きい要素を求める
 - `nextValue(l, r, vmin)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、`vmin` 以上で最も小さい要素を求める
+- `select(l, r, v, k)`: $A_l, A_{l + 1}, \dots, A_{r - 1}$ で、値=`v`の要素のうち、`k`個目の位置を求める
 - `access(i)`: $i$ 番目の要素を求める
 
 本クラスにおいて、高さ`h`は、最下位ビットを0としたときのビット位置に対応する階層を表す。
@@ -47,6 +49,17 @@ public int rangeFreqAbove(int l, int r, int vmin)
 - 計算量
   - $O(\mathrm{height})$
 
+### 指定した値の要素数の取得
+```java
+public int rank(int l, int r, int v)
+```
+`[l, r)`で、値が`v`である要素数を取得する。
+- 引数
+  - `l`, `r` : 対象とする数列の範囲
+  - `v` : 対象とする値。 $x = v$ を満たす $x$ の個数を求める。
+- 計算量
+  - $O(\mathrm{height})$
+
 ### 指定した値の前後の値の取得
 ```java
 public int prevValue(int l, int r, int vmax)
@@ -58,6 +71,19 @@ public int nextValue(int l, int r, int vmin)
   - `vmin`, `vmax` : 基準とする値。`prevValue()`では $x \lt \mathrm{vmax}$ を満たす最大の $x$ を、`nextValue()`では $\mathrm{vmin} \le x$ を満たす最小の $x$ を求める。
 - 計算量
   - $O(\mathrm{height})$
+
+### 指定した値の $k$ 番目の位置を取得
+```java
+public int select(int v, int k)
+public int select(int l, int r, int v, int k)
+```
+`[l, r)`で、値が`v`である要素のうち、 $k$ 番目の要素の位置を取得する。存在しない場合は-1を返す。
+- 引数
+  - `l`, `r` : 対象とする数列の範囲。省略した場合は`[0, n)`全体を対象とする。
+  - `v` : 対象とする値。 $x = v$ を満たす $x$ の個数を求める。
+  - `k` : 何番目の要素を取得するか。0-indexで指定する。
+- 計算量
+  - $O(\mathrm{height}\log{n})$
 
 ### 高さ $h$ の $i$ 番目のビットの取得
 ```java
@@ -81,6 +107,18 @@ public int rank1(int h, int i)
   - `i` : `h`ビット目に対応するBit Vectorの何番目のビットより前のビット個数を取得するか $(0\le i\lt N)$
 - 計算量
   - $O(1)$
+
+### 高さ $h$ の $k$ 個目の0/1のビットの位置
+```java
+public int select0(int h, int k)
+public int select1(int h, int k)
+```
+高さ $h$ の $k$ 個目の0や1のビットの位置。`select0()`は0のビットの位置、`select1()`は1のビットの位置を取得する。
+- 引数
+  - `h` : Wavelet Matrixにおける高さ $(0\le h\lt\mathrm{htight})$
+  - `k` : `h`ビット目に対応するBit Vectorの何個目のビットの位置を取得するか
+- 計算量
+  - $O(\log{n})$
 
 ### 高さ $h$ の $i$ 番目のビットの次の階層のインデックス取得
 ```java
@@ -140,6 +178,5 @@ public void move1()
 
 ## 検証
 - [Range Kth Smallest (Library Checker)](https://judge.yosupo.jp/submission/368569) (quantile)
+- [Static Range Frequency (Library Checker)](https://judge.yosupo.jp/submission/368692) (rank)
 - [Range Nearest Query (yukicoder)](https://yukicoder.me/submissions/1161651) (prevValue, nextValue)
-
-

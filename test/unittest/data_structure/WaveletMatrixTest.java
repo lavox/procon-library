@@ -49,4 +49,18 @@ public class WaveletMatrixTest {
     assertEquals(5, wm.prevValue(3, 9, 6));
     assertEquals(3, wm.prevValue(3, 9, 5));
   }
+  @Test
+  public void testRank() {
+    int[] arr = new int[] {11, 1, 9, 0, 3, 5, 11, 5, 11, 16, 2, 10, 11, 17};
+    WaveletMatrix wm = new WaveletMatrix(arr);
+    assertEquals(2, wm.rank(3, 12, 11)); // 0, 3, 5, 11, 5, 11, 16, 2, 10,
+    assertEquals(0, wm.rank(3, 12, 1));
+  }
+  @Test
+  public void testSelect() {
+    int[] arr = new int[] {11, 1, 9, 0, 3, 5, 11, 5, 11, 16, 2, 10, 11, 17};
+    WaveletMatrix wm = new WaveletMatrix(arr);
+    assertEquals(8, wm.select(11, 2));
+    assertEquals(6, wm.select(1, 10, 11, 0));
+  }
 }

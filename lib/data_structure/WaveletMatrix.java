@@ -62,6 +62,50 @@ public class WaveletMatrix {
 	public int rank0(int h, int i) {
 		return i - rank1(h, i);
 	}
+	public int select1(int h, int k) {
+		if (k < 0 || k >= n - cnt0[h]) return -1;
+		int li = 0;
+		int ri = m;
+		while (ri - li > 1) {
+			int mi = (li + ri) >> 1;
+			if (cum[h][mi] <= k) li = mi;
+			else ri = mi;
+		}
+		long b = bits[h][li];
+		int rest_k = k - cum[h][li];
+		int pos = 0;
+		for (int rg = 32; rg > 0; rg >>= 1) {
+			int c = Long.bitCount(b & ((1L << rg) - 1));
+			if (c <= rest_k) {
+				rest_k -= c;
+				b >>>= rg;
+				pos += rg;
+			}
+		}
+		return (li << BLEN) + pos;
+	}
+	public int select0(int h, int k) {
+		if (k < 0 || k >= cnt0[h]) return -1;
+		int li = 0;
+		int ri = m;
+		while (ri - li > 1) {
+			int mi = (li + ri) >> 1;
+			if ((mi << BLEN) - cum[h][mi] <= k) li = mi;
+			else ri = mi;
+		}
+		long b = bits[h][li];
+		int rest_k = k - ((li << BLEN) - cum[h][li]);
+		int pos = 0;
+		for (int rg = 32; rg > 0; rg >>= 1) {
+			int c = rg - Long.bitCount(b & ((1L << rg) - 1));
+			if (c <= rest_k) {
+				rest_k -= c;
+				b >>>= rg;
+				pos += rg;
+			}
+		}
+		return (li << BLEN) + pos;
+	}
 	public int next_i0(int h, int i) {
 		return rank0(h, i);
 	}
@@ -133,6 +177,44 @@ public class WaveletMatrix {
 		int cnt = rangeFreqBelow(l, r, vmin);
 		return cnt == r - l ? -1 : quantile(l, r, cnt);
 	}
+	public int rank(int l, int r, int v) {
+		if (v >= 1 << height) return 0;
+		for (int h = height - 1; h >= 0; h--) {
+			if (((v >>> h) & 1) == 0) {
+				l = rank0(h, l);
+				r = rank0(h, r);
+			} else {
+				l = cnt0[h] + rank1(h, l);
+				r = cnt0[h] + rank1(h, r);
+			}
+		}
+		return r - l;
+	}
+	public int select(int v, int k) {
+		return select(0, n, v, k);
+	}
+	public int select(int l, int r, int v, int k) {
+		if (v < 0 || v >= 1 << height || l >= r) return -1;
+		for (int h = height - 1; h >= 0; h--) {
+			if (((v >>> h) & 1) == 0) {
+				l = rank0(h, l);
+				r = rank0(h, r);
+			} else {
+				l = cnt0[h] + rank1(h, l);
+				r = cnt0[h] + rank1(h, r);
+			}
+		}
+		if (l + k >= r) return -1;
+		int ret = l + k;
+		for (int h = 0; h < height; h++) {
+			if (((v >>> h) & 1) == 0) {
+				ret = select0(h, ret);
+			} else {
+				ret = select1(h, ret - cnt0[h]);
+			}
+		}
+		return ret;
+	}
 
 	public Range createRange(int l, int r) {
 		return new Range(height - 1, l, r);
@@ -178,5 +260,10 @@ public class WaveletMatrix {
 		public int next_r1() { return next_r1; }
 		public int next_len0() { return next_r0 - next_l0; }
 		public int next_len1() { return next_r1 - next_l1; }
+	}
+
+	public static void main(String[] args) {
+		WaveletMatrix wm = new WaveletMatrix(new int[] {5, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0});
+		System.out.println(wm.select(6, 0));
 	}
 }
