@@ -13,6 +13,8 @@
 | FenwickTree.java         | Fenwick木                            |
 | Permutation.java         | 順列(順列全列挙含む)                 |
 | RunLengthCompression.java| ランレングス圧縮                     |
+| SqrtDecomposition.java   | 平方分割用ユーティリティ             |
+| MoQuery.java             | Mo's algorithm                       |
 | WaveletMatrix.java       | Wavelet Matrix                       |
 
 ### data_structure.segment_tree
