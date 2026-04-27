@@ -3,10 +3,13 @@
 
 ### コンストラクタ
 ```java
-public Compression(long[] vals)
+public Compression(long[] vals, long... v)
+public Compression(int[] vals, int... v)
 ```
+呼び出しの簡略化のため`int`型のコンストラクタがあるが、インスタンス生成後、内部では`long`として扱われる。
 - 引数
   - `vals` : 座標圧縮対象となる配列
+  - `v` : 座標圧縮対象となる値。`vals`の要素に加えて、番兵の値を追加可能。
 - 計算量
   - $O(N\log N)$ ($N$は`vals`の要素数)
 
@@ -59,4 +62,4 @@ public int size()
   - $O(1)$
 
 ## 検証
-- [ABC036C 座圧 (AtCoder)](https://atcoder.jp/contests/abc036/submissions/68701571)
+- [ABC036C 座圧 (AtCoder)](https://atcoder.jp/contests/abc036/submissions/75316001)

@@ -4,16 +4,26 @@ import java.util.Arrays;
 public class Compression {
 	long[] vals = null;
 	
-	public Compression(long[] vals) {
-		long[] arr = Arrays.copyOf(vals, vals.length);
+	public Compression(long[] vals, long... v) {
+		long[] arr = Arrays.copyOf(vals, vals.length + v.length);
+		System.arraycopy(v, 0, arr, vals.length, v.length);
+		init(arr);
+	}
+	public Compression(int[] vals, int... v) {
+		long[] arr = new long[vals.length + v.length];
+		for (int i = 0; i < vals.length; i++) arr[i] = vals[i];
+		for (int i = 0; i < v.length; i++) arr[vals.length + i] = v[i];
+		init(arr);
+	}
+	private void init(long[] arr) {
 		int sz = 0;
 		Arrays.sort(arr);
-		for ( int i = 0 ; i < vals.length ; i++ ) {
+		for ( int i = 0 ; i < arr.length ; i++ ) {
 			if ( i == 0 || arr[i] != arr[i - 1] ) sz++;
 		}
 		this.vals = new long[sz];
 		int vi = 0;
-		for ( int i = 0 ; i < vals.length ; i++ ) {
+		for ( int i = 0 ; i < arr.length ; i++ ) {
 			if ( i == 0 || arr[i] != arr[i - 1] ) this.vals[vi++] = arr[i];
 		}
 	}
