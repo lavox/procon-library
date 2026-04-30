@@ -145,6 +145,7 @@ public class PosSet implements Iterable<Pos> {
 	public boolean equals(Object o) {
 		if (o instanceof PosSet) {
 			PosSet ps = (PosSet)o;
+			if (sz != ps.sz) return false;
 			return this.mem.equals(ps.mem);
 		}
 		return false;
