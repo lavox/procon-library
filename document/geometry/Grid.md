@@ -34,6 +34,16 @@ public boolean isValid(int i, int j)
 - 計算量
   - $O(1)$
 
+### 盤面のサイズ取得
+```java
+public int H()
+public int W()
+public int size()
+```
+盤面の高さ・幅・全体のセルの個数を取得する。
+- 計算量
+  - $O(1)$
+
 ### 隣接関係の初期化（4方向）
 ```java
 public void initAdj()

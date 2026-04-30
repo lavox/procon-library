@@ -69,4 +69,13 @@ public class Grid {
 	public boolean isValid(int i, int j) {
 		return 0 <= i && i < H && 0 <= j && j < W;
 	}
+	public int H() {
+		return H;
+	}
+	public int W() {
+		return W;
+	}
+	public int size() {
+		return H * W;
+	}
 }

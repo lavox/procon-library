@@ -65,6 +65,7 @@
 | GeomUtil.java            | 幾何ユーティリティ(凸包等)           |
 | Direction.java           | 方向(4方向・8方向)の列挙型           |
 | Grid.java<br>Pos.java    | 2次元格子盤面と座標                  |
+| PosSet.java              | 座標集合                             |
 
 ### string
 | ファイル名               | 内容                                 |

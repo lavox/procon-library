@@ -66,4 +66,8 @@ public enum Direction {
 	public boolean isVertical() {
 		return dj == 0;
 	}
+	@Override
+	public String toString() {
+		return name;
+	}
 }

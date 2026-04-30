@@ -70,4 +70,8 @@ public class Pos {
 			return false;
 		}
 	}
+	@Override
+	public String toString() {
+		return String.format("(%d,%d)", i, j);
+	}
 }
