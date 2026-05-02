@@ -57,3 +57,9 @@ ArrayList<Long>,Collections.sort prepare:    17 ms, main:   169 ms
 
 ### 検証
 - [Associative Array (Library Checker)](https://judge.yosupo.jp/submission/369795)
+
+## HashSet
+- IntSet : int版
+- LongSet : long版
+
+`java.util.HashSet`のprimitive版。主要なほとんどのメソッドを実装だが一部未実装のメソッドあり。
