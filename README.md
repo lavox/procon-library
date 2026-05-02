@@ -80,12 +80,10 @@
 ### primitive
 | ファイル名               | 内容                                 |
 |:-------------------------|:-------------------------------------|
-| IntArrayList.java        | int版ArrayList                       |
-| IntArrays.java           | Comparotorを使用したintのソート      |
-| IntComparator.java       | int版Comparator                      |
-| LongArrayList.java       | long版ArrayList                      |
-| LongArrays.java          | Comparotorを使用したlongのソート     |
-| LongComparator.java      | long版Comparator                     |
+| IntArrayList.java<br>LongArrayList.java  | int/long版ArrayList  |
+| IntArrays.java<br>LongArrays.java | Comparotorを使用したint/longのソート |
+| IntComparator.java<br>LongComparator.java | int/long版Comparator         |
+| IntIntMap.java<br>IntLongMap.java<br>IntObjMap.java<br>LongIntMap.java<br>LongLongMap.java<br>LongObjMap.java<br>ObjIntMap.java<br>ObjLongMap.java  | int/long版HashMap  |
 
 ### template
 | ファイル名               | 内容                                 |

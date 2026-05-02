@@ -32,3 +32,28 @@ long[],Arrays.sort               prepare:     4 ms, main:    45 ms
 long[],LongArrays.sort           prepare:     4 ms, main:    84 ms
 ArrayList<Long>,Collections.sort prepare:    17 ms, main:   169 ms
 ```
+
+## HashMap
+| クラス名      | キー      | 値        |
+|:--------------|:----------|:----------|
+| IntIntMap     | int       | int       |
+| IntLongMap    | int       | long      |
+| IntObjMap     | int       | Object(V) |
+| LongIntMap    | long      | int       |
+| LongLongMap   | long      | long      |
+| LongObjMap    | long      | Object(V) |
+| ObjIntMap     | Object(K) | int       |
+| ObjLongMap    | Object(K) | long      |
+
+`java.util.HashMap`のprimitive版。主要なほとんどのメソッドは実装済みだが一部未実装のメソッドあり。
+`java.util.HashMap`と動作仕様が異なる点は以下の通り。
+
+- 値がint, longのクラス
+  - `get()`等で値が存在しなかった場合に`null`の代わりに返す値を、コンストラクタにパラメータ`defaultValue`で指定する。無指定時はintの場合は`Integer.MIN_VALUE`、longの場合は`Long.MIN_VALUE`を指定したものとみなす。
+	- `compute()`, `computeIfPresent()`, `merge()`で`java.util.HashMap`では`remappingFunction()`が`null`を返した場合は値が削除されるが、本クラスは値がprimitive型で`null`を返せないため、この仕様はサポートしていない。
+	- 紐づけられている値に`value`を加えるメソッド`countUp(value)`を追加している。値が紐づけられていなかった場合は、`value`を紐づける。
+- 全般
+  - 全エントリを走査する際に、インスタンス生成の節約のため、`entrySet()`に加えて`public EntryIterator entryIterator()`を実装している。`EntryIterator`では`next()`でカーソルを進めた後、`key()`, `value()`でキーや値を取得することができる。
+
+### 検証
+- [Associative Array (Library Checker)](https://judge.yosupo.jp/submission/369795)
