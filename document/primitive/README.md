@@ -33,6 +33,19 @@ long[],LongArrays.sort           prepare:     4 ms, main:    84 ms
 ArrayList<Long>,Collections.sort prepare:    17 ms, main:   169 ms
 ```
 
+## ArrayDeque
+- IntDeque : int版
+- LongDeque : long版
+
+`java.util.ArrayDeque`のprimitive版。主要なほとんどのメソッドは実装済みだが一部未実装のメソッドあり。
+`java.util.ArrayDeque`と動作仕様が異なる点は以下の通り。
+
+- サイズが0の状態で`poll`系、`peek`系のメソッドを呼ぶと`NoSuchElementException`が発生する。
+- `peekFirst(int i)`, `peekLast(int i)`を追加している。先頭・末尾から`i`番目の要素を返却する。
+
+### 検証
+- [Deque (Library Checker)](https://judge.yosupo.jp/submission/369983)
+
 ## HashMap
 | クラス名      | キー      | 値        |
 |:--------------|:----------|:----------|

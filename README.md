@@ -83,6 +83,7 @@
 | IntArrayList.java<br>LongArrayList.java  | int/long版ArrayList  |
 | IntArrays.java<br>LongArrays.java | Comparotorを使用したint/longのソート |
 | IntComparator.java<br>LongComparator.java | int/long版Comparator         |
+| IntDeque.java<br>LongDeque.java | int/long版ArrayDeque          |
 | IntIntMap.java<br>IntLongMap.java<br>IntObjMap.java<br>LongIntMap.java<br>LongLongMap.java<br>LongObjMap.java<br>ObjIntMap.java<br>ObjLongMap.java  | int/long版HashMap  |
 | IntSet.java<br>LongSet.java  | int/long版HashSet                |
 
