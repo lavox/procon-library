@@ -79,6 +79,7 @@ public class IntObjMap<V> {
 		values[idx] = value;
 		size++;
 	}
+	@SuppressWarnings("unchecked")
 	private V _update(int idx, V value) {
 		V old = (V)values[idx];
 		values[idx] = value;
@@ -93,6 +94,7 @@ public class IntObjMap<V> {
 			return idxFrom < i && i <= idxTo;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private V _remove(int idx) {
 		size--;
 		V old = (V)values[idx];
@@ -123,6 +125,7 @@ public class IntObjMap<V> {
 	public boolean isEmpty() {
 		return size == 0;
 	}
+	@SuppressWarnings("unchecked")
 	public V get(int key) {
 		int idx = index(key);
 		if (idx >= 0) {
@@ -212,6 +215,7 @@ public class IntObjMap<V> {
 		}
 		return ret;
 	}
+	@SuppressWarnings("unchecked")
 	public ArrayList<V> values() {
 		ArrayList<V> ret = new ArrayList<>(size);
 		if (keys[capacity] != EMPTY_FOR_EXTRA) ret.add((V)values[capacity]);
@@ -220,6 +224,7 @@ public class IntObjMap<V> {
 		}
 		return ret;
 	}
+	@SuppressWarnings("unchecked")
 	public ArrayList<Entry<V>> entrySet() {
 		ArrayList<Entry<V>> ret = new ArrayList<>(size);
 		if (keys[capacity] != EMPTY_FOR_EXTRA) ret.add(new Entry<>(keys[capacity], (V)values[capacity]));
@@ -310,6 +315,7 @@ public class IntObjMap<V> {
 			return null;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public V computeIfAbsent(int key, IntFunction<V> mappingFunction) {
 		ensureCapacity();
 		int idx = index(key);
@@ -323,6 +329,7 @@ public class IntObjMap<V> {
 			return v;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public V computeIfPresent(int key, RemappingFunction<? super V, ? extends V> remappingFunction) {
 		int idx = index(key);
 		if (idx >= 0) {
@@ -337,6 +344,7 @@ public class IntObjMap<V> {
 			return null;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public V compute(int key, RemappingFunction<? super V, ? extends V> remappingFunction) {
 		ensureCapacity();
 		int idx = index(key);
@@ -356,6 +364,7 @@ public class IntObjMap<V> {
 			return v;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public V merge(int key, V value, MergeFunction<? super V, ? extends V> remappingFunction) {
 		if (value == null || remappingFunction == null) throw new NullPointerException();
 		ensureCapacity();
@@ -374,6 +383,7 @@ public class IntObjMap<V> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void forEach(KeyValueConsumer<? super V> action) {
 		if (keys[capacity] != EMPTY_FOR_EXTRA) action.accept(keys[capacity], (V)values[capacity]);
 		for (int i = 0; i < capacity; i++) {
@@ -382,6 +392,7 @@ public class IntObjMap<V> {
 			}
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public void replaceAll(RemappingFunction<? super V, ? extends V> function) {
 		if (keys[capacity] != EMPTY_FOR_EXTRA) values[capacity] = function.apply(keys[capacity], (V)values[capacity]);
 		for (int i = 0; i < capacity; i++) {

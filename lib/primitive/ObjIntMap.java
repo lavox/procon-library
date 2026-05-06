@@ -107,6 +107,7 @@ public class ObjIntMap<K> {
 			return idxFrom < i && i <= idxTo;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private int _remove(int idx) {
 		size--;
 		if (idx == capacity) {
@@ -161,6 +162,7 @@ public class ObjIntMap<K> {
 			return defaultValue;
 		}
 	}
+	@SuppressWarnings("unchecked")
 	private void resize(int new_capacity) {
 		final Object[] old_keys = keys;
 		final int[] old_values = values;
@@ -214,6 +216,7 @@ public class ObjIntMap<K> {
 		}
 		return false;
 	}
+	@SuppressWarnings("unchecked")
 	public ArrayList<K> keySet() {
 		ArrayList<K> ret = new ArrayList<>(size);
 		if (keys[capacity] != EMPTY_FOR_EXTRA) ret.add((K)keys[capacity]);
@@ -231,6 +234,7 @@ public class ObjIntMap<K> {
 		}
 		return ret;
 	}
+	@SuppressWarnings("unchecked")
 	public ArrayList<Entry<K>> entrySet() {
 		ArrayList<Entry<K>> ret = new ArrayList<>(size);
 		if (keys[capacity] != EMPTY_FOR_EXTRA) ret.add(new Entry<>((K)keys[capacity], values[capacity]));
@@ -275,6 +279,7 @@ public class ObjIntMap<K> {
 			prev_pos = pos;
 			advance();
 		}
+		@SuppressWarnings("unchecked")
 		public K key() {
 			return (K)keys[prev_pos];
 		}
@@ -368,6 +373,7 @@ public class ObjIntMap<K> {
 		return merge(key, value, COUNT_UP);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void forEach(KeyValueConsumer<K> action) {
 		if (keys[capacity] != EMPTY_FOR_EXTRA) action.accept((K)keys[capacity], values[capacity]);
 		for (int i = 0; i < capacity; i++) {
@@ -376,6 +382,7 @@ public class ObjIntMap<K> {
 			}
 		}
 	}
+	@SuppressWarnings("unchecked")
 	public void replaceAll(RemappingFunction<K> function) {
 		if (keys[capacity] != EMPTY_FOR_EXTRA) values[capacity] = function.apply((K)keys[capacity], values[capacity]);
 		for (int i = 0; i < capacity; i++) {
