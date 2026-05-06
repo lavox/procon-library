@@ -1,3 +1,5 @@
+package primitive;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -5,14 +7,12 @@ import java.util.Comparator;
 import java.util.PrimitiveIterator;
 import java.util.Random;
 
-import primitive.IntArrayList;
-
-public class IntArrayListBenchmark {
+public class LongArrayListBenchmark {
 	static int N = 30_000_000;
-	static int[] orig = null;
-	static int blackhole = 0;
+	static long[] orig = null;
+	static long blackhole = 0;
 	public static void main(String[] args) {
-		orig = new Random(41).ints(N, 0, 100).toArray();
+		orig = new Random(41).longs(N, 0, 100).toArray();
 		runAll("=== warmup ===");
 		System.gc();
 
@@ -48,12 +48,12 @@ public class IntArrayListBenchmark {
 		System.out.printf("%-32s prepare: %5d ms, main: %5d ms%n", name, prepTime, mainTime);
 	}
 	static void case1() {
-		int[] list = new int[N];
-		measure("int[],for-each",
+		long[] list = new long[N];
+		measure("long[],for-each",
 			() -> { Arrays.fill(list, 0); System.arraycopy(orig, 0, list, 0, N); },
 			() -> {
-				int sum = 0;
-				for (int x : list) {
+				long sum = 0;
+				for (long x : list) {
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -61,12 +61,12 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case2() {
-		ArrayList<Integer> list = new ArrayList<>(N);
-		measure("ArrayList<Integer>,for-each",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		ArrayList<Long> list = new ArrayList<>(N);
+		measure("ArrayList<Long>,for-each",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
-				int sum = 0;
-				for (int x : list) {
+				long sum = 0;
+				for (long x : list) {
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -74,12 +74,12 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case3() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,for-each",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,for-each",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
-				int sum = 0;
-				for (int x : list) {
+				long sum = 0;
+				for (long x : list) {
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -87,13 +87,13 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case4() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,for",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,for",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
-				int sum = 0;
+				long sum = 0;
 				for (int i = 0; i < list.size(); i++) {
-					int x = list.get(i);
+					long x = list.get(i);
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -101,13 +101,13 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case5() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,PrimitiveIterator",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,PrimitiveIterator",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
 				long sum = 0;
-				for (PrimitiveIterator.OfInt it = list.iterator(); it.hasNext();) {
-					long x = it.nextInt();
+				for (PrimitiveIterator.OfLong it = list.iterator(); it.hasNext();) {
+					long x = it.nextLong();
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -115,12 +115,12 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case6() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,list.foreach",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,list.foreach",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
-				int[] sum = new int[1];
-				list.forEach((int x) -> {
+				long[] sum = new long[1];
+				list.forEach((long x) -> {
 					if (x % 2 == 0) sum[0] += x;
 				});
 				blackhole += sum[0];
@@ -128,12 +128,12 @@ public class IntArrayListBenchmark {
 		);
 	}
 	static void case7() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,for-values",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,for-values",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
-				int sum = 0;
-				for (int x: list.toArray()) {
+				long sum = 0;
+				for (long x: list.toArray()) {
 					if (x % 2 == 0) sum += x;
 				}
 				blackhole += sum;
@@ -142,12 +142,12 @@ public class IntArrayListBenchmark {
 	}
 }
 
-class IntArrayListSortBenchmark {
+class LongArrayListSortBenchmark {
 	static int N = 5_000_000;
-	static int[] orig = null;
-	static int blackhole = 0;
+	static long[] orig = null;
+	static long blackhole = 0;
 	public static void main(String[] args) {
-		orig = new Random(41).ints(N, 0, 100).toArray();
+		orig = new Random(41).longs(N, 0, 100).toArray();
 		runAll("=== warmup ===");
 		System.gc();
 
@@ -179,8 +179,8 @@ class IntArrayListSortBenchmark {
 		System.out.printf("%-32s prepare: %5d ms, main: %5d ms%n", name, prepTime, mainTime);
 	}
 	static void case1() {
-		int[] list = new int[N];
-		measure("int[],Arrays.sort",
+		long[] list = new long[N];
+		measure("long[],Arrays.sort",
 			() -> { Arrays.fill(list, 0); System.arraycopy(orig, 0, list, 0, N); },
 			() -> {
 				Arrays.sort(list);
@@ -188,21 +188,22 @@ class IntArrayListSortBenchmark {
 		);
 	}
 	static void case2() {
-		ArrayList<Integer> list = new ArrayList<>(N);
-		measure("ArrayList<Integer>,Collections.sort",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		ArrayList<Long> list = new ArrayList<>(N);
+		measure("ArrayList<Long>,Collections.sort",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
 				Collections.sort(list, Comparator.naturalOrder());
 			}
 		);
 	}
 	static void case3() {
-		IntArrayList list = new IntArrayList(N);
-		measure("IntArrayList,sort",
-			() -> { list.clear(); for (int x : orig) list.add(x); },
+		LongArrayList list = new LongArrayList(N);
+		measure("LongArrayList,sort",
+			() -> { list.clear(); for (long x : orig) list.add(x); },
 			() -> {
 				list.sort();
 			}
 		);
 	}
+
 }

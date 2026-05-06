@@ -4,6 +4,9 @@ package primitive;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Random;
+
 public class LongIntMapTest {
 
 	@Test
@@ -184,7 +187,7 @@ public class LongIntMapTest {
 		assertFalse(map.replace(1L, 10, 30)); // 古い値が違う
 		assertEquals(20, map.get(1L));
 
-		assertTrue(map.replace(1L, 30)); // 値指定なし
+		assertEquals(20, map.replace(1L, 30)); // 値指定なし
 		assertEquals(30, map.get(1L));
 	}
 
@@ -274,6 +277,35 @@ public class LongIntMapTest {
 		assertEquals(10, map.size());
 		for (long i = 0L; i < 10L; i++) {
 				assertEquals(i * 10L, map.get(i));
+		}
+	}
+
+	@Test
+	public void testRandom() {
+		int DEFAULT_VALUE = -1;
+		Random rnd = new Random(41);
+		int[] KIND = new int[] {10, 1_000, 1_000_000};
+		for (int t = 0; t < 100; t++) {
+			int B = KIND[t % KIND.length];
+			LongIntMap myMap = new LongIntMap(10, DEFAULT_VALUE);
+			HashMap<Long, Integer> refMap = new HashMap<>(10);
+
+			for (int i = 0; i < 100_000; i++) {
+				long key = rnd.nextInt(B);
+				int val = rnd.nextInt();
+				int op = rnd.nextInt(3);
+
+				if (op == 0) { // put
+					myMap.put(key, val);
+					refMap.put(key, val);
+				} else if (op == 1) { // remove
+					myMap.remove(key);
+					refMap.remove(key);
+				} else { // get
+					assertEquals(refMap.getOrDefault(key, DEFAULT_VALUE).intValue(), myMap.get(key));
+				}
+				assertEquals(refMap.size(), myMap.size());
+			}
 		}
 	}
 }

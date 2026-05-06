@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Random;
 
 public class ObjLongMapTest {
 
@@ -187,7 +189,7 @@ public class ObjLongMapTest {
 		assertFalse(map.replace("b", 10L, 30L)); // 古い値が違う
 		assertEquals(20L, map.get("b"));
 
-		assertTrue(map.replace("b", 30L)); // 値指定なし
+		assertEquals(20L, map.replace("b", 30L)); // 値指定なし
 		assertEquals(30L, map.get("b"));
 	}
 
@@ -277,6 +279,36 @@ public class ObjLongMapTest {
 		assertEquals(10, map.size());
 		for (int i = 0; i < 10; i++) {
 				assertEquals(i * 10, map.get(Integer.toString(i)));
+		}
+	}
+
+	@Test
+	public void testRandom() {
+		long DEFAULT_VALUE = -1;
+		Random rnd = new Random(41);
+		int[] KIND = new int[] {10, 1_000, 1_000_000};
+		for (int t = 0; t < 100; t++) {
+			int B = KIND[t % KIND.length];
+			ObjLongMap<String> myMap = new ObjLongMap<>(10, DEFAULT_VALUE);
+			HashMap<String, Long> refMap = new HashMap<>(10);
+
+			for (int i = 0; i < 100_000; i++) {
+				int k = rnd.nextInt(B);
+				String key = k == 0 ? null : Integer.toString(k);
+				long val = rnd.nextLong();
+				int op = rnd.nextInt(3);
+
+				if (op == 0) { // put
+					myMap.put(key, val);
+					refMap.put(key, val);
+				} else if (op == 1) { // remove
+					myMap.remove(key);
+					refMap.remove(key);
+				} else { // get
+					assertEquals(refMap.getOrDefault(key, DEFAULT_VALUE).longValue(), myMap.get(key));
+				}
+				assertEquals(refMap.size(), myMap.size());
+			}
 		}
 	}
 }

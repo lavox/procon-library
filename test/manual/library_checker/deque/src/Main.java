@@ -1,16 +1,16 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.function.IntUnaryOperator;
 import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.function.LongBinaryOperator;
 
+import java.util.Arrays;
 import java.util.PrimitiveIterator;
-import java.util.function.LongConsumer;
-import java.util.function.LongPredicate;
+
+import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 
 // template & library : https://github.com/lavox/procon-library
 public class Main {
@@ -22,21 +22,23 @@ public class Main {
 	public void solve() {
 		FastScanner sc = new FastScanner(System.in);
 		int Q = sc.nextInt();
-		LongArrayList ans = new LongArrayList();
-		LongLongMap map = new LongLongMap();
+		IntDeque queue = new IntDeque();
+		IntArrayList ans = new IntArrayList();
 		for (int q = 0; q < Q; q++) {
 			int t = sc.nextInt();
 			if (t == 0) {
-				long k = sc.nextLong();
-				long v = sc.nextLong();
-				map.put(k, v);
+				int x = sc.nextInt();
+				queue.addFirst(x);
+			} else if (t == 1) {
+				int x = sc.nextInt();
+				queue.addLast(x);
+			} else if (t == 2) {
+				queue.pollFirst();
+			} else if (t == 3) {
+				queue.pollLast();
 			} else {
-				long k = sc.nextLong();
-				if (map.containsKey(k)) {
-					ans.add(map.get(k));
-				} else {
-					ans.add(0L);
-				}
+				int i = sc.nextInt();
+				ans.add((int)queue.peekFirst(i));
 			}
 		}
 		print(ans.toArray(), LF);
@@ -224,429 +226,208 @@ class FastScanner {
 	}
 }
 
-// === begin: primitive/LongLongMap.java ===
-class LongLongMap {
-	private long[] keys = null;
-	private long[] values = null;
-	private int capacity = 0;
-	private int mask = 0;
+// === begin: primitive/IntDeque.java ===
+class IntDeque {
+	private int[] data = null;
+	private int head = 0;
+	private int tail = 0;
 	private int size = 0;
-	private int thr = 0;
-	private long defaultValue = DEFAULT_VALUE;
-	private float loadFactor = DEFAULT_LOAD_FACTOR;
+	private static final int DEFAULT_CAPACITY = 16;
 
-	private static final long EMPTY = 0;
-	private static final long EMPTY_FOR_EXTRA = 1;
-	private static final int NEG = 1 << 31;
-
-	private static final int INITIAL_CAPACITY = 7;
-	private static final long DEFAULT_VALUE = Integer.MIN_VALUE;
-	private static final float DEFAULT_LOAD_FACTOR = 0.5f;
-
-	private static final long RANDOM = System.nanoTime();
-
-	private static final LongBinaryOperator COUNT_UP = (a, b) -> a + b;
-
-	public LongLongMap() {
-		this(INITIAL_CAPACITY, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
+	public IntDeque() {
+		this(DEFAULT_CAPACITY);
 	}
-	public LongLongMap(int initialCapacity) {
-		this(initialCapacity, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
+	public IntDeque(int numElements) {
+		data = new int[Math.max(numElements, 0) + 1];
 	}
-	public LongLongMap(int initialCapacity, float loadFactor) {
-		this(initialCapacity, DEFAULT_VALUE, loadFactor);
+	private int inc(int i, int len) {
+		if (++i >= len) i = 0;
+		return i;
 	}
-	public LongLongMap(int initialCapacity, long defaultValue) {
-		this(initialCapacity, defaultValue, DEFAULT_LOAD_FACTOR);
+	private int dec(int i, int len) {
+		if (--i < 0) i = len - 1;
+		return i;
 	}
-	public LongLongMap(int initialCapacity, long defaultValue, float loadFactor) {
-		this.defaultValue = defaultValue;
-		this.loadFactor = loadFactor;
-		prepareArray(newCapacity(initialCapacity, 1, loadFactor));
-	}
-	public LongLongMap(LongLongMap from) {
-		this.keys = from.keys.clone();
-		this.values = from.values.clone();
-		this.capacity = from.capacity;
-		this.mask = from.mask;
-		this.size = from.size;
-		this.thr = from.thr;
-		this.defaultValue = from.defaultValue;
-	}
-	private void prepareArray(int capacity) {
-		assert Integer.bitCount(capacity) == 1;
-		this.capacity = capacity;
-		mask = capacity - 1;
-		keys = new long[capacity + 1];
-		keys[capacity] = EMPTY_FOR_EXTRA;
-		values = new long[capacity + 1];
-		thr = (int)(capacity * loadFactor);
-	}
-	private static int newCapacity(int sz, int cap, float lf) {
-		cap = Math.max(Integer.highestOneBit(cap) << 1, 16);
-		while (sz >= (int)(cap * lf)) cap <<= 1;
-		return cap;
-	}
-
-	private int hash(long x) {
-		x = (x ^ RANDOM) * 0x9e3779b97f4a7c15L;
-		x = x ^ (x >>> 32);
-		return (int)(x ^ (x >>> 16));
-	}
-	private int index(long key) {
-		if (key == EMPTY) return keys[capacity] == EMPTY_FOR_EXTRA ? capacity | NEG : capacity;
-		int cur;
-		if (keys[cur = hash(key) & mask] == EMPTY) return cur | NEG;
-		if (keys[cur] == key) return cur;
-		while (keys[(cur = (cur + 1) & mask)] != EMPTY) {
-			if (keys[cur] == key) return cur;
-		}
-		return cur | NEG;
-	}
-	private void _insert(int idx, long key, long value) {
-		keys[idx] = key;
-		values[idx] = value;
-		size++;
-	}
-	private long _update(int idx, long value) {
-		long old = values[idx];
-		values[idx] = value;
-		return old;
-	}
-
-	private boolean _canShift(int idxFrom, int idxTo, long key) {
-		int i = hash(key) & mask;
-		if (idxTo < idxFrom) {
-			return i <= idxTo || idxFrom < i;
-		} else {
-			return idxFrom < i && i <= idxTo;
-		}
-	}
-	private long _remove(int idx) {
-		size--;
-		if (idx == capacity) {
-			keys[idx] = EMPTY_FOR_EXTRA;
-			return values[idx];
-		}
-
-		int cur = idx;
-		long ret = values[cur];
-		int prev = cur;
-		long k;
-		while ((k = keys[cur = (cur + 1) & mask]) != EMPTY) {
-			if (_canShift(cur, prev, k)) {
-				keys[prev] = k;
-				values[prev] = values[cur];
-				prev = cur;
+	private void ensureCapacity(int minCapacity) {
+		int oldCapacity = data.length;
+		if (oldCapacity < minCapacity) {
+			boolean full = oldCapacity == size;
+			int extend = oldCapacity < 64 ? oldCapacity + 2 : oldCapacity >> 1;
+			int newCapacity = Math.max(oldCapacity + extend, minCapacity);
+			extend = newCapacity - oldCapacity;
+			int[] old_data = data;
+			data = Arrays.copyOf(data, newCapacity);
+			if (tail < head || full) {
+				System.arraycopy(old_data, head, data, head + extend, oldCapacity - head);
+				head += extend;
 			}
 		}
-		keys[prev] = EMPTY;
+	}
+	public void addFirst(int e) {
+		head = dec(head, data.length);
+		data[head] = e;
+		size++;
+		ensureCapacity(size + 1);
+	}
+	public void addLast(int e) {
+		data[tail] = e;
+		tail = inc(tail, data.length);
+		size++;
+		ensureCapacity(size + 1);
+	}
+	public boolean add(int e) {
+		addLast(e);
+		return true;
+	}
+	public int pollFirst() {
+		if (size == 0) throw new NoSuchElementException();
+		int ret = data[head];
+		head = inc(head, data.length);
+		size--;
 		return ret;
 	}
-
+	public int pollLast() {
+		if (size == 0) throw new NoSuchElementException();
+		tail = dec(tail, data.length);
+		int ret = data[tail];
+		size--;
+		return ret;
+	}
+	public int poll() {
+		return pollFirst();
+	}
+	public int peekFirst() {
+		if (size == 0) throw new NoSuchElementException();
+		return data[head];
+	}
+	public int peekLast() {
+		if (size == 0) throw new NoSuchElementException();
+		return data[dec(tail, data.length)];
+	}
+	public int peekFirst(int i) {
+		if (i < 0 || i >= size) throw new IndexOutOfBoundsException();
+		int index = head + i;
+		if (index >= data.length) index -= data.length;
+		return data[index];
+	}
+	public int peekLast(int i) {
+		if (i < 0 || i >= size) throw new IndexOutOfBoundsException();
+		int index = tail - i - 1;
+		if (index < 0) index += data.length;
+		return data[index];
+	}
+	public void push(int e) {
+		addFirst(e);
+	}
+	public int pop() {
+		return pollFirst();
+	}
 	public int size() {
 		return size;
 	}
 	public boolean isEmpty() {
 		return size == 0;
 	}
-	public long get(long key) {
-		int idx = index(key);
-		if (idx >= 0) {
-			return values[idx];
-		} else {
-			return defaultValue;
+	public PrimitiveIterator.OfInt iterator() {
+		return new DequeIterator(head, size);
+	}
+	private final class DequeIterator implements PrimitiveIterator.OfInt {
+		private int index;
+		private int prev;
+		private int rest;
+		DequeIterator(int head, int size) {
+			this.index = head;
+			this.rest = size;
+		}
+		@Override
+		public boolean hasNext() {
+			return rest > 0;
+		}
+		@Override
+		public int nextInt() {
+			if (rest == 0) throw new NoSuchElementException();
+			prev = index;
+			index = inc(index, data.length);
+			rest--;
+			return data[prev];
 		}
 	}
-	public boolean containsKey(long key) {
-		return index(key) >= 0;
+	public PrimitiveIterator.OfInt descendingIterator() {
+		return new DescendingDequeIterator(tail, size);
 	}
-	private void ensureCapacity() {
-		if (size >= thr) {
-			resize(newCapacity(size, capacity, loadFactor));
+	private final class DescendingDequeIterator implements PrimitiveIterator.OfInt {
+		private int index;
+		private int prev;
+		private int rest;
+		DescendingDequeIterator(int tail, int size) {
+			this.index = dec(tail, data.length);
+			this.rest = size;
 		}
-	}
-	public long put(long key, long value) {
-		ensureCapacity();
-		int idx = index(key);
-		if (idx >= 0) {
-			return _update(idx, value);
-		} else {
-			_insert(NEG ^ idx, key, value);
-			return defaultValue;
+		@Override
+		public boolean hasNext() {
+			return rest > 0;
 		}
-	}
-	private void resize(int new_capacity) {
-		final long[] old_keys = keys;
-		final long[] old_values = values;
-		final int old_capacity = capacity;
-		prepareArray(new_capacity);
-		final long[] new_keys = keys;
-		final long[] new_values = values;
-		final int new_mask = mask;
-
-		if (old_keys[old_capacity] != EMPTY_FOR_EXTRA) {
-			new_keys[new_capacity] = old_keys[old_capacity];
-			new_values[new_capacity] = old_values[old_capacity];
-		}
-		int cur;
-		for (int oi = 0; oi < old_capacity; oi++) {
-			if (old_keys[oi] != EMPTY) {
-				if (new_keys[cur = hash(old_keys[oi]) & new_mask] != EMPTY) {
-					while (new_keys[cur = (cur + 1) & new_mask] != EMPTY);
-				}
-				new_keys[cur] = old_keys[oi];
-				new_values[cur] = old_values[oi];
-			}
-		}
-	}
-	public long remove(long key) {
-		int idx = index(key);
-		if (idx >= 0) {
-			return _remove(idx);
-		} else {
-			return defaultValue;
-		}
-	}
-	public boolean remove(long key, long value) {
-		int idx = index(key);
-		if (idx >= 0 && values[idx] == value) {
-			_remove(idx);
-			return true;
-		} else {
-			return false;
+		@Override
+		public int nextInt() {
+			if (rest == 0) throw new NoSuchElementException();
+			prev = index;
+			index = dec(index, data.length);
+			rest--;
+			return data[prev];
 		}
 	}
 	public void clear() {
-		Arrays.fill(keys, EMPTY);
-		keys[capacity] = EMPTY_FOR_EXTRA;
+		head = 0;
+		tail = 0;
 		size = 0;
 	}
-	public boolean containsValue(long value) {
-		if (keys[capacity] != EMPTY_FOR_EXTRA && values[capacity] == value) return true;
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY && values[i] == value) return true;
-		}
-		return false;
-	}
-	public long[] keySet() {
-		long[] ret = new long[size];
-		int ri = 0;
-		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = keys[capacity];
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY) ret[ri++] = keys[i];
+	public int[] toArray() {
+		int[] ret = new int[size];
+		if (head <= tail) {
+			System.arraycopy(data, head, ret, 0, size);
+		} else {
+			System.arraycopy(data, head, ret, 0, data.length - head);
+			System.arraycopy(data, 0, ret, data.length - head, tail);
 		}
 		return ret;
-	}
-	public long[] values() {
-		long[] ret = new long[size];
-		int ri = 0;
-		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = values[capacity];
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY) ret[ri++] = values[i];
-		}
-		return ret;
-	}
-	public Entry[] entrySet() {
-		Entry[] ret = new Entry[size];
-		int ri = 0;
-		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = new Entry(keys[capacity], values[capacity]);
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY) ret[ri++] = new Entry(keys[i], values[i]);
-		}
-		return ret;
-	}
-	public static class Entry {
-		private long k;
-		private long v;
-		Entry(long k, long v) {
-			this.k = k;
-			this.v = v;
-		}
-		public long key() {
-			return k;
-		}
-		public long value() {
-			return v;
-		}
-	}
-
-	public EntryIterator entryIterator() {
-		return new EntryIterator();
-	}
-	public class EntryIterator {
-		private int prev_pos = -1;
-		private int pos = -1;
-		EntryIterator() {
-			advance();
-		}
-		private void advance() {
-			pos++;
-			while (pos < capacity && keys[pos] == EMPTY) pos++;
-			if (pos == capacity && keys[pos] == EMPTY_FOR_EXTRA) pos++;
-		}
-		public boolean hasNext() {
-			return pos <= capacity;
-		}
-		public void next() {
-			prev_pos = pos;
-			advance();
-		}
-		public long key() {
-			return keys[prev_pos];
-		}
-		public long value() {
-			return values[prev_pos];
-		}
-	}
-
-	public long getOrDefault(long key, long defaultValue) {
-		int idx = index(key);
-		if (idx >= 0) {
-			return values[idx];
-		} else {
-			return defaultValue;
-		}
-	}
-	public long putIfAbsent(long key, long value) {
-		ensureCapacity();
-		int idx = index(key);
-		if (idx >= 0) {
-			return values[idx];
-		} else {
-			_insert(NEG ^ idx, key, value);
-			return defaultValue;
-		}
-	}
-	public boolean replace(long key, long oldValue, long newValue) {
-		int idx = index(key);
-		if (idx >= 0 && values[idx] == oldValue) {
-			_update(idx, newValue);
-			return true;
-		} else {
-			return false;
-		}
-	}
-	public long replace(long key, long value) {
-		int idx = index(key);
-		if (idx >= 0) {
-			return _update(idx, value);
-		} else {
-			return defaultValue;
-		}
-	}
-	public long computeIfAbsent(long key, LongUnaryOperator mappingFunction) {
-		ensureCapacity();
-		int idx = index(key);
-		if (idx >= 0) {
-			return values[idx];
-		} else {
-			long v = mappingFunction.applyAsLong(key);
-			_insert(NEG ^ idx, key, v);
-			return v;
-		}
-	}
-	public long computeIfPresent(long key, LongBinaryOperator remappingFunction) {
-		int idx = index(key);
-		if (idx >= 0) {
-			long v = remappingFunction.applyAsLong(key, values[idx]);
-			_update(idx, v);
-			return v;
-		} else {
-			return defaultValue;
-		}
-	}
-	public long compute(long key, LongBinaryOperator remappingFunction) {
-		ensureCapacity();
-		int idx = index(key);
-		if (idx >= 0) {
-			long v = remappingFunction.applyAsLong(key, values[idx]);
-			_update(idx, v);
-			return v;
-		} else {
-			long v = remappingFunction.applyAsLong(key, defaultValue);
-			_insert(NEG ^ idx, key, v);
-			return v;
-		}
-	}
-	public long merge(long key, long value, LongBinaryOperator remappingFunction) {
-		ensureCapacity();
-		int idx = index(key);
-		if (idx >= 0) {
-			long v = remappingFunction.applyAsLong(values[idx], value);
-			_update(idx, v);
-			return v;
-		} else {
-			_insert(NEG ^ idx, key, value);
-			return value;
-		}
-	}
-	public long countUp(long key, long value) {
-		return merge(key, value, COUNT_UP);
-	}
-
-	public void forEach(KeyValueConsumer action) {
-		if (keys[capacity] != EMPTY_FOR_EXTRA) action.accept(keys[capacity], values[capacity]);
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY) {
-				action.accept(keys[i], values[i]);
-			}
-		}
-	}
-	public void replaceAll(LongBinaryOperator function) {
-		if (keys[capacity] != EMPTY_FOR_EXTRA) values[capacity] = function.applyAsLong(keys[capacity], values[capacity]);
-		for (int i = 0; i < capacity; i++) {
-			if (keys[i] != EMPTY) {
-				values[i] = function.applyAsLong(keys[i], values[i]);
-			}
-		}
-	}
-	@Override
-	public LongLongMap clone() {
-		return new LongLongMap(this);
-	}
-
-	@FunctionalInterface
-	public interface KeyValueConsumer {
-		public void accept(long key, long value);
 	}
 }
-// === end: primitive/LongLongMap.java ===
+// === end: primitive/IntDeque.java ===
 
-// === begin: primitive/LongArrayList.java ===
-class LongArrayList implements Iterable<Long> {
-	private long[] data = null;
+// === begin: primitive/IntArrayList.java ===
+class IntArrayList implements Iterable<Integer> {
+	private int[] data = null;
 	private int size = 0;
 	private static final int DEFAULT_CAPACITY = 10;
 
-	public LongArrayList() {}
-	public LongArrayList(int initialCapacity) {
-		data = new long[initialCapacity];
+	public IntArrayList() {}
+	public IntArrayList(int initialCapacity) {
+		data = new int[initialCapacity];
 	}
-	public LongArrayList(long[] data) {
+	public IntArrayList(int[] data) {
 		this.data = Arrays.copyOf(data, data.length);
 		this.size = data.length;
 	}
-	public LongArrayList(LongArrayList array) {
+	public IntArrayList(IntArrayList array) {
 		this.data = Arrays.copyOf(array.data, array.size);
 		this.size = array.size;
 	}
-	public boolean add(long e) {
+	public boolean add(int e) {
 		ensureCapacity(size + 1);
 		data[size++] = e;
 		return true;
 	}
-	public void add(int index, long element) {
+	public void add(int index, int element) {
 		if (index < 0 || index > size) throw new IndexOutOfBoundsException();
 		ensureCapacity(size + 1);
 		System.arraycopy(data, index, data, index + 1, size - index);
 		data[index] = element;
 		size++;
 	}
-	public void addAll(LongArrayList c) {
+	public void addAll(IntArrayList c) {
 		addAll(size, c);
 	}
-	public void addAll(int index, LongArrayList c) {
+	public void addAll(int index, IntArrayList c) {
 		if (index < 0 || index > size) throw new IndexOutOfBoundsException();
 		if (c.size() == 0) return;
 		ensureCapacity(size + c.size);
@@ -657,44 +438,44 @@ class LongArrayList implements Iterable<Long> {
 	public void clear() {
 		size = 0;
 	}
-	public LongArrayList clone() {
-		LongArrayList copy = new LongArrayList();
+	public IntArrayList clone() {
+		IntArrayList copy = new IntArrayList();
 		if (data != null) {
-			copy.data = new long[data.length];
+			copy.data = new int[data.length];
 			System.arraycopy(data, 0, copy.data, 0, data.length);
 		}
 		copy.size = size;
 		return copy;
 	}
-	public boolean contains(long e) {
-		for (long value : data) {
+	public boolean contains(int e) {
+		for (int value : data) {
 			if (value == e) return true;
 		}
 		return false;
 	}
 	public void ensureCapacity(int minCapacity) {
 		if (data == null) {
-			data = new long[Math.max(DEFAULT_CAPACITY, minCapacity)];
+			data = new int[Math.max(DEFAULT_CAPACITY, minCapacity)];
 		} else if (data.length < minCapacity) {
 			data = Arrays.copyOf(data, Math.max(data.length * 2, minCapacity));
 		}
 	}
-	public void forEach(LongConsumer action) {
+	public void forEach(IntConsumer action) {
 		if (data != null) {
 			for (int i = 0; i < size; i++) {
 				action.accept(data[i]);
 			}
 		}
 	}
-	public long get(int index) {
+	public int get(int index) {
 		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
 		return data[index];
 	}
-	public long last() {
+	public int last() {
 		if (size == 0) throw new IndexOutOfBoundsException();
 		return data[size - 1];
 	}
-	public int indexOf(long e) {
+	public int indexOf(int e) {
 		for (int i = 0; i < size; i++) {
 			if (data[i] == e) return i;
 		}
@@ -703,14 +484,14 @@ class LongArrayList implements Iterable<Long> {
 	public boolean isEmpty() {
 		return size == 0;
 	}
-	public PrimitiveIterator.OfLong iterator() {
-		return new LongArrayIterator(data, size);
+	public PrimitiveIterator.OfInt iterator() {
+		return new IntArrayIterator(data, size);
 	}
-	private final class LongArrayIterator implements PrimitiveIterator.OfLong {
+	private final class IntArrayIterator implements PrimitiveIterator.OfInt {
 		private int index = 0;
 		private int size;
-		private long[] data;
-		LongArrayIterator(long[] data, int size) {
+		private int[] data;
+		IntArrayIterator(int[] data, int size) {
 			this.data = data;
 			this.size = size;
 		}
@@ -719,31 +500,31 @@ class LongArrayList implements Iterable<Long> {
 			return index != size;
 		}
 		@Override
-		public long nextLong() {
+		public int nextInt() {
 			int i = index;
 			if (i == size) throw new IndexOutOfBoundsException();
 			index = i + 1;
 			return data[i];
 		}
 	}
-	public int lastIndexOf(long e) {
+	public int lastIndexOf(int e) {
 		for (int i = size - 1; i >= 0; i--) {
 			if (data[i] == e) return i;
 		}
 		return -1;
 	}
-	public long removeByIndex(int index) {
+	public int removeByIndex(int index) {
 		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
-		long oldValue = data[index];
+		int oldValue = data[index];
 		System.arraycopy(data, index + 1, data, index, size - index - 1);
 		data[--size] = 0;
 		return oldValue;
 	}
-	public long removeLast() {
+	public int removeLast() {
 		if (size == 0) throw new IndexOutOfBoundsException();
 		return data[--size];
 	}
-	public boolean removeByVal(long e) {
+	public boolean removeByVal(int e) {
 		int index = indexOf(e);
 		if (index >= 0) {
 			removeByIndex(index);
@@ -751,7 +532,7 @@ class LongArrayList implements Iterable<Long> {
 		}
 		return false;
 	}
-	public boolean removeAll(LongArrayList c) {
+	public boolean removeAll(IntArrayList c) {
 		if (size == 0 || c.size() == 0) return false;
 		int w = 0;
 		boolean removed = false;
@@ -765,7 +546,7 @@ class LongArrayList implements Iterable<Long> {
 		size = w;
 		return removed;
 	}
-	public boolean removeIf(LongPredicate filter) {
+	public boolean removeIf(IntPredicate filter) {
 		if (data == null || size == 0) return false;
 		int w = 0;
 		boolean modified = false;
@@ -786,13 +567,13 @@ class LongArrayList implements Iterable<Long> {
 		System.arraycopy(data, toIndex, data, fromIndex, size - toIndex);
 		size -= (toIndex - fromIndex);
 	}
-	public void replaceAll(LongUnaryOperator operator) {
+	public void replaceAll(IntUnaryOperator operator) {
 		if (data == null) return;
 		for (int i = 0; i < size; i++) {
-			data[i] = operator.applyAsLong(data[i]);
+			data[i] = operator.applyAsInt(data[i]);
 		}
 	}
-	public boolean retainAll(LongArrayList c) {
+	public boolean retainAll(IntArrayList c) {
 		if (size == 0 || c.size() == 0) return false;
 		int w = 0;
 		boolean removed = false;
@@ -806,9 +587,9 @@ class LongArrayList implements Iterable<Long> {
 		size = w;
 		return removed;
 	}
-	public long set(int index, long element) {
+	public int set(int index, int element) {
 		if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
-		long oldValue = data[index];
+		int oldValue = data[index];
 		data[index] = element;
 		return oldValue;
 	}
@@ -818,18 +599,18 @@ class LongArrayList implements Iterable<Long> {
 	public void sort() {
 		Arrays.sort(data, 0, size);
 	}
-	public void sort(LongComparator c) {
-		LongArrays.sort(data, 0, size, c);
+	public void sort(IntComparator c) {
+		IntArrays.sort(data, 0, size, c);
 	}
-	public void sort(int fromIndex, int toIndex, LongComparator c) {
+	public void sort(int fromIndex, int toIndex, IntComparator c) {
 		if (toIndex < 0 || toIndex > size) throw new IndexOutOfBoundsException();
-		LongArrays.sort(data, fromIndex, toIndex, c);
+		IntArrays.sort(data, fromIndex, toIndex, c);
 	}
-	public long[] toArray() {
-		if (data == null) return new long[0];
+	public int[] toArray() {
+		if (data == null) return new int[0];
 		return Arrays.copyOf(data, size);
 	}
-	public long[] toArray(long[] a) {
+	public int[] toArray(int[] a) {
 		if (a.length < size) {
 			return Arrays.copyOf(data, size);
 		}
@@ -843,8 +624,8 @@ class LongArrayList implements Iterable<Long> {
 	}
 	@Override
 	public boolean equals(Object o) {
-		if (o instanceof LongArrayList) {
-			LongArrayList ol = (LongArrayList)o;
+		if (o instanceof IntArrayList) {
+			IntArrayList ol = (IntArrayList)o;
 			if (size != ol.size) return false;
 			for (int i = 0; i < size; i++) {
 				if (data[i] != ol.data[i]) return false;
@@ -857,25 +638,25 @@ class LongArrayList implements Iterable<Long> {
 	public int hashCode() {
 		int hashCode = 1;
 		for (int i = 0; i < size; i++) {
-			hashCode = 31 * hashCode + (int)(data[i] ^ (data[i] >>> 32));
+			hashCode = 31 * hashCode + data[i];
 		}
 		return hashCode;
 	}
 }
-// === end: primitive/LongArrayList.java ===
+// === end: primitive/IntArrayList.java ===
 
-// === begin: primitive/LongArrays.java ===
-class LongArrays {
-	public static void sort(long[] a, LongComparator comp) {
+// === begin: primitive/IntArrays.java ===
+class IntArrays {
+	public static void sort(int[] a, IntComparator comp) {
 		sort(a, 0, a.length, comp);
 	}
-	public static void sort(long[] a, int fromIndex, int toIndex, LongComparator comp) {
+	public static void sort(int[] a, int fromIndex, int toIndex, IntComparator comp) {
 		if (toIndex - fromIndex <= 1) return;
 		int maxDepth = 2 * (31 - Integer.numberOfLeadingZeros(toIndex - fromIndex));
 		introSort(a, fromIndex, toIndex, maxDepth, comp);
 	}
 
-	private static void introSort(long[] a, int left, int right, int maxDepth, LongComparator comp) {
+	private static void introSort(int[] a, int left, int right, int maxDepth, IntComparator comp) {
 		while (right - left > 32) {
 			if (maxDepth == 0) {
 				heapSort(a, left, right, comp);
@@ -889,7 +670,7 @@ class LongArrays {
 				swap(a, mid, right - 1);
 				if (comp.compare(a[left], a[mid]) > 0) swap(a, left, mid);
 			}
-			long pivot = a[mid];
+			int pivot = a[mid];
 			int i = left + 1, j = right - 2;
 			while (i <= j) {
 				while (comp.compare(a[i], pivot) < 0) i++;
@@ -910,9 +691,9 @@ class LongArrays {
 		}
 		insertionSort(a, left, right, comp);
 	}
-	private static void insertionSort(long[] a, int left, int right, LongComparator comp) {
+	private static void insertionSort(int[] a, int left, int right, IntComparator comp) {
 		for (int i = left + 1; i < right; i++) {
-			long v = a[i];
+			int v = a[i];
 			int j = i - 1;
 			while (j >= left && comp.compare(a[j], v) > 0) {
 				a[j + 1] = a[j];
@@ -921,7 +702,7 @@ class LongArrays {
 			a[j + 1] = v;
 		}
 	}
-	private static void heapSort(long[] a, int left, int right, LongComparator comp) {
+	private static void heapSort(int[] a, int left, int right, IntComparator comp) {
 		int n = right - left;
 		for (int i = (n >>> 1) - 1; i >= 0; i--) downHeap(a, i, n, left, comp);
 		for (int i = n - 1; i > 0; i--) {
@@ -929,7 +710,7 @@ class LongArrays {
 			downHeap(a, 0, i, left, comp);
 		}
 	}
-	private static void downHeap(long[] a, int i, int n, int base, LongComparator comp) {
+	private static void downHeap(int[] a, int i, int n, int base, IntComparator comp) {
 		while (true) {
 			int l = (i << 1) + 1;
 			if (l >= n) break;
@@ -941,17 +722,17 @@ class LongArrays {
 			i = largest;
 		}
 	}
-	private static void swap(long[] a, int i, int j) {
-			long tmp = a[i];
+	private static void swap(int[] a, int i, int j) {
+			int tmp = a[i];
 			a[i] = a[j];
 			a[j] = tmp;
 	}
 }
-// === end: primitive/LongArrays.java ===
+// === end: primitive/IntArrays.java ===
 
-// === begin: primitive/LongComparator.java ===
+// === begin: primitive/IntComparator.java ===
 @FunctionalInterface
-interface LongComparator {
-    int compare(long a, long b);
+interface IntComparator {
+    int compare(int a, int b);
 }
-// === end: primitive/LongComparator.java ===
+// === end: primitive/IntComparator.java ===

@@ -23,7 +23,11 @@
 hs_err_pid*
 replay_pid*
 
+# backup files
+*.bak
+
 **/bin
+bak/**
 tmp/**
 test/manual/**/.vscode
 test/manual/**/*.json
@@ -31,3 +35,4 @@ test/manual/**/test
 **/build
 **/*.egg-info
 **/launch.json
+**/.DS_Store

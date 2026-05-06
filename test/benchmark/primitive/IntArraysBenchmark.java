@@ -1,28 +1,28 @@
+package primitive;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
-import primitive.LongArrays;
-
-public class LongArraysBenchmark {
+public class IntArraysBenchmark {
 	static int N = 3_000_000;
 	public static void main(String[] args) {
 		// int N0 = 3_000_000;
 		int N0 = 3_000;
 		double errorRate = 1.0;// / 10_000;
 		int errorWidth = 1;
-		long[][] orig = createArray(N, N0, errorRate, errorWidth);
+		int[][] orig = createArray(N, N0, errorRate, errorWidth);
 		runAll("=== warmup ===", orig);
 		System.gc();
 
 		runAll("=== benchmark ===", orig);
 	}
 
-	static long[][] createArray(int N, int N0, double errorRate, int errorWidth) {
+	static int[][] createArray(int N, int N0, double errorRate, int errorWidth) {
 		Random rnd = new Random(41);
 		int K = (N - 1) / N0 + 1;
-		long[][] ret = new long[K][N0];
+		int[][] ret = new int[K][N0];
 		for (int k = 0; k < K; k++) {
 			for (int i = 0; i < N0; i++) {
 				if (rnd.nextDouble() < errorRate) {
@@ -36,7 +36,7 @@ public class LongArraysBenchmark {
 		return ret;
 	}
 
-	static void runAll(String name, long[][] orig) {
+	static void runAll(String name, int[][] orig) {
 		System.out.println(name);
 		case1(orig);
 		case2(orig);
@@ -60,40 +60,40 @@ public class LongArraysBenchmark {
 		mainTime = Math.round(mainTime / (1e6 * ITER));
 		System.out.printf("%-32s prepare: %5d ms, main: %5d ms%n", name, prepTime, mainTime);
 	}
-	static void case1(long[][] orig) {
-		long[][] list = new long[orig.length][];
+	static void case1(int[][] orig) {
+		int[][] list = new int[orig.length][];
 
-		measure("long[],Arrays.sort",
+		measure("int[],Arrays.sort",
 			() -> {
 				for (int i = 0; i < orig.length; i++) list[i] = Arrays.copyOf(orig[i], orig[i].length);
 			},
 			() -> {
-				for (long[] l: list) Arrays.sort(l);
+				for (int[] l: list) Arrays.sort(l);
 			}
 		);
 	}
-	static void case2(long[][] orig) {
-		long[][] list = new long[orig.length][];
-		measure("long[],LongArrays.sort",
+	static void case2(int[][] orig) {
+		int[][] list = new int[orig.length][];
+		measure("int[],IntArrays.sort",
 			() -> {
 				for (int i = 0; i < orig.length; i++) list[i] = Arrays.copyOf(orig[i], orig[i].length);
 			},
 			() -> {
-				for (long[] l: list) LongArrays.sort(l, (a, b) -> Long.compare(a, b));
+				for (int[] l: list) IntArrays.sort(l, (a, b) -> Integer.compare(a, b));
 			}
 		);
 	}
-	static void case3(long[][] orig) {
-		ArrayList<Long>[] list = new ArrayList[orig.length];
-		measure("ArrayList<Long>,Collections.sort",
+	static void case3(int[][] orig) {
+		ArrayList<Integer>[] list = new ArrayList[orig.length];
+		measure("ArrayList<Integer>,Collections.sort",
 			() -> { 
 				for (int i = 0; i < orig.length; i++) {
 					list[i] = new ArrayList<>(orig[i].length);
-					for (long v: orig[i]) list[i].add(v);
+					for (int v: orig[i]) list[i].add(v);
 				}
 			},
 			() -> {
-				for (ArrayList<Long> l: list) Collections.sort(l, (a, b) -> Long.compare(a, b));
+				for (ArrayList<Integer> l: list) Collections.sort(l, (a, b) -> Integer.compare(a, b));
 			}
 		);
 	}

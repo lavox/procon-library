@@ -3,6 +3,7 @@
     "lib",
     "test/oj-verify",
     "test/unittest",
+    "test/benchmark",
     "sandbox/src",
   ],
   "java.project.outputPath": "bin",

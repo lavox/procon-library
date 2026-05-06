@@ -5,34 +5,43 @@ import java.util.function.IntBinaryOperator;
 import java.util.function.LongToIntFunction;
 
 public class LongIntMap {
-	private long[] keys;
-	private int[] values;
-	private int capacity;
-	private int mask;
-	private int size;
-	private int occupiedCnt;
-	private int thr;
-	private byte[] state;
-	private int defaultValue;
+	private long[] keys = null;
+	private int[] values = null;
+	private int capacity = 0;
+	private int mask = 0;
+	private int size = 0;
+	private int thr = 0;
+	private int defaultValue = DEFAULT_VALUE;
+	private float loadFactor = DEFAULT_LOAD_FACTOR;
 
-	private static final byte EMPTY = 0;
-	private static final byte OCCUPIED = 1;
-	private static final byte REMOVED = 2;
+	private static final long EMPTY = 0;
+	private static final long EMPTY_FOR_EXTRA = 1;
+	private static final int NEG = 1 << 31;
 
-	private static final int INITIAL_CAPACITY = 15;
+	private static final int INITIAL_CAPACITY = 7;
 	private static final int DEFAULT_VALUE = Integer.MIN_VALUE;
+	private static final float DEFAULT_LOAD_FACTOR = 0.5f;
+
+	private static final long RANDOM = System.nanoTime();
 
 	private static final IntBinaryOperator COUNT_UP = (a, b) -> a + b;
 
 	public LongIntMap() {
-		this(INITIAL_CAPACITY, DEFAULT_VALUE);
+		this(INITIAL_CAPACITY, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
 	}
 	public LongIntMap(int initialCapacity) {
-		this(initialCapacity, DEFAULT_VALUE);
+		this(initialCapacity, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
+	}
+	public LongIntMap(int initialCapacity, float loadFactor) {
+		this(initialCapacity, DEFAULT_VALUE, loadFactor);
 	}
 	public LongIntMap(int initialCapacity, int defaultValue) {
+		this(initialCapacity, defaultValue, DEFAULT_LOAD_FACTOR);
+	}
+	public LongIntMap(int initialCapacity, int defaultValue, float loadFactor) {
 		this.defaultValue = defaultValue;
-		init(Integer.highestOneBit(initialCapacity) << 1);
+		this.loadFactor = loadFactor;
+		prepareArray(newCapacity(initialCapacity, 1, loadFactor));
 	}
 	public LongIntMap(LongIntMap from) {
 		this.keys = from.keys.clone();
@@ -40,60 +49,79 @@ public class LongIntMap {
 		this.capacity = from.capacity;
 		this.mask = from.mask;
 		this.size = from.size;
-		this.occupiedCnt = from.occupiedCnt;
 		this.thr = from.thr;
-		this.state = from.state.clone();
 		this.defaultValue = from.defaultValue;
+		this.loadFactor = from.loadFactor;
 	}
-	private void init(int capacity) {
+	private void prepareArray(int capacity) {
+		assert Integer.bitCount(capacity) == 1;
 		this.capacity = capacity;
 		mask = capacity - 1;
-		keys = new long[capacity];
-		values = new int[capacity];
-		state = new byte[capacity];
-		thr = Math.min((int)(capacity * 0.7), capacity - 1);
-		occupiedCnt = 0;
-		size = 0;
+		keys = new long[capacity + 1];
+		keys[capacity] = EMPTY_FOR_EXTRA;
+		values = new int[capacity + 1];
+		thr = (int)(capacity * loadFactor);
+	}
+	private static int newCapacity(int sz, int cap, float lf) {
+		cap = Math.max(Integer.highestOneBit(cap) << 1, 16);
+		while (sz >= (int)(cap * lf)) cap <<= 1;
+		return cap;
 	}
 
-	private static int hash(long x) {
-		x = (x ^ (x >>> 30)) * 0xbf58476d1ce4e5b9L;
-		x = (x ^ (x >>> 27)) * 0x94d049bb133111ebL;
-		x ^= (x >>> 31);
-		return (int)x;
-	}
-	private static int hash2(int x) {
-		return ((x * 0x9e3779b9) >>> 1) | 1;
+	private int hash(long x) {
+		x = (x ^ RANDOM) * 0x9e3779b97f4a7c15L;
+		x = x ^ (x >>> 32);
+		return (int)(x ^ (x >>> 16));
 	}
 	private int index(long key) {
-		int h = hash(key);
-		int d = hash2(h);
-		int cur = h & mask;
-		int target = -1;
-		while (state[cur] != EMPTY) {
-			if (state[cur] == OCCUPIED && keys[cur] == key) {
-				return cur;
-			} else if (state[cur] == REMOVED && target == -1) {
-				target = cur;
-			}
-			cur = (cur + d) & mask;
+		if (key == EMPTY) return keys[capacity] == EMPTY_FOR_EXTRA ? capacity | NEG : capacity;
+		int cur;
+		if (keys[cur = hash(key) & mask] == EMPTY) return cur | NEG;
+		if (keys[cur] == key) return cur;
+		while (keys[(cur = (cur + 1) & mask)] != EMPTY) {
+			if (keys[cur] == key) return cur;
 		}
-		return target == -1 ? cur : target;
+		return cur | NEG;
 	}
-	private boolean matchesKey(int idx, long key) {
-		return state[idx] == OCCUPIED && keys[idx] == key;
-	}
-	private void assign(int idx, long key, int value) {
-		if (state[idx] == EMPTY) occupiedCnt++;
-		size++;
+	private void _insert(int idx, long key, int value) {
 		keys[idx] = key;
 		values[idx] = value;
-		state[idx] = OCCUPIED;
+		size++;
+	}
+	private int _update(int idx, int value) {
+		int old = values[idx];
+		values[idx] = value;
+		return old;
+	}
+
+	private boolean _canShift(int idxFrom, int idxTo, long key) {
+		int i = hash(key) & mask;
+		if (idxTo < idxFrom) {
+			return i <= idxTo || idxFrom < i;
+		} else {
+			return idxFrom < i && i <= idxTo;
+		}
 	}
 	private int _remove(int idx) {
 		size--;
-		state[idx] = REMOVED;
-		return values[idx];
+		if (idx == capacity) {
+			keys[idx] = EMPTY_FOR_EXTRA;
+			return values[idx];
+		}
+
+		int cur = idx;
+		int ret = values[cur];
+		int prev = cur;
+		long k;
+		while ((k = keys[cur = (cur + 1) & mask]) != EMPTY) {
+			if (_canShift(cur, prev, k)) {
+				keys[prev] = k;
+				values[prev] = values[cur];
+				prev = cur;
+			}
+		}
+		keys[prev] = EMPTY;
+		return ret;
 	}
 
 	public int size() {
@@ -104,64 +132,57 @@ public class LongIntMap {
 	}
 	public int get(long key) {
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			return values[idx];
 		} else {
 			return defaultValue;
 		}
 	}
 	public boolean containsKey(long key) {
-		int idx = index(key);
-		return matchesKey(idx, key);
+		return index(key) >= 0;
 	}
 	private void ensureCapacity() {
-		if (occupiedCnt >= thr) {
-			if (size < capacity * 0.5) {
-				resize(capacity);
-			} else {
-				resize(capacity << 1);
-			}
+		if (size >= thr) {
+			resize(newCapacity(size, capacity, loadFactor));
 		}
 	}
 	public int put(long key, int value) {
 		ensureCapacity();
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
-			int old = values[idx];
-			values[idx] = value;
-			return old;
+		if (idx >= 0) {
+			return _update(idx, value);
 		} else {
-			assign(idx, key, value);
+			_insert(NEG ^ idx, key, value);
 			return defaultValue;
 		}
 	}
-	private void _put(long key, int value) {
-		int h = hash(key);
-		int d = hash2(h);
-		int cur = h & mask;
-		while (state[cur] != EMPTY) {
-			cur = (cur + d) & mask;
-		}
-		occupiedCnt++;
-		size++;
-		keys[cur] = key;
-		values[cur] = value;
-		state[cur] = OCCUPIED;
-	}
 	private void resize(int new_capacity) {
-		long[] old_keys = keys;
-		int[] old_values = values;
-		byte[] old_state = state;
-		init(new_capacity);
-		for (int i = 0; i < old_keys.length; i++) {
-			if (old_state[i] == OCCUPIED) {
-				_put(old_keys[i], old_values[i]);
+		final long[] old_keys = keys;
+		final int[] old_values = values;
+		final int old_capacity = capacity;
+		prepareArray(new_capacity);
+		final long[] new_keys = keys;
+		final int[] new_values = values;
+		final int new_mask = mask;
+
+		if (old_keys[old_capacity] != EMPTY_FOR_EXTRA) {
+			new_keys[new_capacity] = old_keys[old_capacity];
+			new_values[new_capacity] = old_values[old_capacity];
+		}
+		int cur;
+		for (int oi = 0; oi < old_capacity; oi++) {
+			if (old_keys[oi] != EMPTY) {
+				if (new_keys[cur = hash(old_keys[oi]) & new_mask] != EMPTY) {
+					while (new_keys[cur = (cur + 1) & new_mask] != EMPTY);
+				}
+				new_keys[cur] = old_keys[oi];
+				new_values[cur] = old_values[oi];
 			}
 		}
 	}
 	public int remove(long key) {
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			return _remove(idx);
 		} else {
 			return defaultValue;
@@ -169,7 +190,7 @@ public class LongIntMap {
 	}
 	public boolean remove(long key, int value) {
 		int idx = index(key);
-		if (matchesKey(idx, key) && values[idx] == value) {
+		if (idx >= 0 && values[idx] == value) {
 			_remove(idx);
 			return true;
 		} else {
@@ -177,37 +198,41 @@ public class LongIntMap {
 		}
 	}
 	public void clear() {
-		Arrays.fill(state, EMPTY);
+		Arrays.fill(keys, EMPTY);
+		keys[capacity] = EMPTY_FOR_EXTRA;
 		size = 0;
-		occupiedCnt = 0;
 	}
 	public boolean containsValue(int value) {
+		if (keys[capacity] != EMPTY_FOR_EXTRA && values[capacity] == value) return true;
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED && values[i] == value) return true;
+			if (keys[i] != EMPTY && values[i] == value) return true;
 		}
 		return false;
 	}
 	public long[] keySet() {
 		long[] ret = new long[size];
-		int ii = 0;
+		int ri = 0;
+		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = keys[capacity];
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED) ret[ii++] = keys[i];
+			if (keys[i] != EMPTY) ret[ri++] = keys[i];
 		}
 		return ret;
 	}
 	public int[] values() {
 		int[] ret = new int[size];
-		int ii = 0;
+		int ri = 0;
+		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = values[capacity];
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED) ret[ii++] = values[i];
+			if (keys[i] != EMPTY) ret[ri++] = values[i];
 		}
 		return ret;
 	}
 	public Entry[] entrySet() {
 		Entry[] ret = new Entry[size];
-		int ii = 0;
+		int ri = 0;
+		if (keys[capacity] != EMPTY_FOR_EXTRA) ret[ri++] = new Entry(keys[capacity], values[capacity]);
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED) ret[ii++] = new Entry(keys[i], values[i]);
+			if (keys[i] != EMPTY) ret[ri++] = new Entry(keys[i], values[i]);
 		}
 		return ret;
 	}
@@ -237,10 +262,11 @@ public class LongIntMap {
 		}
 		private void advance() {
 			pos++;
-			while (pos < capacity && state[pos] != OCCUPIED) pos++;
+			while (pos < capacity && keys[pos] == EMPTY) pos++;
+			if (pos == capacity && keys[pos] == EMPTY_FOR_EXTRA) pos++;
 		}
 		public boolean hasNext() {
-			return pos < capacity;
+			return pos <= capacity;
 		}
 		public void next() {
 			prev_pos = pos;
@@ -256,7 +282,7 @@ public class LongIntMap {
 
 	public int getOrDefault(long key, int defaultValue) {
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			return values[idx];
 		} else {
 			return defaultValue;
@@ -265,47 +291,46 @@ public class LongIntMap {
 	public int putIfAbsent(long key, int value) {
 		ensureCapacity();
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			return values[idx];
 		} else {
-			assign(idx, key, value);
+			_insert(NEG ^ idx, key, value);
 			return defaultValue;
 		}
 	}
 	public boolean replace(long key, int oldValue, int newValue) {
 		int idx = index(key);
-		if (matchesKey(idx, key) && values[idx] == oldValue) {
-			values[idx] = newValue;
+		if (idx >= 0 && values[idx] == oldValue) {
+			_update(idx, newValue);
 			return true;
 		} else {
 			return false;
 		}
 	}
-	public boolean replace(long key, int value) {
+	public int replace(long key, int value) {
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
-			values[idx] = value;
-			return true;
+		if (idx >= 0) {
+			return _update(idx, value);
 		} else {
-			return false;
+			return defaultValue;
 		}
 	}
 	public int computeIfAbsent(long key, LongToIntFunction mappingFunction) {
 		ensureCapacity();
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			return values[idx];
 		} else {
 			int v = mappingFunction.applyAsInt(key);
-			assign(idx, key, v);
+			_insert(NEG ^ idx, key, v);
 			return v;
 		}
 	}
 	public int computeIfPresent(long key, RemappingFunction remappingFunction) {
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			int v = remappingFunction.apply(key, values[idx]);
-			values[idx] = v;
+			_update(idx, v);
 			return v;
 		} else {
 			return defaultValue;
@@ -314,25 +339,25 @@ public class LongIntMap {
 	public int compute(long key, RemappingFunction remappingFunction) {
 		ensureCapacity();
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			int v = remappingFunction.apply(key, values[idx]);
-			values[idx] = v;
+			_update(idx, v);
 			return v;
 		} else {
 			int v = remappingFunction.apply(key, defaultValue);
-			assign(idx, key, v);
+			_insert(NEG ^ idx, key, v);
 			return v;
 		}
 	}
 	public int merge(long key, int value, IntBinaryOperator remappingFunction) {
 		ensureCapacity();
 		int idx = index(key);
-		if (matchesKey(idx, key)) {
+		if (idx >= 0) {
 			int v = remappingFunction.applyAsInt(values[idx], value);
-			values[idx] = v;
+			_update(idx, v);
 			return v;
 		} else {
-			assign(idx, key, value);
+			_insert(NEG ^ idx, key, value);
 			return value;
 		}
 	}
@@ -341,15 +366,17 @@ public class LongIntMap {
 	}
 
 	public void forEach(KeyValueConsumer action) {
+		if (keys[capacity] != EMPTY_FOR_EXTRA) action.accept(keys[capacity], values[capacity]);
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED) {
+			if (keys[i] != EMPTY) {
 				action.accept(keys[i], values[i]);
 			}
 		}
 	}
 	public void replaceAll(RemappingFunction function) {
+		if (keys[capacity] != EMPTY_FOR_EXTRA) values[capacity] = function.apply(keys[capacity], values[capacity]);
 		for (int i = 0; i < capacity; i++) {
-			if (state[i] == OCCUPIED) {
+			if (keys[i] != EMPTY) {
 				values[i] = function.apply(keys[i], values[i]);
 			}
 		}

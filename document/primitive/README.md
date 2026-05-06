@@ -68,8 +68,20 @@ ArrayList<Long>,Collections.sort prepare:    17 ms, main:   169 ms
 - 全般
   - 全エントリを走査する際に、インスタンス生成の節約のため、`entrySet()`に加えて`public EntryIterator entryIterator()`を実装している。`EntryIterator`では`next()`でカーソルを進めた後、`key()`, `value()`でキーや値を取得することができる。
 
+```
+=== benchmark ===
+IntIntMap,get(hit)               prepare:     0 ms, main:    30 ms
+HashMap,get(hit)                 prepare:     0 ms, main:    56 ms
+IntIntMap,get(no-hit)            prepare:     0 ms, main:    67 ms
+HashMap,get(no-hit)              prepare:     0 ms, main:   102 ms
+IntIntMap,put(insert)            prepare:     0 ms, main:   283 ms
+HashMap,put(insert)              prepare:    40 ms, main:  1295 ms
+IntIntMap,put(update)            prepare:   272 ms, main:   228 ms
+HashMap,put(update)              prepare:   700 ms, main:   918 ms
+```
+
 ### 検証
-- [Associative Array (Library Checker)](https://judge.yosupo.jp/submission/369795)
+- [Associative Array (Library Checker)](https://judge.yosupo.jp/submission/370642)
 
 ## HashSet
 - IntSet : int版
