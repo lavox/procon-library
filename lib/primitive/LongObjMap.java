@@ -29,6 +29,9 @@ public class LongObjMap<V> {
 	public LongObjMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_LOAD_FACTOR);
 	}
+	public LongObjMap(float loadFactor) {
+		this(INITIAL_CAPACITY, loadFactor);
+	}
 	public LongObjMap(int initialCapacity, float loadFactor) {
 		this.loadFactor = loadFactor;
 		prepareArray(newCapacity(initialCapacity, 1, loadFactor));

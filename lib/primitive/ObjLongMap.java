@@ -34,6 +34,9 @@ public class ObjLongMap<K> {
 	public ObjLongMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
 	}
+	public ObjLongMap(float loadFactor) {
+		this(INITIAL_CAPACITY, DEFAULT_VALUE, loadFactor);
+	}
 	public ObjLongMap(int initialCapacity, float loadFactor) {
 		this(initialCapacity, DEFAULT_VALUE, loadFactor);
 	}

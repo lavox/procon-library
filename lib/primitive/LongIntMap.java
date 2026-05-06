@@ -32,6 +32,9 @@ public class LongIntMap {
 	public LongIntMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
 	}
+	public LongIntMap(float loadFactor) {
+		this(INITIAL_CAPACITY, DEFAULT_VALUE, loadFactor);
+	}
 	public LongIntMap(int initialCapacity, float loadFactor) {
 		this(initialCapacity, DEFAULT_VALUE, loadFactor);
 	}

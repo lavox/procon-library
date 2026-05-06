@@ -34,6 +34,9 @@ public class ObjIntMap<K> {
 	public ObjIntMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_VALUE, DEFAULT_LOAD_FACTOR);
 	}
+	public ObjIntMap(float loadFactor) {
+		this(INITIAL_CAPACITY, DEFAULT_VALUE, loadFactor);
+	}
 	public ObjIntMap(int initialCapacity, float loadFactor) {
 		this(initialCapacity, DEFAULT_VALUE, loadFactor);
 	}

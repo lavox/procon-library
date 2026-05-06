@@ -29,6 +29,9 @@ public class IntObjMap<V> {
 	public IntObjMap(int initialCapacity) {
 		this(initialCapacity, DEFAULT_LOAD_FACTOR);
 	}
+	public IntObjMap(float loadFactor) {
+		this(INITIAL_CAPACITY, loadFactor);
+	}
 	public IntObjMap(int initialCapacity, float loadFactor) {
 		this.loadFactor = loadFactor;
 		prepareArray(newCapacity(initialCapacity, 1, loadFactor));
