@@ -5,25 +5,23 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Dfs {
-	private final Graph g;
 	private int[] visitedGen = null;
 	int gen = 0;
 
-	public Dfs(Graph g) {
-		this.g = g;
-		this.visitedGen = new int[g.size()];
+	public Dfs(int size) {
+		this.visitedGen = new int[size];
 	}
-	public Iterable<DfsStep> dfsBothOrder(int v0) {
+	public Iterable<DfsStep> dfsBothOrder(Graph g, int v0) {
 		gen++;
-		return () -> new DfsIterator(v0, true, true);
+		return () -> new DfsIterator(g, v0, true, true);
 	}
-	public Iterable<DfsStep> dfsPreOrder(int v0) {
+	public Iterable<DfsStep> dfsPreOrder(Graph g, int v0) {
 		gen++;
-		return () -> new DfsIterator(v0, true, false);
+		return () -> new DfsIterator(g, v0, true, false);
 	}
-	public Iterable<DfsStep> dfsPostOrder(int v0) {
+	public Iterable<DfsStep> dfsPostOrder(Graph g, int v0) {
 		gen++;
-		return () -> new DfsIterator(v0, false, true);
+		return () -> new DfsIterator(g, v0, false, true);
 	}
 	private void setVisited(int nodeId) {
 		visitedGen[nodeId] = gen;
@@ -33,11 +31,13 @@ public class Dfs {
 	}
 
 	public class DfsIterator implements Iterator<DfsStep> {
+		private final Graph g;
 		private final ArrayDeque<DfsStep> stack;
 		private final boolean requirePreOrder;
 		private final boolean requirePostOrder;
 		private DfsStep nextStep = null;
-		private DfsIterator(int v0, boolean requirePreOrder, boolean requirePostOrder) {
+		protected DfsIterator(Graph g, int v0, boolean requirePreOrder, boolean requirePostOrder) {
+			this.g = g;
 			this.requirePreOrder = requirePreOrder;
 			this.requirePostOrder = requirePostOrder;
 			this.stack = new ArrayDeque<>();
@@ -92,7 +92,7 @@ public class Dfs {
 		public final int depth;
 		private final Iterator<? extends Edge> eit; // parentのedgeのiterator
 
-		private DfsStep(int cur, int parent, int edgeIndex, Iterator<? extends Edge> eit, boolean isPre, int depth) {
+		protected DfsStep(int cur, int parent, int edgeIndex, Iterator<? extends Edge> eit, boolean isPre, int depth) {
 			this.cur = cur;
 			this.parent = parent;
 			this.edgeIndex = edgeIndex;

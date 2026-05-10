@@ -56,8 +56,8 @@ public abstract class LongRerooting {
 	}
 
 	private void dfs(int v0) {
-		Dfs dfs = new Dfs(g);
-		for (Dfs.DfsStep s: dfs.dfsPostOrder(v0)) {
+		Dfs dfs = new Dfs(g.size());
+		for (Dfs.DfsStep s: dfs.dfsPostOrder(g, v0)) {
 			if (s.parent != -1) {
 				long val = e();
 				Edge pe = edges[s.edgeIndex];
