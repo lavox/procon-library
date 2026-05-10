@@ -46,6 +46,7 @@
 | WarshallFloyd.java       | Warshall-Floyd法(全頂点間最短経路)   |
 | Tsp.java                 | 巡回セールスマン問題                 |
 | LowLink.java             | Low Link(関節点・橋の検出)           |
+| CentroidDecomposer.java  | 木の重心分解                         |
 
 ### math
 | ファイル名               | 内容                                 |
