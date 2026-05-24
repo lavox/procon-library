@@ -276,12 +276,13 @@ def merge_into_main(main_path: Path, lib_root: Path, includes: list[str]):
   newly_defined_simples = set()
   for fqn, _, _, unit in taken:
     newly_defined_simples.update(collect_defined_simple_types(unit))
+  all_defined_simples = newly_defined_simples | already_in_main
   def import_targets_simple(imp: str):
     return set() if imp.endswith(".*") else {imp.split(".")[-1]}
   filtered_normals = set()
   for imp in need_imports_norm:
     sims = import_targets_simple(imp)
-    if sims and any(s in newly_defined_simples for s in sims):
+    if sims and any(s in all_defined_simples for s in sims):
       continue
     filtered_normals.add(imp)
   new_main_code = insert_missing_imports(main_code, filtered_normals, need_imports_stat)
