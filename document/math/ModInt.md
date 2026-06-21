@@ -214,6 +214,16 @@ public ModInt mul(long a1, long... a)
 - 計算量
   - $O(1)$ (乗算対象を可変個指定した場合は、その長さ)
 
+### 累乗
+```java
+public ModInt pow(long n)
+```
+累乗を実行する。本インスタンスが表す値を、引数で指定した値乗する。本インスタンスが表す値は変化せず、計算結果を表す新しいインスタンスを返す。
+- 引数
+  - `o`,`n` : 演算対象
+- 計算量
+  - $O(\log\mathrm{m})$
+
 ### 除算
 ```java
 public ModInt div(ModInt o)

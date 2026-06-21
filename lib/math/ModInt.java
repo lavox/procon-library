@@ -83,6 +83,9 @@ public class ModInt {
 	public ModInt div(long a) {
 		return new ModInt(mop, mop.div(v, mop.mod(a)));
 	}
+	public ModInt pow(long n) {
+		return new ModInt(mop, mop.pow(v, n));
+	}
 	public ModInt inv() {
 		return new ModInt(mop, mop.inv(v));
 	}
@@ -173,6 +176,10 @@ class ModFraction extends ModInt {
 	@Override
 	public ModInt div(long a) {
 		return new ModFraction(mop, mop.div(v, mop.mod(a)), vd / a);
+	}
+	@Override
+	public ModInt pow(long n) {
+		return new ModFraction(mop, mop.pow(v, n), Math.pow(vd, n));
 	}
 	@Override
 	public ModInt inv() {
