@@ -11,6 +11,8 @@
   - 辺の接続関係、コストのみを簡易に扱える実装クラス。
 - `GridGraph`
   - 2次元盤面をグラフとして扱うための実装クラス。
+- `LayeredGraph`
+  - ベースとなるグラフに対して頂点倍化したグラフを扱うための実装クラス。
 - `Edge`
   - 辺を表すクラス
 
@@ -242,6 +244,78 @@ public boolean isValid(int v)
 - 計算量
   - $O(1)$
 
+## `LayeredGraph`クラス
+以下のいずれかの方法で使用する。
+- 以下の2メソッドをオーバーライドする
+  - `forEachBaseEdge(bv0, layer0, bv1, eid, bcost, action)` : ベースグラフの辺から誘導される辺
+  - `forEachLayerEdge(bv0, layer0, action)` : 上記以外の辺(特に、ベースグラフの同一頂点でLayer間に張る辺)
+- `forEachEdge(v, action)` : 上記の形式で対応できない場合にオーバーライドする
+
+### コンストラクタ
+```java
+public LayeredGraph(Graph baseGraph, int layerSize)
+```
+- 引数
+  - `baseGraph` : ベースとなるグラフ
+  - `layerSize` : Layerの数
+- 計算量
+  - $O(1)$
+
+### グラフのサイズの取得
+```java
+public int size()
+public int baseSize()
+public int layerSize()
+```
+頂点倍化したグラフのサイズ、ベースグラフのサイズ、Layerの数を取得する。
+
+### ベースグラフの頂点番号・レイヤーと、頂点番号を変換する
+```java
+public int bv(int v)
+public int layer(int v)
+public int v(int bv, int layer)
+```
+ベースグラフの頂点番号`bv`、レイヤー`layer`と、頂点倍化した本グラフの頂点番号`v`を変換する。
+- 引数
+  - `bv` : ベースグラフの頂点番号
+  - `layer` : レイヤー番号
+  - `v` : 本グラフの頂点番号
+- 計算量
+  - $O(1)$
+
+### 頂点倍化した辺の処理を行う
+```java
+public void forEachEdge(int v, EdgeConsumer action)
+protected void forEachBaseEdge(int bv0, int layer0, int bv1, int eid, long bcost, EdgeConsumer action)
+protected void forEachLayerEdge(int bv0, int layer0, EdgeConsumer action)
+```
+初期実装は空実装となっているため、必要に応じてオーバーライドして実装を行う。`forEachBaseEdge()`はベースグラフの辺から誘導される辺の処理、`forEachLayerEdge()`はそれ以外の辺の処理(特に、ベースグラフの同一頂点の別レイヤーへの辺の処理)を想定している。
+これらのオーバーライドで対応できない場合は、`forEachEdge()`自体をオーバーライドして処理を実装する。
+- 引数
+  - `v` : 本グラフの現在の頂点番号
+  - `bv0` : 現在のベースグラフの頂点番号
+  - `layer0` : 現在のレイヤー番号
+  - `bv1` : ベースグラフの辺の遷移先頂点番号
+  - `eid` : ベースグラフの辺のID
+  - `bcost` : ベースグラフの辺のコスト
+  - `action` : 辺の処理を行うaction
+
+### 辺の処理を行うユーティリティメソッド
+```java
+protected void acceptAction(int bv0, int layer0, int bv1, int layer1, int id, long cost, EdgeConsumer action)
+```
+`forEachBaseEdge()`や`forEachLayerEdge()`を実装する際に使用するユーティリティメソッド。
+- 引数
+  - `bv0` : 現在のベースグラフの頂点番号
+  - `layer0` : 現在のレイヤー番号
+  - `bv1` : 遷移先のベースグラフの頂点番号
+  - `layer1` : 遷移先のレイヤー番号
+  - `eid` : 辺のID
+  - `bcost` : 辺のコスト
+  - `action` : 辺の処理を行うaction
+
 ## 検証
 - `GridGraph`
   - [ABC363E Sinking Land (AtCoder)](https://atcoder.jp/contests/abc363/submissions/74570319)
+- `LayeredGraph`
+  - [ABC410D XOR Shortest Walk (AtCoder)](https://atcoder.jp/contests/abc410/submissions/76867859)
