@@ -9,8 +9,8 @@ public class RollingHashTest {
     String str = "qwertyasdfgzxcvb";
     int len = 4;
     long b = 10007;
-    RollingHash rhAll = RollingHash.createWithBase(str.length(), b, RollingHash.MOD1000000007);
-    RollingHash rh = RollingHash.createWithBase(len, b, RollingHash.MOD1000000007);
+    RollingHash rhAll = RollingHashBuilder.createWithBase(b, RollingHashBuilder.MOD1000000007).newHash(str.length());
+    RollingHash rh = RollingHashBuilder.createWithBase(b, RollingHashBuilder.MOD1000000007).newHash(len);
     rhAll.add(str);
     rh.add(str.substring(0, len - 1));
     for (int i = len - 1; i < str.length(); i++) {

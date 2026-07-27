@@ -1,6 +1,48 @@
 package string;
 
+import java.util.Random;
+import java.util.function.IntUnaryOperator;
+
+import primitive.LongArrayList;
+
 public class RollingHash {
+	private final RollingHashBuilder builder;
+	private long[] hash = null;
+	private int hlen = 0;
+	private int pos = 0;
+
+	protected RollingHash(int n, RollingHashBuilder builder) {
+		this.builder = builder;
+		this.prepare(n);
+	}
+	protected void prepare(int n) {
+		this.hlen = n + 1;
+		hash = new long[n + 1];
+		pos = 0;
+		hash[pos] = 0;
+	}
+
+	public void add(String s) {
+		add((i) -> s.charAt(i), s.length());
+	}
+	public void add(int[] array) {
+		add((i) -> array[i], array.length);
+	}
+	public void add(IntUnaryOperator op, int len) {
+		for (int i = 0; i < len; i++) add(op.applyAsInt(i));
+	}
+	public void add(int v) {
+		pos++;
+		hash[pos % hlen] = builder.shiftAdd(hash[(pos - 1) % hlen], 1, v);
+	}
+	public long hash(int i0, int len) {
+		assert 0 <= len && len < hlen;
+		assert Math.max(pos - hlen + 1, 0) <= i0 && i0 + len <= pos;
+		return builder.diffHash(hash[(i0 + len) % hlen], hash[i0 % hlen], len);
+	}
+}
+
+class RollingHashBuilder {
 	public static final long MOD1L61 = (1L << 61) - 1;
 	public static final long MOD998244353 = 998244353;
 	public static final long MOD1000000007 = 1000000007;
@@ -11,66 +53,51 @@ public class RollingHash {
 
 	private long m = 0;
 	private long b = 0;
-	private long[] pow = null;
-	private long[] hash = null;
-	private int hlen = 0;
-	private int pos = 0;
+	private LongArrayList pow = null;
 	private static final int DEFAULT_MAX_VALUE = 2000000;
-
-	public static RollingHash createWithBase(int n, long b, long m) {
-		RollingHash ret = m == MOD1L61 ? new RollingHash61(m) : new RollingHash(m);
-		ret.prepare(n, b);
+	
+	public RollingHash newHash(int n) {
+		return new RollingHash(n, this);
+	}
+	public static RollingHashBuilder createWithBase(long b, long m) {
+		RollingHashBuilder ret = m == MOD1L61 ? new RollingHashBuilder61(m) : new RollingHashBuilder(m);
+		ret.prepare(b);
 		return ret;
 	}
-	public static RollingHash create(int n, long m) {
-		return create(n, m, DEFAULT_MAX_VALUE);
+	public static RollingHashBuilder create(long m) {
+		return create(m, DEFAULT_MAX_VALUE);
 	}
-	public static RollingHash create(int n, long m, int maxVal) {
-		RollingHash ret = m == MOD1L61 ? new RollingHash61(m) : new RollingHash(m);
-		ret.prepare(n, ret.findBase(m, maxVal));
+	public static RollingHashBuilder create(long m, int maxVal) {
+		RollingHashBuilder ret = m == MOD1L61 ? new RollingHashBuilder61(m) : new RollingHashBuilder(m);
+		ret.prepare(ret.findBase(m, maxVal));
 		return ret;
 	}
-
-	protected RollingHash(long m) {
+	protected RollingHashBuilder(long m) {
 		this.m = m;
 	}
-	protected void prepare(int n, long b) {
+
+	protected void prepare(long b) {
 		this.b = b;
-		this.hlen = n + 1;
-		pow = new long[n + 1];
-		hash = new long[n + 1];
-		pow[0] = 1;
-		pos = 0;
-		hash[pos] = 0;
-		for (int i = 1; i <= n; i++) {
-			pow[i] = mul(pow[i - 1], b);
-		}
+		pow = new LongArrayList();
+		pow.add(1L);
 	}
-
-	public void add(String s) {
-		add((i) -> s.charAt(i), s.length());
-	}
-	public void add(int[] array) {
-		add((i) -> array[i], array.length);
-	}
-	public void add(java.util.function.IntUnaryOperator op, int len) {
-		for (int i = 0; i < len; i++) add(op.applyAsInt(i));
-	}
-	public void add(int v) {
-		pos++;
-		hash[pos % hlen] = mod(mul(hash[(pos - 1) % hlen], b) + v);
-	}
-	public long hash(int i0, int len) {
-		assert 0 <= len && len < hlen;
-		assert Math.max(pos - hlen + 1, 0) <= i0 && i0 + len <= pos;
-		return mod(hash[(i0 + len) % hlen] + m - mul(hash[i0 % hlen], pow[len]));
-	}
-
 	protected long mul(long x, long y) {
 		return (x * y) % m;
 	}
+	protected long diffHash(long h1, long h2, int len) {
+		return mod(h1 + m - mul(h2, pow(len)));
+	}
+	protected long shiftAdd(long x, int len, long y) {
+		return mod(mul(x, pow(len)) + y);
+	}
 	protected long mod(long x) {
 		return x % m;
+	}
+	protected long pow(int n) {
+		while (pow.size() <= n) {
+			pow.add(mul(pow.get(pow.size() - 1), b));
+		}
+		return pow.get(n);
 	}
 	protected long pow(long x, long n) {
 		long c = x, r = 1;
@@ -82,7 +109,7 @@ public class RollingHash {
 		return r;
 	}
 	protected long findBase(long m, int maxV) {
-		java.util.Random rnd = new java.util.Random();
+		Random rnd = new Random();
 		long mMax = Math.min(m, Integer.MAX_VALUE);
 		long root = findPrimitiveRoot(m);
 		while (true) {
@@ -111,13 +138,12 @@ public class RollingHash {
 		return a;
 	}
 }
-class RollingHash61 extends RollingHash {
+class RollingHashBuilder61 extends RollingHashBuilder {
 	private static final long MOD61 = MOD1L61;
 	private static final long MASK30 = (1L << 30) - 1;
 	private static final long MASK31 = (1L << 31) - 1;
 	private static final long MASK61 = MOD1L61;
-
-	protected RollingHash61(long m) {
+	protected RollingHashBuilder61(long m) {
 		super(m);
 	}
 	@Override
