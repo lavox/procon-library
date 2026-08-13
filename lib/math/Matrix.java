@@ -168,14 +168,16 @@ public class Matrix {
 		return ret;
 	}
 
-	public boolean equals(Matrix o) {
-		if ( a.length != o.a.length ) return false;
-		for (int i = 0; i < a.length; i++) {
-			if ( a[i].length != o.a[i].length ) return false;
-			for (int j = 0; j < a[i].length; j++) {
-				if ( a[i] != o.a[i] ) return false;
-			}
+	@Override
+	public int hashCode() {
+		return Arrays.deepHashCode(a);
+	}
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof Matrix) {
+			Matrix m = (Matrix)o;
+			return Arrays.deepEquals(a, m.a);
 		}
-		return true;
+		return false;
 	}
 }
