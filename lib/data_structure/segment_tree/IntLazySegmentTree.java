@@ -2,6 +2,7 @@ package data_structure.segment_tree;
 import java.util.Collection;
 import java.util.function.IntPredicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/IntLazySegmentTree.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: hhttps://github.com/atcoder/ac-library/blob/master/atcoder/lazysegtree.hpp
 public class IntLazySegmentTree {

@@ -2,6 +2,7 @@ package data_structure.segment_tree;
 import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/DynamicSegmentTree.java
 public class DynamicSegmentTree<S> {
 	private long L = 0;
 	private long R = 0;

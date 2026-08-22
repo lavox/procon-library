@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/ShortestPath.java
 public class ShortestPath {
 	public static final long INF = Long.MAX_VALUE;
 	public static final long NINF = Long.MIN_VALUE;

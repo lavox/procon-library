@@ -1,6 +1,7 @@
 package math;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/Matrix.java
 public class Matrix {
 	long[][] a = null;
 	public Matrix(int H, int W) {

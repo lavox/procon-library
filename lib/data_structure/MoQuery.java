@@ -1,5 +1,6 @@
 package data_structure;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/MoQuery.java
 public class MoQuery implements Comparable<MoQuery> {
 	public final int id;
 	public final int l;

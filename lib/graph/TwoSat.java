@@ -1,5 +1,6 @@
 package graph;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/TwoSat.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/twosat.hpp
 public class TwoSat {

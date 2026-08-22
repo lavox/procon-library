@@ -1,6 +1,7 @@
 package math;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/Convolution.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/convolution.hpp
 public class Convolution {

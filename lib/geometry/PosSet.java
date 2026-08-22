@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/PosSet.java
 public class PosSet implements Iterable<Pos> {
 	private final Grid grid;
 	private final BitSet mem;

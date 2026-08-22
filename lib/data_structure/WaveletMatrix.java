@@ -2,6 +2,7 @@ package data_structure;
 
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/WaveletMatrix.java
 public class WaveletMatrix {
 	private int n = 0;
 	private int m = 0;

@@ -1,5 +1,6 @@
 package geometry;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/Direction.java
 public enum Direction {
 	R(0, 1, 0, 0, "R"),
 	D(1, 0, 1, 2, "D"),

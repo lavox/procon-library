@@ -3,6 +3,7 @@ package graph;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Bfs01.java
 public class Bfs01 extends ShortestPath {
 	public static Dist search(Graph g, int s) {
 		return search(g, s, (from, to, id, cost) -> cost > 0);

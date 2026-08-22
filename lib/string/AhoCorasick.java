@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.function.IntUnaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/string/AhoCorasick.java
 public class AhoCorasick {
 	private Node root = null;
 	private int K = 0;

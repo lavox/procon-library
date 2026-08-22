@@ -5,6 +5,7 @@ import java.util.function.IntUnaryOperator;
 
 import primitive.LongArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/string/RollingHash.java
 public class RollingHash {
 	private final RollingHashBuilder builder;
 	private long[] hash = null;

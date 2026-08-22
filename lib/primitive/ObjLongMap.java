@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.LongBinaryOperator;
 import java.util.function.ToLongFunction;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/ObjLongMap.java
 public class ObjLongMap<K> {
 	private Object[] keys = null;
 	private long[] values = null;

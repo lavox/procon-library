@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/LowLink.java
 public class LowLink {
 	private Node[] nodes = null;
 	private Graph g = null;

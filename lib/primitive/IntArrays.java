@@ -1,5 +1,6 @@
 package primitive;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/IntArrays.java
 public class IntArrays {
 	public static void sort(int[] a, IntComparator comp) {
 		sort(a, 0, a.length, comp);

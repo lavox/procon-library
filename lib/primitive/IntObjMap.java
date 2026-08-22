@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/IntObjMap.java
 public class IntObjMap<V> {
 	private int[] keys = null;
 	private Object[] values = null;

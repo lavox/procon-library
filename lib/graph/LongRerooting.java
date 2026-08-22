@@ -1,6 +1,7 @@
 package graph;
 import java.util.BitSet;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/LongRerooting.java
 public abstract class LongRerooting {
 	public abstract long e();
 	public abstract long merge(long x, long y);

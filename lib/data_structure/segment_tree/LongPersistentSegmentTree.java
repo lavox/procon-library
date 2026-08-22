@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.function.LongBinaryOperator;
 import java.util.function.IntToLongFunction;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/LongPersistentSegmentTree.java
 public class LongPersistentSegmentTree {
 	private final int n;
 	private final Monoid monoid;

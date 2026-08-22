@@ -3,6 +3,7 @@ package primitive;
 import java.util.PrimitiveIterator;
 import java.util.function.IntConsumer;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/IntSet.java
 public class IntSet {
 	private IntIntMap map;
 	private static final int PRESENT = 1;

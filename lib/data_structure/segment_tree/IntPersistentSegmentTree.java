@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.function.IntUnaryOperator;
 import java.util.function.IntBinaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/IntPersistentSegmentTree.java
 public class IntPersistentSegmentTree {
 	private final int n;
 	private final Monoid monoid;

@@ -1,5 +1,6 @@
 package graph;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/SimpleGraph.java
 public class SimpleGraph extends GenericGraph<Edge> {
 	public SimpleGraph(int n) {
 		super(n);

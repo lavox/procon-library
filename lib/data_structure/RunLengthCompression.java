@@ -2,6 +2,7 @@ package data_structure;
 import java.util.ArrayList;
 import java.util.function.IntUnaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/RunLengthCompression.java
 public class RunLengthCompression {
 	public static ArrayList<RunLength> encode(String str) {
 		return encode((i) -> (int)str.charAt(i), str.length());

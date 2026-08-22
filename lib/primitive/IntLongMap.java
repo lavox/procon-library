@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.IntToLongFunction;
 import java.util.function.LongBinaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/IntLongMap.java
 public class IntLongMap {
 	private int[] keys = null;
 	private long[] values = null;

@@ -2,6 +2,7 @@ package math;
 
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/NTT.java
 // Ported to Java from the original C++ implementation by Nyaan.
 // Original Source: https://nyaannyaan.github.io/library/ntt/ntt.hpp
 public class NTT {

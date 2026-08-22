@@ -2,6 +2,7 @@ package math;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/Prime.java
 public class Prime {
 	private int max = 0;
 	int[] lpf = null;

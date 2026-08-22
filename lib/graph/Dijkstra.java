@@ -3,6 +3,7 @@ package graph;
 import java.util.Arrays;
 import java.util.PriorityQueue;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Dijkstra.java
 public class Dijkstra extends ShortestPath {
 	public static Dist search(Graph g, int s) {
 		return search(g, new int[] {s}, null);

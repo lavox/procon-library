@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongUnaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/LongLongMap.java
 public class LongLongMap {
 	private long[] keys = null;
 	private long[] values = null;

@@ -2,6 +2,7 @@ package graph;
 import java.lang.reflect.Array;
 import java.util.BitSet;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Rerooting.java
 public abstract class Rerooting<E> {
 	public abstract E e();
 	public abstract E merge(E x, E y);

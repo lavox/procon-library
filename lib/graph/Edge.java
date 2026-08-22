@@ -1,5 +1,6 @@
 package graph;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Edge.java
 public class Edge {
 	public int from;
 	public int to;

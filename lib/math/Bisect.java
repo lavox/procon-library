@@ -4,6 +4,7 @@ import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/Bisect.java
 public class Bisect {
 	public static int minTrueInt(int low, int high, IntPredicate condition) {
 		assert low <= high;

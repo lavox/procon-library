@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.PrimitiveIterator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/GenericGraph.java
 public class GenericGraph<E extends Edge> implements Graph {
 	private ArrayList<E> _edges = null;
 	private int maxEdgeId = 0;

@@ -3,6 +3,7 @@ package data_structure;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/WeightedUnionFind.java
 public class WeightedUnionFind {
 	private int[] parent = null;
 	private int[] size = null;

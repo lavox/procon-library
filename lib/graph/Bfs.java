@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Bfs.java
 public class Bfs extends ShortestPath {
 	public static Dist search(Graph g, int s) {
 		return search(g, new int[] {s}, null);

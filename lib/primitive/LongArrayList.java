@@ -5,6 +5,7 @@ import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/LongArrayList.java
 public class LongArrayList implements Iterable<Long> {
 	private long[] data = null;
 	private int size = 0;

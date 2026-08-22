@@ -3,6 +3,7 @@ package graph;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Lca.java
 public class Lca {
 	private Graph g = null;
 	private int[] depth = null;

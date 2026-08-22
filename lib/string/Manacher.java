@@ -2,6 +2,7 @@ package string;
 
 import java.util.function.IntBinaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/string/Manacher.java
 // Ported to Java from the original C++ implementation by Luzhiled.
 // Original Source: hhttps://ei1333.github.io/luzhiled/snippets/string/manacher.html
 public class Manacher {

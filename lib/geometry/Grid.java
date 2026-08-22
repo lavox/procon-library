@@ -3,6 +3,7 @@ package geometry;
 import java.util.BitSet;
 import java.util.function.BiPredicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/Grid.java
 public class Grid {
 	private final int H;
 	private final int W;

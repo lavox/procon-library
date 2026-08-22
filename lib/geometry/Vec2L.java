@@ -2,6 +2,7 @@ package geometry;
 
 import java.util.Comparator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/Vec2L.java
 public class Vec2L {
 	long x;
 	long y;

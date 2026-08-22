@@ -2,6 +2,7 @@ package data_structure;
 
 import java.util.function.IntFunction;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/UnionFind.java
 public class UnionFind {
 	private int[] parent = null;
 	private int[] size = null;

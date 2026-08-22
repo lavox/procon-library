@@ -6,6 +6,7 @@ import java.util.PrimitiveIterator;
 
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/CentroidDecomposer.java
 public class CentroidDecomposer {
 	public static SubTree createInitTree(Graph g) {
 		Context ctx = new Context(g);

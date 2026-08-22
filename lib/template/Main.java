@@ -8,6 +8,7 @@ import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 
 // template & library : https://github.com/lavox/procon-library
+// https://github.com/lavox/procon-library/blob/main/lib/template/Main.java
 public class Main {
 	public static void main(String[] args) {
 		Main o = new Main();

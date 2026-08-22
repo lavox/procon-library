@@ -3,6 +3,7 @@ package graph;
 import java.util.ArrayList;
 import java.util.PrimitiveIterator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/GridGraph.java
 public class GridGraph implements Graph {
 	protected int height = 0;
 	protected int width = 0;

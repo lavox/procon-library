@@ -2,6 +2,7 @@ package graph;
 
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Tsp.java
 public class Tsp extends ShortestPath {
 	public static TspRoute search(long[][] distMap) {
 		return search(distMap, 0, false);

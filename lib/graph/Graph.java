@@ -5,6 +5,7 @@ import java.util.PrimitiveIterator;
 
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Graph.java
 public interface Graph {
 	public int size();
 	public void forEachEdge(int v, EdgeConsumer action);

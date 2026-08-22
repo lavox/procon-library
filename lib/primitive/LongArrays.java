@@ -1,5 +1,6 @@
 package primitive;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/LongArrays.java
 public class LongArrays {
 	public static void sort(long[] a, LongComparator comp) {
 		sort(a, 0, a.length, comp);

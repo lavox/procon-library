@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.function.IntBinaryOperator;
 import java.util.function.ToIntFunction;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/ObjIntMap.java
 public class ObjIntMap<K> {
 	private Object[] keys = null;
 	private int[] values = null;

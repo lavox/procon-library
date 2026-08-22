@@ -1,5 +1,6 @@
 package data_structure;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/SqrtDecomposition.java
 public class SqrtDecomposition {
 	public final int N;
 	public final int B;

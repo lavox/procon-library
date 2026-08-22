@@ -1,6 +1,7 @@
 package data_structure;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/Compression.java
 public class Compression {
 	long[] vals = null;
 	

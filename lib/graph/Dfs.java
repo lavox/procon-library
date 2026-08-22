@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/Dfs.java
 public class Dfs {
 	private int[] visitedGen = null;
 	int gen = 0;

@@ -1,5 +1,6 @@
 package data_structure;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/FastClearingArray.java
 public class FastClearingArray<T> {
 	private Object[] val = null;
 	private int[] gen = null;

@@ -3,6 +3,7 @@ package graph;
 import data_structure.Permutation;
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/TopologicalSort.java
 public class TopologicalSort {
 	private int _n = 0;
 	private SimpleGraph g = null;

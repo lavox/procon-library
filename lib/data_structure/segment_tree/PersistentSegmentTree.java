@@ -4,6 +4,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/PersistentSegmentTree.java
 public class PersistentSegmentTree<S> {
 	private final int n;
 	private final Monoid<S> monoid;

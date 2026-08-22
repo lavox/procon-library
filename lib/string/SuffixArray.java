@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
+// https://github.com/lavox/procon-library/blob/main/lib/string/SuffixArray.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/string.hpp
 public class SuffixArray {

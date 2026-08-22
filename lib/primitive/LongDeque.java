@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.PrimitiveIterator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/LongDeque.java
 public class LongDeque {
 	private long[] data = null;
 	private int head = 0;

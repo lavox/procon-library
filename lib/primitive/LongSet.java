@@ -3,6 +3,7 @@ package primitive;
 import java.util.PrimitiveIterator;
 import java.util.function.LongConsumer;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/LongSet.java
 public class LongSet {
 	private LongIntMap map;
 	private static final int PRESENT = 1;

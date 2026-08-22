@@ -1,5 +1,6 @@
 package math;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/NTTFriendlyFPS.java
 // Ported to Java from the original C++ implementation by Nyaan.
 // Original Source: https://nyaannyaan.github.io/library/fps/ntt-friendly-fps.hpp
 public class NTTFriendlyFPS extends FormalPowerSeries {

@@ -2,6 +2,7 @@ package math;
 
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/ModInt.java
 public class ModInt {
 	final ModOperation mop;
 	int v = 0;

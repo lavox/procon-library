@@ -5,6 +5,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
+// https://github.com/lavox/procon-library/blob/main/lib/primitive/IntArrayList.java
 public class IntArrayList implements Iterable<Integer> {
 	private int[] data = null;
 	private int size = 0;

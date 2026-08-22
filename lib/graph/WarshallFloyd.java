@@ -1,5 +1,6 @@
 package graph;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/WarshallFloyd.java
 public class WarshallFloyd extends ShortestPath {
 	public static DistMap createMap(int n) {
 		DistMap d = new DistMap(n);

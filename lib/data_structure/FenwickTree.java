@@ -1,6 +1,7 @@
 package data_structure;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/FenwickTree.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/fenwicktree.hpp
 public class FenwickTree {

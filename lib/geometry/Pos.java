@@ -3,6 +3,7 @@ package geometry;
 import java.util.ArrayList;
 import java.util.function.BiPredicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/Pos.java
 public class Pos {
 	private final Grid grid;
 	public final int i;

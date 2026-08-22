@@ -5,6 +5,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/SegmentTree.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/segtree.hpp
 public class SegmentTree<S> {

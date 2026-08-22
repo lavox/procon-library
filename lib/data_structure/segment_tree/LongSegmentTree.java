@@ -3,6 +3,7 @@ import java.util.Collection;
 import java.util.function.LongBinaryOperator;
 import java.util.function.LongPredicate;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/segment_tree/LongSegmentTree.java
 // Ported to Java from the original C++ implementation by Atcoder.
 // Original Source: https://github.com/atcoder/ac-library/blob/master/atcoder/segtree.hpp
 public class LongSegmentTree {

@@ -1,5 +1,6 @@
 package graph;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/LayeredGraph.java
 public abstract class LayeredGraph implements Graph {
 	protected final Graph base;
 	protected final int bSize;

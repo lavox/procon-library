@@ -1,6 +1,7 @@
 package math;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/math/Vec.java
 public class Vec {
 	long[] a = null;
 	public Vec(int N) {

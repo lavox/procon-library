@@ -4,6 +4,7 @@ import java.util.BitSet;
 
 import primitive.IntArrayList;
 
+// https://github.com/lavox/procon-library/blob/main/lib/graph/BellmanFord.java
 public class BellmanFord extends ShortestPath {
 	public static Dist search(Graph g, int s) {
 		return search(g, new int[] {s});

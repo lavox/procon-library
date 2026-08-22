@@ -3,6 +3,7 @@ package geometry;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+// https://github.com/lavox/procon-library/blob/main/lib/geometry/GeomUtil.java
 public class GeomUtil {
 	public static double EPS = 1e-9;
 	public static boolean eq(double a, double b) {
