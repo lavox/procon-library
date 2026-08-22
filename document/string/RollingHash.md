@@ -1,15 +1,21 @@
 # ローリングハッシュ
 指定区間のローリングハッシュを求める。`int`型配列、文字列、`i`番目の値を返す`IntUnaryOperator`に対して実行可能。
 
+- 使用方法
+  - `RollingHashBuilder`インスタンスを`create()`メソッドにて生成
+  - `RollingHashBuilder`インスタンスの`newHash()`メソッドで`RollingHash`インスタンスを生成
+  - `RollingHash`インスタンスに文字列や数値を追加し、ハッシュを取得
+
 - 参考サイト
   - [安全で爆速なRollingHashの話](https://qiita.com/keymoon/items/11fac5627672a6d6a9f6)
   - [Rolling Hashで基数に原始根を使う【新歓ブログリレー2020 36日目】](https://trap.jp/post/1036/)
 
+## `RollingHashBuilder`クラス
 ### インスタンス生成
 ```java
-public static RollingHash createWithBase(int n, long b, long m)
-public static RollingHash create(int n, long m)
-public static RollingHash create(int n, long m, int maxVal)
+public static RollingHashBuilder createWithBase(long b, long m)
+public static RollingHashBuilder create(long m)
+public static RollingHashBuilder create(long m, int maxVal)
 ```
 RollingHashを求めるためのインスタンスを生成する。以下の3パターンの生成方法を提供する。
 - 基数`b`と素数`m`を指定
@@ -27,14 +33,23 @@ public static final long MOD1000000087 = 1000000087;
 ```
 また、コンストラクタの直接呼び出しは行わないこと。
 - 引数
-  - `n` : ローリングハッシュを求める区間の最大の長さ
   - `b` : ハッシュ計算に使用する基数の値
   - `m` : ハッシュ計算に使用する素数の値。`maxVal`より大きい値を指定すること。定数で指定した値以外の場合は、 $2^{31}-1$ 以下の値を使用すること
   - `maxVal` : 文字列(または配列)の値として使用される値の最大値
 - 計算量
-  - $O(n)$
+  - $O(1)$
   - 基数を自動設定する場合は、乱数で`m`の原始根かつ`maxVal`以上になるように設定するためリトライを行うが、平均3回、最大でも数十回程度のため通常は無視できる
 
+### `RollingHash`インスタンスの生成
+```java
+public RollingHash newHash(int n)
+```
+- 引数
+  - `n` : ローリングハッシュを求める区間の最大の長さ
+- 計算量
+  - $O(n)$
+
+## `RollingHash`クラス
 ### 文字列・配列の追加
 ```java
 public void add(String s)
@@ -64,5 +79,5 @@ public long hash(int i0, int len)
   - $O(1)$
 
 ## 検証
-- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/68052704) (MOD998244353)
-- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/68052651) (MOD1L61)
+- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/77882515) (MOD998244353)
+- [ABC141E Who Says a Pun? (AtCoder)](https://atcoder.jp/contests/abc141/submissions/77882502) (MOD1L61)

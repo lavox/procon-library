@@ -1,6 +1,7 @@
 {
   "java.project.sourcePaths": [
     "lib",
+    "template",
     "test/oj-verify",
     "test/unittest",
     "test/benchmark",
