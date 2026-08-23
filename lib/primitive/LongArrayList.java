@@ -20,7 +20,7 @@ public class LongArrayList implements Iterable<Long> {
 		this.size = data.length;
 	}
 	public LongArrayList(LongArrayList array) {
-		this.data = Arrays.copyOf(array.data, array.size);
+		if (array.data != null) this.data = Arrays.copyOf(array.data, array.size);
 		this.size = array.size;
 	}
 	public boolean add(long e) {
@@ -59,8 +59,9 @@ public class LongArrayList implements Iterable<Long> {
 		return copy;
 	}
 	public boolean contains(long e) {
-		for (long value : data) {
-			if (value == e) return true;
+		if (data == null) return false;
+		for (int i = 0; i < size; i++) {
+			if (data[i] == e) return true;
 		}
 		return false;
 	}
@@ -175,6 +176,7 @@ public class LongArrayList implements Iterable<Long> {
 		if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
 			throw new IndexOutOfBoundsException();
 		}
+		if (data == null) return;
 		System.arraycopy(data, toIndex, data, fromIndex, size - toIndex);
 		size -= (toIndex - fromIndex);
 	}
@@ -208,13 +210,16 @@ public class LongArrayList implements Iterable<Long> {
 		return size;
 	}
 	public void sort() {
+		if (data == null) return;
 		Arrays.sort(data, 0, size);
 	}
 	public void sort(LongComparator c) {
+		if (data == null) return;
 		LongArrays.sort(data, 0, size, c);
 	}
 	public void sort(int fromIndex, int toIndex, LongComparator c) {
-		if (toIndex < 0 || toIndex > size) throw new IndexOutOfBoundsException();
+		if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) throw new IndexOutOfBoundsException();
+		if (data == null) return;
 		LongArrays.sort(data, fromIndex, toIndex, c);
 	}
 	public long[] toArray() {
@@ -225,7 +230,7 @@ public class LongArrayList implements Iterable<Long> {
 		if (a.length < size) {
 			return Arrays.copyOf(data, size);
 		}
-		System.arraycopy(data, 0, a, 0, size);
+		if (data != null) System.arraycopy(data, 0, a, 0, size);
 		if (a.length > size) a[size] = 0;
 		return a;
 	}
