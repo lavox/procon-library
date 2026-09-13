@@ -14,6 +14,7 @@
 | Permutation.java         | 順列(順列全列挙含む)                 |
 | RunLengthCompression.java| ランレングス圧縮                     |
 | SqrtDecomposition.java   | 平方分割用ユーティリティ             |
+| Trie.java                | トライ木                             |
 | MoQuery.java             | Mo's algorithm                       |
 | WaveletMatrix.java       | Wavelet Matrix                       |
 | FastClearingArray.java<br>IntFastClearingArray.java | Fast-Clearing Array(高速初期化配列) |
