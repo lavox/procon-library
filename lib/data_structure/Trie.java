@@ -6,6 +6,7 @@ import java.util.function.IntUnaryOperator;
 import primitive.IntArrayList;
 import primitive.LongIntMap;
 
+// https://github.com/lavox/procon-library/blob/main/lib/data_structure/Trie.java
 public interface Trie {
 	public static final int NONE = -1;
 	public static final int ROOT = 0;
