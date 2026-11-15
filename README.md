@@ -16,7 +16,7 @@
 | SqrtDecomposition.java   | 平方分割用ユーティリティ             |
 | Trie.java                | トライ木                             |
 | MoQuery.java             | Mo's algorithm                       |
-| WaveletMatrix.java       | Wavelet Matrix                       |
+| WaveletMatrix.java<br>LongWaveletMatrix.java | Wavelet Matrix                       |
 | FastClearingArray.java<br>IntFastClearingArray.java | Fast-Clearing Array(高速初期化配列) |
 
 ### data_structure.segment_tree

@@ -16,7 +16,7 @@ public class WaveletMatrix {
 	public WaveletMatrix(int[] arr, int height) {
 		this.n = arr.length;
 		this.m = (n + 63) >>> BLEN;
-		this.height = height;
+		this.height = Math.max(height, 1);
 		this.build(arr);
 	}
 	public WaveletMatrix(int[] arr) {
@@ -151,7 +151,8 @@ public class WaveletMatrix {
 		return rangeFreqBelow(l, r, vmax) - rangeFreqBelow(l, r, vmin);
 	}
 	public int rangeFreqBelow(int l, int r, int vmax) {
-		if (vmax >= 1 << height) return r - l;
+		if (vmax <= 0) return 0;
+		if (height < 31 && vmax >= 1 << height) return r - l;
 		int ret = 0;
 		for (int h = height - 1; h >= 0; h--) {
 			int lc1 = rank1(h, l);
@@ -179,7 +180,7 @@ public class WaveletMatrix {
 		return cnt == r - l ? -1 : quantile(l, r, cnt);
 	}
 	public int rank(int l, int r, int v) {
-		if (v >= 1 << height) return 0;
+		if (v < 0 || (height < 31 && v >= 1 << height)) return 0;
 		for (int h = height - 1; h >= 0; h--) {
 			if (((v >>> h) & 1) == 0) {
 				l = rank0(h, l);
@@ -195,7 +196,7 @@ public class WaveletMatrix {
 		return select(0, n, v, k);
 	}
 	public int select(int l, int r, int v, int k) {
-		if (v < 0 || v >= 1 << height || l >= r) return -1;
+		if (v < 0 || (height < 31 && v >= 1 << height) || l >= r) return -1;
 		for (int h = height - 1; h >= 0; h--) {
 			if (((v >>> h) & 1) == 0) {
 				l = rank0(h, l);
