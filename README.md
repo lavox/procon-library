@@ -18,6 +18,7 @@
 | MoQuery.java             | Mo's algorithm                       |
 | WaveletMatrix.java<br>LongWaveletMatrix.java | Wavelet Matrix                       |
 | FastClearingArray.java<br>IntFastClearingArray.java | Fast-Clearing Array(高速初期化配列) |
+| BitSetEx.java            | シフト操作に対応したBitSet           |
 
 ### data_structure.segment_tree
 | ファイル名               | 内容                                 |
